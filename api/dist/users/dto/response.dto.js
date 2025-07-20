@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResponseUpdateAvatarDto = exports.ResponseDeleteUserDto = exports.ResponseUpdateUserDto = exports.ResponseCreateUserDto = exports.ResponseFindUserDto = void 0;
+exports.ResponseDeleteUserDto = exports.ResponseUpdateUserDto = exports.ResponseCreateUserDto = exports.ResponseFindUserDto = void 0;
 const openapi = require("@nestjs/swagger");
 class ResponseFindUserDto {
     id;
@@ -40,14 +40,4 @@ class ResponseDeleteUserDto {
     }
 }
 exports.ResponseDeleteUserDto = ResponseDeleteUserDto;
-class ResponseUpdateAvatarDto {
-    id;
-    name;
-    email;
-    avatar;
-    static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => String }, name: { required: true, type: () => String }, email: { required: true, type: () => String }, avatar: { required: true, type: () => String, nullable: true } };
-    }
-}
-exports.ResponseUpdateAvatarDto = ResponseUpdateAvatarDto;
 //# sourceMappingURL=response.dto.js.map

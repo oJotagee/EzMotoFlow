@@ -13,8 +13,6 @@ exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const hashing_service_1 = require("../auth/hash/hashing.service");
 const prisma_service_1 = require("../prisma/prisma.service");
-const fs = require("node:fs");
-const path = require("node:path");
 let UsersService = class UsersService {
     prismaService;
     hashingService;
@@ -149,38 +147,6 @@ let UsersService = class UsersService {
         }
         catch (error) {
             throw new common_1.HttpException('Failed to delete user', error instanceof common_1.HttpException
-                ? error.getStatus()
-                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    async uploadAvatarFile(file, payloadToken) {
-        try {
-            const fileExtension = path
-                .extname(file.originalname)
-                .toLowerCase()
-                .substring(1);
-            const fileName = `${payloadToken.sub}.${fileExtension}`;
-            const fileLocale = path.resolve(process.cwd(), 'file', fileName);
-            fs.writeFileSync(fileLocale, file.buffer);
-            const findUser = await this.prismaService.users.findFirst({
-                where: { id: payloadToken.sub },
-            });
-            if (!findUser)
-                throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
-            const updateUser = await this.prismaService.users.update({
-                data: { avatar: fileName },
-                where: { id: findUser.id },
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    avatar: true,
-                },
-            });
-            return updateUser;
-        }
-        catch (error) {
-            throw new common_1.HttpException('Failed to update avatar', error instanceof common_1.HttpException
                 ? error.getStatus()
                 : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }

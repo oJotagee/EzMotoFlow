@@ -14,15 +14,14 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersController = void 0;
 const openapi = require("@nestjs/swagger");
-const common_1 = require("@nestjs/common");
 const payload_dto_1 = require("../auth/dto/payload.dto");
 const token_payload_param_1 = require("../auth/params/token-payload.param");
 const users_service_1 = require("./users.service");
-const platform_express_1 = require("@nestjs/platform-express");
 const swagger_1 = require("@nestjs/swagger");
 const update_user_dto_1 = require("./dto/update-user.dto");
 const create_user_dto_1 = require("./dto/create-user.dto");
 const auth_token_guard_1 = require("../auth/guard/auth-token.guard");
+const common_1 = require("@nestjs/common");
 let UsersController = class UsersController {
     userService;
     constructor(userService) {
@@ -39,9 +38,6 @@ let UsersController = class UsersController {
     }
     deleteUser(tokenPayload) {
         return this.userService.delete(tokenPayload);
-    }
-    uploadAvatar(tokenPayload, file) {
-        return this.userService.uploadAvatarFile(file, tokenPayload);
     }
 };
 exports.UsersController = UsersController;
@@ -91,40 +87,6 @@ __decorate([
     __metadata("design:paramtypes", [payload_dto_1.PayloadDto]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "deleteUser", null);
-__decorate([
-    (0, common_1.Post)('upload'),
-    (0, swagger_1.ApiBearerAuth)(),
-    (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiConsumes)('multipart/form-data'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
-    (0, swagger_1.ApiOperation)({ summary: 'Update avatar' }),
-    (0, swagger_1.ApiBody)({
-        schema: {
-            type: 'object',
-            properties: {
-                file: {
-                    type: 'string',
-                    format: 'binary',
-                },
-            },
-        },
-    }),
-    openapi.ApiResponse({ status: 201, type: require("./dto/response.dto").ResponseUpdateAvatarDto }),
-    __param(0, (0, token_payload_param_1.TokenPayload)()),
-    __param(1, (0, common_1.UploadedFile)(new common_1.ParseFilePipeBuilder()
-        .addFileTypeValidator({
-        fileType: /jpeg|jpg|png/g,
-    })
-        .addMaxSizeValidator({
-        maxSize: 5 * (1024 * 1024),
-    })
-        .build({
-        errorHttpStatusCode: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-    }))),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [payload_dto_1.PayloadDto, Object]),
-    __metadata("design:returntype", Promise)
-], UsersController.prototype, "uploadAvatar", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [users_service_1.UsersService])

@@ -20,9 +20,3 @@ export declare class ResponseUpdateUserDto {
 export declare class ResponseDeleteUserDto {
     message: string;
 }
-export declare class ResponseUpdateAvatarDto {
-    id: string;
-    name: string;
-    email: string;
-    avatar: string | null;
-}

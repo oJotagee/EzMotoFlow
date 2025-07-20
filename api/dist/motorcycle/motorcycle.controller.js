@@ -81,13 +81,13 @@ __decorate([
     (0, swagger_1.ApiQuery)({
         name: 'anoMin',
         required: false,
-        example: 2021,
+        example: 2017,
         description: 'Filtrar por ano da motocicleta (exato)',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'anoMax',
         required: false,
-        example: 2021,
+        example: 2025,
         description: 'Filtrar por ano da motocicleta (exato)',
     }),
     openapi.ApiResponse({ status: 200, type: [require("./dto/response.dto").ResponseAllMotorcycleDto] }),

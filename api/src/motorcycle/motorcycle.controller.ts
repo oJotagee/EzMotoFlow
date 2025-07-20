@@ -62,13 +62,13 @@ export class MotorcycleController {
 	@ApiQuery({
 		name: 'anoMin',
 		required: false,
-		example: 2021,
+		example: 2017,
 		description: 'Filtrar por ano da motocicleta (exato)',
 	})
 	@ApiQuery({
 		name: 'anoMax',
 		required: false,
-		example: 2021,
+		example: 2025,
 		description: 'Filtrar por ano da motocicleta (exato)',
 	})
 	fintAllMotorcycle(@Query() Filter: FilterDto) {

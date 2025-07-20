@@ -128,6 +128,11 @@ let MotorcycleService = class MotorcycleService {
     async createOne(body) {
         try {
             const fotos = [body.foto1, body.foto2, body.foto3];
+            const existingByPlate = await this.prismaService.motorCycle.findUnique({
+                where: { placa: body.placa },
+            });
+            if (existingByPlate)
+                throw new common_1.HttpException('Plate is already registered.', common_1.HttpStatus.CONFLICT);
             const existingByChassi = await this.prismaService.motorCycle.findUnique({
                 where: { chassi: body.chassi },
             });
@@ -193,6 +198,17 @@ let MotorcycleService = class MotorcycleService {
     }
     async updateOne(id, body) {
         try {
+            if (body.placa) {
+                const existingByPlate = await this.prismaService.motorCycle.findFirst({
+                    where: {
+                        placa: body.placa,
+                        id: { not: id },
+                    },
+                });
+                if (existingByPlate) {
+                    throw new common_1.HttpException('Plate is already registered.', common_1.HttpStatus.CONFLICT);
+                }
+            }
             if (body.chassi) {
                 const existingByChassi = await this.prismaService.motorCycle.findFirst({
                     where: {
@@ -306,6 +322,9 @@ let MotorcycleService = class MotorcycleService {
             return motorcycle;
         }
         catch (error) {
+            if (error instanceof common_1.HttpException) {
+                throw error;
+            }
             throw new common_1.HttpException('Error updating motorcycle', error instanceof common_1.HttpException
                 ? error.getStatus()
                 : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
