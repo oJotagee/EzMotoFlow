@@ -54,4 +54,16 @@ export class CreateMotorCycleDto {
 	@IsString()
 	@IsOptional()
 	readonly observacao: string;
+
+	@IsOptional()
+	@IsString()
+	readonly foto1?: string;
+
+	@IsOptional()
+	@IsString()
+	readonly foto2?: string;
+
+	@IsOptional()
+	@IsString()
+	readonly foto3?: string;
 }

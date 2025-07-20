@@ -1,16 +1,20 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateMotorCycleDto } from './dto/create-motorcycle.dto';
+import { UpdateMotorcycleDto } from './dto/update-motorcycle.dto';
+import { FilterDto } from './dto/filter.dto';
+import { AwsS3Service } from 'src/aws/aws-s3.service';
 import {
 	ResponseAllMotorcycleDto,
 	ResponseMotorcycleDto,
 } from './dto/response.dto';
-import { CreateMotorCycleDto } from './dto/create-motorcycle.dto';
-import { UpdateMotorcycleDto } from './dto/update-motorcycle.dto';
-import { FilterDto } from './dto/filter.dto';
 
 @Injectable()
 export class MotorcycleService {
-	constructor(private prismaService: PrismaService) {}
+	constructor(
+		private prismaService: PrismaService,
+		private s3Service: AwsS3Service,
+	) {}
 
 	async getAll(filter: FilterDto): Promise<ResponseAllMotorcycleDto[]> {
 		try {
@@ -113,6 +117,9 @@ export class MotorcycleService {
 					valor_fipe: true,
 					observacao: true,
 					status: true,
+					foto1: true,
+					foto2: true,
+					foto3: true,
 					created_at: true,
 					updated_at: true,
 				},
@@ -136,6 +143,8 @@ export class MotorcycleService {
 		body: CreateMotorCycleDto,
 	): Promise<ResponseAllMotorcycleDto> {
 		try {
+			const fotos = [body.foto1, body.foto2, body.foto3];
+
 			const existingByChassi = await this.prismaService.motorCycle.findUnique({
 				where: { chassi: body.chassi },
 			});
@@ -156,6 +165,16 @@ export class MotorcycleService {
 					HttpStatus.CONFLICT,
 				);
 
+			const fotoUrls = await Promise.all(
+				fotos.map((foto) =>
+					foto && foto !== ''
+						? this.s3Service.uploadBase64Image(foto)
+						: Promise.resolve(null),
+				),
+			);
+
+			const [fotoUrl1, fotoUrl2, fotoUrl3] = fotoUrls;
+
 			const newMotorcycle = await this.prismaService.motorCycle.create({
 				data: {
 					nome: body.nome,
@@ -169,6 +188,9 @@ export class MotorcycleService {
 					valor_venda: body.valor_venda,
 					valor_fipe: body.valor_fipe,
 					observacao: body.observacao,
+					foto1: fotoUrl1,
+					foto2: fotoUrl2,
+					foto3: fotoUrl3,
 				},
 				select: {
 					id: true,
@@ -184,6 +206,9 @@ export class MotorcycleService {
 					valor_fipe: true,
 					observacao: true,
 					status: true,
+					foto1: true,
+					foto2: true,
+					foto3: true,
 					created_at: true,
 					updated_at: true,
 				},
@@ -208,6 +233,40 @@ export class MotorcycleService {
 		body: UpdateMotorcycleDto,
 	): Promise<ResponseAllMotorcycleDto> {
 		try {
+			if (body.chassi) {
+				const existingByChassi = await this.prismaService.motorCycle.findFirst({
+					where: {
+						chassi: body.chassi,
+						id: { not: id },
+					},
+				});
+
+				if (existingByChassi) {
+					throw new HttpException(
+						'Chassi is already registered.',
+						HttpStatus.CONFLICT,
+					);
+				}
+			}
+
+			if (body.renavam) {
+				const existingByRenavam = await this.prismaService.motorCycle.findFirst(
+					{
+						where: {
+							renavam: body.renavam,
+							id: { not: id }, // ignora o próprio registro
+						},
+					},
+				);
+
+				if (existingByRenavam) {
+					throw new HttpException(
+						'Renavam is already registered.',
+						HttpStatus.CONFLICT,
+					);
+				}
+			}
+
 			const findMotorcycle = await this.prismaService.motorCycle.findFirst({
 				where: {
 					id: id,
@@ -217,6 +276,64 @@ export class MotorcycleService {
 			if (!findMotorcycle)
 				throw new HttpException('Motorcycle not found', HttpStatus.NOT_FOUND);
 
+			// Atualiza foto1
+			let foto1 = findMotorcycle.foto1;
+			if (body.foto1 !== undefined) {
+				if (
+					body.foto1 &&
+					body.foto1 !== '' &&
+					!body.foto1.startsWith('https://')
+				) {
+					if (foto1) {
+						await this.s3Service.deleteImage(foto1);
+					}
+					foto1 = await this.s3Service.uploadBase64Image(body.foto1);
+				} else if (body.foto1 === null || body.foto1 === '') {
+					// foto1 = null;
+				} else {
+					// Se for URL (começa com https), mantém como está
+					foto1 = body.foto1;
+				}
+			}
+
+			// Atualiza foto2
+			let foto2 = findMotorcycle.foto2;
+			if (body.foto2 !== undefined) {
+				if (
+					body.foto2 &&
+					body.foto2 !== '' &&
+					!body.foto2.startsWith('https://')
+				) {
+					if (foto2) {
+						await this.s3Service.deleteImage(foto2);
+					}
+					foto2 = await this.s3Service.uploadBase64Image(body.foto2);
+				} else if (body.foto2 === null || body.foto2 === '') {
+					// foto2 = null;
+				} else {
+					foto2 = body.foto2;
+				}
+			}
+
+			// Atualiza foto3
+			let foto3 = findMotorcycle.foto3;
+			if (body.foto3 !== undefined) {
+				if (
+					body.foto3 &&
+					body.foto3 !== '' &&
+					!body.foto3.startsWith('https://')
+				) {
+					if (foto3) {
+						await this.s3Service.deleteImage(foto3);
+					}
+					foto3 = await this.s3Service.uploadBase64Image(body.foto3);
+				} else if (body.foto3 === null || body.foto3 === '') {
+					// foto3 = null;
+				} else {
+					foto3 = body.foto3;
+				}
+			}
+
 			const motorcycle = await this.prismaService.motorCycle.update({
 				where: {
 					id: findMotorcycle.id,
@@ -224,6 +341,9 @@ export class MotorcycleService {
 				data: {
 					...body,
 					ano: body.ano ? new Date(body.ano) : undefined,
+					foto1: foto1,
+					foto2: foto2,
+					foto3: foto3,
 					updated_at: new Date(),
 				},
 				select: {
@@ -240,6 +360,9 @@ export class MotorcycleService {
 					valor_fipe: true,
 					observacao: true,
 					status: true,
+					foto1: true,
+					foto2: true,
+					foto3: true,
 					created_at: true,
 					updated_at: true,
 				},
@@ -266,6 +389,20 @@ export class MotorcycleService {
 
 			if (!findMotorcycle)
 				throw new HttpException('Motorcycle not found', HttpStatus.NOT_FOUND);
+
+			const fotos = [
+				findMotorcycle.foto1,
+				findMotorcycle.foto2,
+				findMotorcycle.foto3,
+			];
+
+			await Promise.all(
+				fotos.map((foto) =>
+					foto && foto !== ''
+						? this.s3Service.deleteImage(foto)
+						: Promise.resolve(),
+				),
+			);
 
 			await this.prismaService.motorCycle.delete({
 				where: {

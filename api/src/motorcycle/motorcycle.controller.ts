@@ -91,9 +91,7 @@ export class MotorcycleController {
 	@Post()
 	@ApiBearerAuth()
 	@UseGuards(AuthTokenGuard)
-	@ApiOperation({ summary: 'Create a motorcycle' })
 	CreateMotorcycle(@Body() body: CreateMotorCycleDto) {
-		console.log(body);
 		return this.motorcycleService.createOne(body);
 	}
 

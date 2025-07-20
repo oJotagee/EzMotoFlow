@@ -8,6 +8,7 @@ import { ApiExceptionFilter } from 'src/commom/filters/exception-filter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MotorcycleModule } from 'src/motorcycle/motorcycle.module';
+import { AwsS3Module } from 'src/aws/aws-s3.module';
 
 @Module({
 	imports: [
@@ -15,6 +16,7 @@ import { MotorcycleModule } from 'src/motorcycle/motorcycle.module';
 		AuthModule,
 		UsersModule,
 		MotorcycleModule,
+		AwsS3Module,
 		ServeStaticModule.forRoot({
 			rootPath: join(__dirname, '..', '..', 'files'),
 			serveRoot: '/files',

@@ -12,12 +12,13 @@ const motorcycle_controller_1 = require("./motorcycle.controller");
 const motorcycle_service_1 = require("./motorcycle.service");
 const prisma_module_1 = require("../prisma/prisma.module");
 const auth_module_1 = require("../auth/auth.module");
+const aws_s3_module_1 = require("../aws/aws-s3.module");
 let MotorcycleModule = class MotorcycleModule {
 };
 exports.MotorcycleModule = MotorcycleModule;
 exports.MotorcycleModule = MotorcycleModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, auth_module_1.AuthModule],
+        imports: [prisma_module_1.PrismaModule, auth_module_1.AuthModule, aws_s3_module_1.AwsS3Module],
         controllers: [motorcycle_controller_1.MotorcycleController],
         providers: [motorcycle_service_1.MotorcycleService],
     })

@@ -24,8 +24,11 @@ class CreateMotorCycleDto {
     valor_venda;
     valor_fipe;
     observacao;
+    foto1;
+    foto2;
+    foto3;
     static _OPENAPI_METADATA_FACTORY() {
-        return { nome: { required: true, type: () => String }, cor: { required: true, type: () => String }, placa: { required: true, type: () => String, maxLength: 7 }, ano: { required: true, type: () => String }, chassi: { required: true, type: () => String, maxLength: 17 }, renavam: { required: true, type: () => String, maxLength: 11 }, km: { required: true, type: () => String }, valor_compra: { required: true, type: () => Number }, valor_venda: { required: true, type: () => Number }, valor_fipe: { required: true, type: () => Number }, observacao: { required: true, type: () => String } };
+        return { nome: { required: true, type: () => String }, cor: { required: true, type: () => String }, placa: { required: true, type: () => String, maxLength: 7 }, ano: { required: true, type: () => String }, chassi: { required: true, type: () => String, maxLength: 17 }, renavam: { required: true, type: () => String, maxLength: 11 }, km: { required: true, type: () => String }, valor_compra: { required: true, type: () => Number }, valor_venda: { required: true, type: () => Number }, valor_fipe: { required: true, type: () => Number }, observacao: { required: true, type: () => String }, foto1: { required: false, type: () => String }, foto2: { required: false, type: () => String }, foto3: { required: false, type: () => String } };
     }
 }
 exports.CreateMotorCycleDto = CreateMotorCycleDto;
@@ -87,4 +90,19 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateMotorCycleDto.prototype, "observacao", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateMotorCycleDto.prototype, "foto1", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateMotorCycleDto.prototype, "foto2", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateMotorCycleDto.prototype, "foto3", void 0);
 //# sourceMappingURL=create-motorcycle.dto.js.map

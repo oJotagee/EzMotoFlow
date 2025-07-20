@@ -18,7 +18,6 @@ model Users {
   name       String
   password   String
   email      String    @unique
-  avatar     String?
   created_at DateTime? @default(now())
   updated_at DateTime? @default(now())
 }
@@ -36,6 +35,9 @@ model MotorCycle {
   valor_venda  Int
   valor_fipe   Int
   observacao   String?
+  foto1        String?
+  foto2        String?
+  foto3        String?
   status       String    @default("ativo")
   created_at   DateTime? @default(now())
   updated_at   DateTime? @default(now())

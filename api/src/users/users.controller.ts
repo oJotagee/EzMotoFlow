@@ -1,30 +1,19 @@
+import { PayloadDto } from 'src/auth/dto/payload.dto';
+import { TokenPayload } from 'src/auth/params/token-payload.param';
+import { UsersService } from './users.service';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
 import {
 	Body,
 	Controller,
 	Delete,
 	Get,
-	HttpStatus,
-	ParseFilePipeBuilder,
 	Patch,
 	Post,
-	UploadedFile,
 	UseGuards,
-	UseInterceptors,
 } from '@nestjs/common';
-import { PayloadDto } from 'src/auth/dto/payload.dto';
-import { TokenPayload } from 'src/auth/params/token-payload.param';
-import { UsersService } from './users.service';
-import { ResponseUpdateAvatarDto } from './dto/response.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import {
-	ApiBearerAuth,
-	ApiBody,
-	ApiConsumes,
-	ApiOperation,
-} from '@nestjs/swagger';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateUserDto } from './dto/create-user.dto';
-import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
 
 @Controller('users')
 export class UsersController {
@@ -65,39 +54,39 @@ export class UsersController {
 		return this.userService.delete(tokenPayload);
 	}
 
-	@Post('upload')
-	@ApiBearerAuth()
-	@UseGuards(AuthTokenGuard)
-	@ApiConsumes('multipart/form-data')
-	@UseInterceptors(FileInterceptor('file'))
-	@ApiOperation({ summary: 'Update avatar' })
-	@ApiBody({
-		schema: {
-			type: 'object',
-			properties: {
-				file: {
-					type: 'string',
-					format: 'binary',
-				},
-			},
-		},
-	})
-	uploadAvatar(
-		@TokenPayload() tokenPayload: PayloadDto,
-		@UploadedFile(
-			new ParseFilePipeBuilder()
-				.addFileTypeValidator({
-					fileType: /jpeg|jpg|png/g,
-				})
-				.addMaxSizeValidator({
-					maxSize: 5 * (1024 * 1024),
-				})
-				.build({
-					errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-				}),
-		)
-		file: Express.Multer.File,
-	): Promise<ResponseUpdateAvatarDto> {
-		return this.userService.uploadAvatarFile(file, tokenPayload);
-	}
+	// @Post('upload')
+	// @ApiBearerAuth()
+	// @UseGuards(AuthTokenGuard)
+	// @ApiConsumes('multipart/form-data')
+	// @UseInterceptors(FileInterceptor('file'))
+	// @ApiOperation({ summary: 'Update avatar' })
+	// @ApiBody({
+	// 	schema: {
+	// 		type: 'object',
+	// 		properties: {
+	// 			file: {
+	// 				type: 'string',
+	// 				format: 'binary',
+	// 			},
+	// 		},
+	// 	},
+	// })
+	// uploadAvatar(
+	// 	@TokenPayload() tokenPayload: PayloadDto,
+	// 	@UploadedFile(
+	// 		new ParseFilePipeBuilder()
+	// 			.addFileTypeValidator({
+	// 				fileType: /jpeg|jpg|png/g,
+	// 			})
+	// 			.addMaxSizeValidator({
+	// 				maxSize: 5 * (1024 * 1024),
+	// 			})
+	// 			.build({
+	// 				errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+	// 			}),
+	// 	)
+	// 	file: Express.Multer.File,
+	// ): Promise<ResponseUpdateAvatarDto> {
+	// 	return this.userService.uploadAvatarFile(file, tokenPayload);
+	// }
 }

@@ -33,7 +33,6 @@ let MotorcycleController = class MotorcycleController {
         return this.motorcycleService.getOne(id);
     }
     CreateMotorcycle(body) {
-        console.log(body);
         return this.motorcycleService.createOne(body);
     }
     UpdatePost(id, body) {
@@ -117,7 +116,6 @@ __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: 'Create a motorcycle' }),
     openapi.ApiResponse({ status: 201, type: require("./dto/response.dto").ResponseAllMotorcycleDto }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

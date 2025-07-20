@@ -12,10 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MotorcycleService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const aws_s3_service_1 = require("../aws/aws-s3.service");
 let MotorcycleService = class MotorcycleService {
     prismaService;
-    constructor(prismaService) {
+    s3Service;
+    constructor(prismaService, s3Service) {
         this.prismaService = prismaService;
+        this.s3Service = s3Service;
     }
     async getAll(filter) {
         try {
@@ -105,6 +108,9 @@ let MotorcycleService = class MotorcycleService {
                     valor_fipe: true,
                     observacao: true,
                     status: true,
+                    foto1: true,
+                    foto2: true,
+                    foto3: true,
                     created_at: true,
                     updated_at: true,
                 },
@@ -121,6 +127,7 @@ let MotorcycleService = class MotorcycleService {
     }
     async createOne(body) {
         try {
+            const fotos = [body.foto1, body.foto2, body.foto3];
             const existingByChassi = await this.prismaService.motorCycle.findUnique({
                 where: { chassi: body.chassi },
             });
@@ -131,6 +138,10 @@ let MotorcycleService = class MotorcycleService {
             });
             if (existingByRenavam)
                 throw new common_1.HttpException('Renavam is already registered.', common_1.HttpStatus.CONFLICT);
+            const fotoUrls = await Promise.all(fotos.map((foto) => foto && foto !== ''
+                ? this.s3Service.uploadBase64Image(foto)
+                : Promise.resolve(null)));
+            const [fotoUrl1, fotoUrl2, fotoUrl3] = fotoUrls;
             const newMotorcycle = await this.prismaService.motorCycle.create({
                 data: {
                     nome: body.nome,
@@ -144,6 +155,9 @@ let MotorcycleService = class MotorcycleService {
                     valor_venda: body.valor_venda,
                     valor_fipe: body.valor_fipe,
                     observacao: body.observacao,
+                    foto1: fotoUrl1,
+                    foto2: fotoUrl2,
+                    foto3: fotoUrl3,
                 },
                 select: {
                     id: true,
@@ -159,6 +173,9 @@ let MotorcycleService = class MotorcycleService {
                     valor_fipe: true,
                     observacao: true,
                     status: true,
+                    foto1: true,
+                    foto2: true,
+                    foto3: true,
                     created_at: true,
                     updated_at: true,
                 },
@@ -176,6 +193,28 @@ let MotorcycleService = class MotorcycleService {
     }
     async updateOne(id, body) {
         try {
+            if (body.chassi) {
+                const existingByChassi = await this.prismaService.motorCycle.findFirst({
+                    where: {
+                        chassi: body.chassi,
+                        id: { not: id },
+                    },
+                });
+                if (existingByChassi) {
+                    throw new common_1.HttpException('Chassi is already registered.', common_1.HttpStatus.CONFLICT);
+                }
+            }
+            if (body.renavam) {
+                const existingByRenavam = await this.prismaService.motorCycle.findFirst({
+                    where: {
+                        renavam: body.renavam,
+                        id: { not: id },
+                    },
+                });
+                if (existingByRenavam) {
+                    throw new common_1.HttpException('Renavam is already registered.', common_1.HttpStatus.CONFLICT);
+                }
+            }
             const findMotorcycle = await this.prismaService.motorCycle.findFirst({
                 where: {
                     id: id,
@@ -183,6 +222,54 @@ let MotorcycleService = class MotorcycleService {
             });
             if (!findMotorcycle)
                 throw new common_1.HttpException('Motorcycle not found', common_1.HttpStatus.NOT_FOUND);
+            let foto1 = findMotorcycle.foto1;
+            if (body.foto1 !== undefined) {
+                if (body.foto1 &&
+                    body.foto1 !== '' &&
+                    !body.foto1.startsWith('https://')) {
+                    if (foto1) {
+                        await this.s3Service.deleteImage(foto1);
+                    }
+                    foto1 = await this.s3Service.uploadBase64Image(body.foto1);
+                }
+                else if (body.foto1 === null || body.foto1 === '') {
+                }
+                else {
+                    foto1 = body.foto1;
+                }
+            }
+            let foto2 = findMotorcycle.foto2;
+            if (body.foto2 !== undefined) {
+                if (body.foto2 &&
+                    body.foto2 !== '' &&
+                    !body.foto2.startsWith('https://')) {
+                    if (foto2) {
+                        await this.s3Service.deleteImage(foto2);
+                    }
+                    foto2 = await this.s3Service.uploadBase64Image(body.foto2);
+                }
+                else if (body.foto2 === null || body.foto2 === '') {
+                }
+                else {
+                    foto2 = body.foto2;
+                }
+            }
+            let foto3 = findMotorcycle.foto3;
+            if (body.foto3 !== undefined) {
+                if (body.foto3 &&
+                    body.foto3 !== '' &&
+                    !body.foto3.startsWith('https://')) {
+                    if (foto3) {
+                        await this.s3Service.deleteImage(foto3);
+                    }
+                    foto3 = await this.s3Service.uploadBase64Image(body.foto3);
+                }
+                else if (body.foto3 === null || body.foto3 === '') {
+                }
+                else {
+                    foto3 = body.foto3;
+                }
+            }
             const motorcycle = await this.prismaService.motorCycle.update({
                 where: {
                     id: findMotorcycle.id,
@@ -190,6 +277,9 @@ let MotorcycleService = class MotorcycleService {
                 data: {
                     ...body,
                     ano: body.ano ? new Date(body.ano) : undefined,
+                    foto1: foto1,
+                    foto2: foto2,
+                    foto3: foto3,
                     updated_at: new Date(),
                 },
                 select: {
@@ -206,6 +296,9 @@ let MotorcycleService = class MotorcycleService {
                     valor_fipe: true,
                     observacao: true,
                     status: true,
+                    foto1: true,
+                    foto2: true,
+                    foto3: true,
                     created_at: true,
                     updated_at: true,
                 },
@@ -227,6 +320,14 @@ let MotorcycleService = class MotorcycleService {
             });
             if (!findMotorcycle)
                 throw new common_1.HttpException('Motorcycle not found', common_1.HttpStatus.NOT_FOUND);
+            const fotos = [
+                findMotorcycle.foto1,
+                findMotorcycle.foto2,
+                findMotorcycle.foto3,
+            ];
+            await Promise.all(fotos.map((foto) => foto && foto !== ''
+                ? this.s3Service.deleteImage(foto)
+                : Promise.resolve()));
             await this.prismaService.motorCycle.delete({
                 where: {
                     id: id,
@@ -244,6 +345,7 @@ let MotorcycleService = class MotorcycleService {
 exports.MotorcycleService = MotorcycleService;
 exports.MotorcycleService = MotorcycleService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        aws_s3_service_1.AwsS3Service])
 ], MotorcycleService);
 //# sourceMappingURL=motorcycle.service.js.map

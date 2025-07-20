@@ -10,4 +10,7 @@ export declare class CreateMotorCycleDto {
     readonly valor_venda: number;
     readonly valor_fipe: number;
     readonly observacao: string;
+    readonly foto1?: string;
+    readonly foto2?: string;
+    readonly foto3?: string;
 }

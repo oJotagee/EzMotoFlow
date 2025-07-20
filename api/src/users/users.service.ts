@@ -1,19 +1,18 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { HashingProtocol } from 'src/auth/hash/hashing.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PayloadDto } from 'src/auth/dto/payload.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import {
 	ResponseCreateUserDto,
 	ResponseDeleteUserDto,
 	ResponseFindUserDto,
-	ResponseUpdateAvatarDto,
 	ResponseUpdateUserDto,
 } from './dto/response.dto';
-import { PayloadDto } from 'src/auth/dto/payload.dto';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 
-import * as fs from 'node:fs';
-import * as path from 'node:path';
+// import * as fs from 'node:fs';
+// import * as path from 'node:path';
 
 @Injectable()
 export class UsersService {
@@ -203,45 +202,45 @@ export class UsersService {
 		}
 	}
 
-	async uploadAvatarFile(
-		file: Express.Multer.File,
-		payloadToken: PayloadDto,
-	): Promise<ResponseUpdateAvatarDto> {
-		try {
-			const fileExtension = path
-				.extname(file.originalname)
-				.toLowerCase()
-				.substring(1);
-			const fileName = `${payloadToken.sub}.${fileExtension}`;
-			const fileLocale = path.resolve(process.cwd(), 'file', fileName);
-			fs.writeFileSync(fileLocale, file.buffer);
+	// async uploadAvatarFile(
+	// 	file: Express.Multer.File,
+	// 	payloadToken: PayloadDto,
+	// ): Promise<ResponseUpdateAvatarDto> {
+	// 	try {
+	// 		const fileExtension = path
+	// 			.extname(file.originalname)
+	// 			.toLowerCase()
+	// 			.substring(1);
+	// 		const fileName = `${payloadToken.sub}.${fileExtension}`;
+	// 		const fileLocale = path.resolve(process.cwd(), 'file', fileName);
+	// 		fs.writeFileSync(fileLocale, file.buffer);
 
-			const findUser = await this.prismaService.users.findFirst({
-				where: { id: payloadToken.sub },
-			});
+	// 		const findUser = await this.prismaService.users.findFirst({
+	// 			where: { id: payloadToken.sub },
+	// 		});
 
-			if (!findUser)
-				throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+	// 		if (!findUser)
+	// 			throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 
-			const updateUser = await this.prismaService.users.update({
-				data: { avatar: fileName },
-				where: { id: findUser.id },
-				select: {
-					id: true,
-					name: true,
-					email: true,
-					avatar: true,
-				},
-			});
+	// 		const updateUser = await this.prismaService.users.update({
+	// 			data: { avatar: fileName },
+	// 			where: { id: findUser.id },
+	// 			select: {
+	// 				id: true,
+	// 				name: true,
+	// 				email: true,
+	// 				avatar: true,
+	// 			},
+	// 		});
 
-			return updateUser;
-		} catch (error) {
-			throw new HttpException(
-				'Failed to update avatar',
-				error instanceof HttpException
-					? error.getStatus()
-					: HttpStatus.INTERNAL_SERVER_ERROR,
-			);
-		}
-	}
+	// 		return updateUser;
+	// 	} catch (error) {
+	// 		throw new HttpException(
+	// 			'Failed to update avatar',
+	// 			error instanceof HttpException
+	// 				? error.getStatus()
+	// 				: HttpStatus.INTERNAL_SERVER_ERROR,
+	// 		);
+	// 	}
+	// }
 }

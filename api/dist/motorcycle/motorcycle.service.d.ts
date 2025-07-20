@@ -1,11 +1,13 @@
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ResponseAllMotorcycleDto, ResponseMotorcycleDto } from './dto/response.dto';
 import { CreateMotorCycleDto } from './dto/create-motorcycle.dto';
 import { UpdateMotorcycleDto } from './dto/update-motorcycle.dto';
 import { FilterDto } from './dto/filter.dto';
+import { AwsS3Service } from 'src/aws/aws-s3.service';
+import { ResponseAllMotorcycleDto, ResponseMotorcycleDto } from './dto/response.dto';
 export declare class MotorcycleService {
     private prismaService;
-    constructor(prismaService: PrismaService);
+    private s3Service;
+    constructor(prismaService: PrismaService, s3Service: AwsS3Service);
     getAll(filter: FilterDto): Promise<ResponseAllMotorcycleDto[]>;
     getOne(id: string): Promise<ResponseAllMotorcycleDto>;
     createOne(body: CreateMotorCycleDto): Promise<ResponseAllMotorcycleDto>;
