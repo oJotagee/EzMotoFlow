@@ -7,12 +7,14 @@ import { APP_FILTER } from '@nestjs/core';
 import { ApiExceptionFilter } from 'src/commom/filters/exception-filter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { MotorcycleModule } from 'src/motorcycle/motorcycle.module';
 
 @Module({
   imports: [
     UsersModule,
     AuthModule,
     UsersModule,
+    MotorcycleModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, "..", "..", "files"),
       serveRoot: "/files"

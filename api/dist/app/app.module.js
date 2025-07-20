@@ -16,6 +16,7 @@ const core_1 = require("@nestjs/core");
 const exception_filter_1 = require("../commom/filters/exception-filter");
 const serve_static_1 = require("@nestjs/serve-static");
 const path_1 = require("path");
+const motorcycle_module_1 = require("../motorcycle/motorcycle.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -25,6 +26,7 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
+            motorcycle_module_1.MotorcycleModule,
             serve_static_1.ServeStaticModule.forRoot({
                 rootPath: (0, path_1.join)(__dirname, "..", "..", "files"),
                 serveRoot: "/files"
