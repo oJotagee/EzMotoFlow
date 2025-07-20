@@ -1,7 +1,7 @@
 export declare class CreateMotorCycleDto {
     readonly cor: string;
     readonly placa: string;
-    readonly ano: Date;
+    readonly ano: string;
     readonly chassi: string;
     readonly renavam: string;
     readonly km: string;

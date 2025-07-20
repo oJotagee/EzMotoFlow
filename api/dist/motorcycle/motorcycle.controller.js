@@ -19,6 +19,8 @@ const motorcycle_service_1 = require("./motorcycle.service");
 const swagger_1 = require("@nestjs/swagger");
 const auth_token_guard_1 = require("../auth/guard/auth-token.guard");
 const pagination_dto_1 = require("../commom/dto/pagination.dto");
+const create_motorcycle_dto_1 = require("./dto/create-motorcycle.dto");
+const update_motorcycle_dto_1 = require("./dto/update-motorcycle.dto");
 let MotorcycleController = class MotorcycleController {
     motorcycleService;
     constructor(motorcycleService) {
@@ -26,6 +28,18 @@ let MotorcycleController = class MotorcycleController {
     }
     fintAllMotorcycle(Pagination) {
         return this.motorcycleService.getAll(Pagination);
+    }
+    findMotorcycleById(id) {
+        return this.motorcycleService.getOne(id);
+    }
+    CreateMotorcycle(body) {
+        return this.motorcycleService.createOne(body);
+    }
+    UpdatePost(id, body) {
+        return this.motorcycleService.updateOne(id, body);
+    }
+    DeletePost(id) {
+        return this.motorcycleService.deleteOne(id);
     }
 };
 exports.MotorcycleController = MotorcycleController;
@@ -52,6 +66,66 @@ __decorate([
     __metadata("design:paramtypes", [pagination_dto_1.PaginationDto]),
     __metadata("design:returntype", void 0)
 ], MotorcycleController.prototype, "fintAllMotorcycle", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
+    (0, swagger_1.ApiOperation)({ summary: "Find a motorcycle" }),
+    (0, swagger_1.ApiParam)({
+        name: "id",
+        example: "dtpysooc8k9p2mk6f09rv5ro",
+        description: "Motorcycle identifier"
+    }),
+    openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").ResponseAllMotorcycleDto }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], MotorcycleController.prototype, "findMotorcycleById", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
+    (0, swagger_1.ApiOperation)({ summary: "Create a motorcycle" }),
+    openapi.ApiResponse({ status: 201, type: require("./dto/response.dto").ResponseAllMotorcycleDto }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_motorcycle_dto_1.CreateMotorCycleDto]),
+    __metadata("design:returntype", void 0)
+], MotorcycleController.prototype, "CreateMotorcycle", null);
+__decorate([
+    (0, common_1.Patch)(":id"),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
+    (0, swagger_1.ApiOperation)({ summary: "Update a motorcycle" }),
+    (0, swagger_1.ApiParam)({
+        name: "id",
+        example: "dtpysooc8k9p2mk6f09rv5ro",
+        description: "Motorcycle identifier"
+    }),
+    openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").ResponseAllMotorcycleDto }),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_motorcycle_dto_1.UpdateMotorcycleDto]),
+    __metadata("design:returntype", void 0)
+], MotorcycleController.prototype, "UpdatePost", null);
+__decorate([
+    (0, common_1.Delete)(":id"),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
+    (0, swagger_1.ApiParam)({
+        name: "id",
+        example: "dtpysooc8k9p2mk6f09rv5ro",
+        description: "Motorcycle identifier"
+    }),
+    (0, swagger_1.ApiOperation)({ summary: "Delete a motorcycle" }),
+    openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").ResponseMotorcycleDto }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], MotorcycleController.prototype, "DeletePost", null);
 exports.MotorcycleController = MotorcycleController = __decorate([
     (0, common_1.Controller)('motorcycle'),
     __metadata("design:paramtypes", [motorcycle_service_1.MotorcycleService])

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResponseAllMotorcycleDto = void 0;
+exports.ResponseMotorcycleDto = exports.ResponseAllMotorcycleDto = void 0;
 const openapi = require("@nestjs/swagger");
 class ResponseAllMotorcycleDto {
     id;
@@ -21,4 +21,11 @@ class ResponseAllMotorcycleDto {
     }
 }
 exports.ResponseAllMotorcycleDto = ResponseAllMotorcycleDto;
+class ResponseMotorcycleDto {
+    message;
+    static _OPENAPI_METADATA_FACTORY() {
+        return { message: { required: true, type: () => String } };
+    }
+}
+exports.ResponseMotorcycleDto = ResponseMotorcycleDto;
 //# sourceMappingURL=response.dto.js.map

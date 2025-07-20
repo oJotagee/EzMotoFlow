@@ -24,7 +24,7 @@ class CreateMotorCycleDto {
     valor_fipe;
     observacao;
     static _OPENAPI_METADATA_FACTORY() {
-        return { cor: { required: true, type: () => String }, placa: { required: true, type: () => String, maximum: 7 }, ano: { required: true, type: () => Date }, chassi: { required: true, type: () => String, maximum: 17 }, renavam: { required: true, type: () => String, maximum: 11 }, km: { required: true, type: () => String }, valor_compra: { required: true, type: () => Number }, valor_venda: { required: true, type: () => Number }, valor_fipe: { required: true, type: () => Number }, observacao: { required: true, type: () => String } };
+        return { cor: { required: true, type: () => String }, placa: { required: true, type: () => String, maxLength: 7 }, ano: { required: true, type: () => String }, chassi: { required: true, type: () => String, maxLength: 17 }, renavam: { required: true, type: () => String, maxLength: 11 }, km: { required: true, type: () => String }, valor_compra: { required: true, type: () => Number }, valor_venda: { required: true, type: () => Number }, valor_fipe: { required: true, type: () => Number }, observacao: { required: true, type: () => String } };
     }
 }
 exports.CreateMotorCycleDto = CreateMotorCycleDto;
@@ -34,26 +34,26 @@ __decorate([
     __metadata("design:type", String)
 ], CreateMotorCycleDto.prototype, "cor", void 0);
 __decorate([
-    (0, class_validator_1.Max)(7),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(7),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateMotorCycleDto.prototype, "placa", void 0);
 __decorate([
-    (0, class_validator_1.IsDate)(),
     (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", Date)
+    (0, class_validator_1.IsDateString)(),
+    __metadata("design:type", String)
 ], CreateMotorCycleDto.prototype, "ano", void 0);
 __decorate([
-    (0, class_validator_1.Max)(17),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MaxLength)(17),
     __metadata("design:type", String)
 ], CreateMotorCycleDto.prototype, "chassi", void 0);
 __decorate([
-    (0, class_validator_1.Max)(11),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MaxLength)(11),
     __metadata("design:type", String)
 ], CreateMotorCycleDto.prototype, "renavam", void 0);
 __decorate([
@@ -78,7 +78,7 @@ __decorate([
 ], CreateMotorCycleDto.prototype, "valor_fipe", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsEmpty)(),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateMotorCycleDto.prototype, "observacao", void 0);
 //# sourceMappingURL=create-motorcycle.dto.js.map

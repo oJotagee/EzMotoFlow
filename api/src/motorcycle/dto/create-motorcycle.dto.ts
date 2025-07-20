@@ -1,27 +1,27 @@
-import { IsDate, IsEmpty, IsInt, IsNotEmpty, IsString, Max } from "class-validator";
+import { IsDateString, IsInt, IsNotEmpty, IsOptional, IsString, Max, MaxLength } from "class-validator";
 
 export class CreateMotorCycleDto {
   @IsString()
   @IsNotEmpty()
   readonly cor: string;
 
-  @Max(7)
   @IsString()
+  @MaxLength(7)
   @IsNotEmpty()
   readonly placa: string;
 
-  @IsDate()
   @IsNotEmpty()
-  readonly ano: Date;
+  @IsDateString()
+  readonly ano: string;
 
-  @Max(17)
   @IsString()
   @IsNotEmpty()
+  @MaxLength(17)
   readonly chassi: string;
 
-  @Max(11)
   @IsString()
   @IsNotEmpty()
+  @MaxLength(11)
   readonly renavam: string;
 
   @IsString()
@@ -41,6 +41,6 @@ export class CreateMotorCycleDto {
   readonly valor_fipe: number;
 
   @IsString()
-  @IsEmpty()
+  @IsOptional()
   readonly observacao: string;
 }

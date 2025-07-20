@@ -45,7 +45,131 @@ let MotorcycleService = class MotorcycleService {
             return motorcycles;
         }
         catch (error) {
-            throw new common_1.HttpException("Failed to update user", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException("Failed to get all motorcycles", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async getOne(id) {
+        try {
+            const motorcycle = await this.prismaService.motorCycle.findFirst({
+                where: { id: id },
+                select: {
+                    id: true,
+                    cor: true,
+                    placa: true,
+                    ano: true,
+                    chassi: true,
+                    renavam: true,
+                    km: true,
+                    valor_compra: true,
+                    valor_venda: true,
+                    valor_fipe: true,
+                    observacao: true,
+                    created_at: true,
+                    updated_at: true,
+                }
+            });
+            if (!motorcycle)
+                throw new common_1.HttpException('Motorcycle not found', common_1.HttpStatus.NOT_FOUND);
+            return motorcycle;
+        }
+        catch (error) {
+            throw new common_1.HttpException("Failed to get motorcycle", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async createOne(body) {
+        try {
+            const newMotorcycle = await this.prismaService.motorCycle.create({
+                data: {
+                    cor: body.cor,
+                    placa: body.placa,
+                    ano: new Date(body.ano),
+                    chassi: body.chassi,
+                    renavam: body.renavam,
+                    km: body.km,
+                    valor_compra: body.valor_compra,
+                    valor_venda: body.valor_venda,
+                    valor_fipe: body.valor_fipe,
+                    observacao: body.observacao,
+                },
+                select: {
+                    id: true,
+                    cor: true,
+                    placa: true,
+                    ano: true,
+                    chassi: true,
+                    renavam: true,
+                    km: true,
+                    valor_compra: true,
+                    valor_venda: true,
+                    valor_fipe: true,
+                    observacao: true,
+                    created_at: true,
+                    updated_at: true,
+                }
+            });
+            return newMotorcycle;
+        }
+        catch (error) {
+            throw new common_1.HttpException('Error creating motorcycle', error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async updateOne(id, body) {
+        try {
+            const findMotorcycle = await this.prismaService.motorCycle.findFirst({
+                where: {
+                    id: id,
+                },
+            });
+            if (!findMotorcycle)
+                throw new common_1.HttpException('Motorcycle not found', common_1.HttpStatus.NOT_FOUND);
+            const motorcycle = await this.prismaService.motorCycle.update({
+                where: {
+                    id: findMotorcycle.id,
+                },
+                data: {
+                    ...body,
+                    updated_at: new Date()
+                },
+                select: {
+                    id: true,
+                    cor: true,
+                    placa: true,
+                    ano: true,
+                    chassi: true,
+                    renavam: true,
+                    km: true,
+                    valor_compra: true,
+                    valor_venda: true,
+                    valor_fipe: true,
+                    observacao: true,
+                    created_at: true,
+                    updated_at: true,
+                },
+            });
+            return motorcycle;
+        }
+        catch (error) {
+            throw new common_1.HttpException('Error updating motorcycle', error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async deleteOne(id) {
+        try {
+            const findMotorcycle = await this.prismaService.motorCycle.findFirst({
+                where: {
+                    id: id,
+                },
+            });
+            if (!findMotorcycle)
+                throw new common_1.HttpException('Motorcycle not found', common_1.HttpStatus.NOT_FOUND);
+            await this.prismaService.motorCycle.delete({
+                where: {
+                    id: id,
+                },
+            });
+            return { message: 'Motorcycle deleted successfully' };
+        }
+        catch (error) {
+            throw new common_1.HttpException('Error deleting post', error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };

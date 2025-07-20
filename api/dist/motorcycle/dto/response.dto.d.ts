@@ -13,3 +13,6 @@ export declare class ResponseAllMotorcycleDto {
     created_at: Date | null;
     updated_at: Date | null;
 }
+export declare class ResponseMotorcycleDto {
+    message: string;
+}
