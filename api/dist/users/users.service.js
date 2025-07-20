@@ -39,7 +39,7 @@ let UsersService = class UsersService {
             return findUser;
         }
         catch (error) {
-            throw new common_1.HttpException("Failed to get user", common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException("Failed to get user", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async create(createUserDto) {

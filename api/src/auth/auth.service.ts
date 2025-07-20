@@ -56,8 +56,8 @@ export class AuthService {
       }
     } catch (error) {
       throw new HttpException(
-				error.message ? error.message : "Error creating task",
-				HttpStatus.INTERNAL_SERVER_ERROR,
+				error.message ? error.message : "Error login",
+				error instanceof HttpException ? error.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR,
 			);
     }
   }

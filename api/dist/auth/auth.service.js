@@ -58,7 +58,7 @@ let AuthService = class AuthService {
             };
         }
         catch (error) {
-            throw new common_1.HttpException(error.message ? error.message : "Error creating task", common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException(error.message ? error.message : "Error login", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };

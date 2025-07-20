@@ -33,7 +33,10 @@ export class UsersService {
 
 			return findUser;
     } catch (error) {
-      throw new HttpException("Failed to get user", HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        "Failed to get user",
+				error instanceof HttpException ? error.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
