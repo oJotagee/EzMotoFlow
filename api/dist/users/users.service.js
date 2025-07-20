@@ -32,23 +32,25 @@ let UsersService = class UsersService {
                     email: true,
                     created_at: true,
                     updated_at: true,
-                }
+                },
             });
             if (!findUser)
-                throw new common_1.HttpException("User not found", common_1.HttpStatus.NOT_FOUND);
+                throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
             return findUser;
         }
         catch (error) {
             if (error instanceof common_1.HttpException) {
                 throw error;
             }
-            throw new common_1.HttpException("Failed to get user", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException('Failed to get user', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async create(createUserDto) {
         try {
             const existingByEmail = await this.prismaService.users.findUnique({
-                where: { email: createUserDto.email }
+                where: { email: createUserDto.email },
             });
             if (existingByEmail)
                 throw new common_1.HttpException('A user with this email address is already registered.', common_1.HttpStatus.CONFLICT);
@@ -57,7 +59,7 @@ let UsersService = class UsersService {
                 data: {
                     name: createUserDto.name,
                     email: createUserDto.email,
-                    password: passwordHash
+                    password: passwordHash,
                 },
                 select: {
                     id: true,
@@ -70,13 +72,15 @@ let UsersService = class UsersService {
             return user;
         }
         catch (error) {
-            throw new common_1.HttpException("Failed to create user", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException('Failed to create user', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async update(updateUserDto, tokenPayload) {
         try {
             const existingByEmail = await this.prismaService.users.findUnique({
-                where: { email: updateUserDto.email }
+                where: { email: updateUserDto.email },
             });
             if (existingByEmail && existingByEmail.id !== tokenPayload.sub)
                 throw new common_1.HttpException('A user with this email address is already registered.', common_1.HttpStatus.CONFLICT);
@@ -86,9 +90,9 @@ let UsersService = class UsersService {
                 },
             });
             if (!findUser)
-                throw new common_1.HttpException("User not found", common_1.HttpStatus.NOT_FOUND);
+                throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
             if (findUser.id !== tokenPayload.sub)
-                throw new common_1.HttpException("You cannot update this user", common_1.HttpStatus.FORBIDDEN);
+                throw new common_1.HttpException('You cannot update this user', common_1.HttpStatus.FORBIDDEN);
             const dataUser = {
                 name: updateUserDto.name ? updateUserDto.name : findUser.name,
                 email: updateUserDto.email ? updateUserDto.email : findUser.email,
@@ -118,7 +122,9 @@ let UsersService = class UsersService {
             if (error instanceof common_1.HttpException) {
                 throw error;
             }
-            throw new common_1.HttpException("Failed to update user", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException('Failed to update user', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async delete(tokenPayload) {
@@ -129,33 +135,38 @@ let UsersService = class UsersService {
                 },
             });
             if (!findUser)
-                throw new common_1.HttpException("User not found", common_1.HttpStatus.NOT_FOUND);
+                throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
             if (findUser.id !== tokenPayload.sub)
-                throw new common_1.HttpException("You cannot delete this user", common_1.HttpStatus.FORBIDDEN);
+                throw new common_1.HttpException('You cannot delete this user', common_1.HttpStatus.FORBIDDEN);
             this.prismaService.users.delete({
                 where: {
                     id: findUser.id,
                 },
             });
             return {
-                message: "User deleted successfully",
+                message: 'User deleted successfully',
             };
         }
         catch (error) {
-            throw new common_1.HttpException("Failed to delete user", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException('Failed to delete user', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async uploadAvatarFile(file, payloadToken) {
         try {
-            const fileExtension = path.extname(file.originalname).toLowerCase().substring(1);
+            const fileExtension = path
+                .extname(file.originalname)
+                .toLowerCase()
+                .substring(1);
             const fileName = `${payloadToken.sub}.${fileExtension}`;
-            const fileLocale = path.resolve(process.cwd(), "file", fileName);
+            const fileLocale = path.resolve(process.cwd(), 'file', fileName);
             fs.writeFileSync(fileLocale, file.buffer);
             const findUser = await this.prismaService.users.findFirst({
-                where: { id: payloadToken.sub }
+                where: { id: payloadToken.sub },
             });
             if (!findUser)
-                throw new common_1.HttpException("User not found", common_1.HttpStatus.NOT_FOUND);
+                throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
             const updateUser = await this.prismaService.users.update({
                 data: { avatar: fileName },
                 where: { id: findUser.id },
@@ -163,13 +174,15 @@ let UsersService = class UsersService {
                     id: true,
                     name: true,
                     email: true,
-                    avatar: true
-                }
+                    avatar: true,
+                },
             });
             return updateUser;
         }
         catch (error) {
-            throw new common_1.HttpException("Failed to update avatar", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException('Failed to update avatar', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };

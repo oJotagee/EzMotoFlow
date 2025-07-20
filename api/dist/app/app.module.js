@@ -28,17 +28,17 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             motorcycle_module_1.MotorcycleModule,
             serve_static_1.ServeStaticModule.forRoot({
-                rootPath: (0, path_1.join)(__dirname, "..", "..", "files"),
-                serveRoot: "/files"
-            })
+                rootPath: (0, path_1.join)(__dirname, '..', '..', 'files'),
+                serveRoot: '/files',
+            }),
         ],
         controllers: [app_controller_1.AppController],
         providers: [
             {
                 provide: core_1.APP_FILTER,
-                useClass: exception_filter_1.ApiExceptionFilter
+                useClass: exception_filter_1.ApiExceptionFilter,
             },
-            app_service_1.AppService
+            app_service_1.AppService,
         ],
     })
 ], AppModule);

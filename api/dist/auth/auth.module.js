@@ -25,21 +25,17 @@ exports.AuthModule = AuthModule = __decorate([
         imports: [
             prisma_module_1.PrismaModule,
             config_1.ConfigModule.forFeature(jwt_config_1.default),
-            jwt_1.JwtModule.registerAsync(jwt_config_1.default.asProvider())
+            jwt_1.JwtModule.registerAsync(jwt_config_1.default.asProvider()),
         ],
         providers: [
             {
                 provide: hashing_service_1.HashingProtocol,
-                useClass: bcrypt_service_1.BcryptService
+                useClass: bcrypt_service_1.BcryptService,
             },
-            auth_service_1.AuthService
+            auth_service_1.AuthService,
         ],
-        exports: [
-            hashing_service_1.HashingProtocol,
-            jwt_1.JwtModule,
-            config_1.ConfigModule
-        ],
-        controllers: [auth_controller_1.AuthController]
+        exports: [hashing_service_1.HashingProtocol, jwt_1.JwtModule, config_1.ConfigModule],
+        controllers: [auth_controller_1.AuthController],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

@@ -28,13 +28,15 @@ let AuthTokenGuard = class AuthTokenGuard {
         const request = context.switchToHttp().getRequest();
         const token = this.extractToken(request);
         if (!token)
-            throw new common_1.HttpException("Token not found.", common_1.HttpStatus.UNAUTHORIZED);
+            throw new common_1.HttpException('Token not found.', common_1.HttpStatus.UNAUTHORIZED);
         try {
             const payload = await this.jwtService.verify(token, this.jwtConfiguraton);
             request[auth_constant_1.TOKEN_PAYLOAD] = payload;
         }
         catch (error) {
-            throw new common_1.HttpException("Invalid or expired token.", common_1.HttpStatus.UNAUTHORIZED);
+            throw new common_1.HttpException('Invalid or expired token.', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return true;
     }

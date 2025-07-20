@@ -5,11 +5,8 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [
-    PrismaModule, 
-    AuthModule
-  ],
-  controllers: [MotorcycleController],
-  providers: [MotorcycleService]
+	imports: [PrismaModule, AuthModule],
+	controllers: [MotorcycleController],
+	providers: [MotorcycleService],
 })
 export class MotorcycleModule {}

@@ -12,7 +12,9 @@ class ApiExceptionFilter {
             error: exception.name,
             timestamp: new Date().toISOString(),
             path: request.url,
-            message: exception.message !== '' ? exception.message : "Error performing the operation"
+            message: exception.message !== ''
+                ? exception.message
+                : 'Error performing the operation',
         });
     }
 }

@@ -1,101 +1,115 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PaginationDto } from 'src/commom/dto/pagination.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ResponseAllMotorcycleDto, ResponseMotorcycleDto } from './dto/response.dto';
+import {
+	ResponseAllMotorcycleDto,
+	ResponseMotorcycleDto,
+} from './dto/response.dto';
 import { CreateMotorCycleDto } from './dto/create-motorcycle.dto';
-import { PayloadDto } from 'src/auth/dto/payload.dto';
 import { UpdateMotorcycleDto } from './dto/update-motorcycle.dto';
 
 @Injectable()
 export class MotorcycleService {
-  constructor(
-    private prismaService: PrismaService,
-  ){}
-  
-  async getAll(pagination: PaginationDto): Promise<ResponseAllMotorcycleDto[]> {
-    try {
-      const { limit = 6, offset = 0 } = pagination;
+	constructor(private prismaService: PrismaService) {}
 
-      const motorcycles = await this.prismaService.motorCycle.findMany({
-        select: {
-          id: true,
-          cor: true,
-          placa: true,
-          ano: true,
-          chassi: true,
-          renavam: true,
-          km: true,
-          valor_compra: true,
-          valor_venda: true,
-          valor_fipe: true,
-          observacao: true,
-          status: true,
-          created_at: true,
-          updated_at: true,
-        },
-        take: limit,
+	async getAll(pagination: PaginationDto): Promise<ResponseAllMotorcycleDto[]> {
+		try {
+			const { limit = 6, offset = 0 } = pagination;
+
+			const motorcycles = await this.prismaService.motorCycle.findMany({
+				select: {
+					id: true,
+					cor: true,
+					placa: true,
+					ano: true,
+					chassi: true,
+					renavam: true,
+					km: true,
+					valor_compra: true,
+					valor_venda: true,
+					valor_fipe: true,
+					observacao: true,
+					status: true,
+					created_at: true,
+					updated_at: true,
+				},
+				take: limit,
 				skip: offset,
 				orderBy: {
 					created_at: 'asc',
 				},
-      })
+			});
 
-      return motorcycles
-    } catch (error) {
-      throw new HttpException(
-        "Failed to get all motorcycles",
-        error instanceof HttpException ? error.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
+			return motorcycles;
+		} catch (error) {
+			throw new HttpException(
+				'Failed to get all motorcycles',
+				error instanceof HttpException
+					? error.getStatus()
+					: HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
 
-  async getOne(id: string): Promise<ResponseAllMotorcycleDto> {
-    try {
-      const motorcycle = await this.prismaService.motorCycle.findFirst({
-        where: { id: id },
-        select: {
-          id: true,
-          cor: true,
-          placa: true,
-          ano: true,
-          chassi: true,
-          renavam: true,
-          km: true,
-          valor_compra: true,
-          valor_venda: true,
-          valor_fipe: true,
-          observacao: true,
-          status: true,
-          created_at: true,
-          updated_at: true,
-        }
-      })
-
-      if (!motorcycle) throw new HttpException('Motorcycle not found', HttpStatus.NOT_FOUND);
-
-      return motorcycle
-    } catch (error) {
-      throw new HttpException(
-        "Failed to get motorcycle",
-        error instanceof HttpException ? error.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  async createOne(body: CreateMotorCycleDto): Promise<ResponseAllMotorcycleDto> {
+	async getOne(id: string): Promise<ResponseAllMotorcycleDto> {
 		try {
-      const existingByChassi = await this.prismaService.motorCycle.findUnique({
-        where: { chassi: body.chassi }
-      });
+			const motorcycle = await this.prismaService.motorCycle.findFirst({
+				where: { id: id },
+				select: {
+					id: true,
+					cor: true,
+					placa: true,
+					ano: true,
+					chassi: true,
+					renavam: true,
+					km: true,
+					valor_compra: true,
+					valor_venda: true,
+					valor_fipe: true,
+					observacao: true,
+					status: true,
+					created_at: true,
+					updated_at: true,
+				},
+			});
 
-      if (existingByChassi) throw new HttpException('Chassi is already registered.', HttpStatus.CONFLICT);
+			if (!motorcycle)
+				throw new HttpException('Motorcycle not found', HttpStatus.NOT_FOUND);
 
-      const existingByRenavam = await this.prismaService.motorCycle.findUnique({
-        where: { renavam: body.renavam }
-      });
-      
-      if (existingByRenavam) throw new HttpException('Renavam is already registered.', HttpStatus.CONFLICT);
-    
+			return motorcycle;
+		} catch (error) {
+			throw new HttpException(
+				'Failed to get motorcycle',
+				error instanceof HttpException
+					? error.getStatus()
+					: HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	async createOne(
+		body: CreateMotorCycleDto,
+	): Promise<ResponseAllMotorcycleDto> {
+		try {
+			const existingByChassi = await this.prismaService.motorCycle.findUnique({
+				where: { chassi: body.chassi },
+			});
+
+			if (existingByChassi)
+				throw new HttpException(
+					'Chassi is already registered.',
+					HttpStatus.CONFLICT,
+				);
+
+			const existingByRenavam = await this.prismaService.motorCycle.findUnique({
+				where: { renavam: body.renavam },
+			});
+
+			if (existingByRenavam)
+				throw new HttpException(
+					'Renavam is already registered.',
+					HttpStatus.CONFLICT,
+				);
 
 			const newMotorcycle = await this.prismaService.motorCycle.create({
 				data: {
@@ -112,35 +126,40 @@ export class MotorcycleService {
 				},
 				select: {
 					id: true,
-          cor: true,
-          placa: true,
-          ano: true,
-          chassi: true,
-          renavam: true,
-          km: true,
-          valor_compra: true,
-          valor_venda: true,
-          valor_fipe: true,
-          observacao: true,
-          status: true,
-          created_at: true,
-          updated_at: true,
-				}
+					cor: true,
+					placa: true,
+					ano: true,
+					chassi: true,
+					renavam: true,
+					km: true,
+					valor_compra: true,
+					valor_venda: true,
+					valor_fipe: true,
+					observacao: true,
+					status: true,
+					created_at: true,
+					updated_at: true,
+				},
 			});
-	
+
 			return newMotorcycle;
 		} catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
+			if (error instanceof HttpException) {
+				throw error;
+			}
 			throw new HttpException(
-        'Error creating motorcycle',
-        error instanceof HttpException ? error.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+				'Error creating motorcycle',
+				error instanceof HttpException
+					? error.getStatus()
+					: HttpStatus.INTERNAL_SERVER_ERROR,
+			);
 		}
 	}
 
-  async updateOne(id: string, body: UpdateMotorcycleDto): Promise<ResponseAllMotorcycleDto> {
+	async updateOne(
+		id: string,
+		body: UpdateMotorcycleDto,
+	): Promise<ResponseAllMotorcycleDto> {
 		try {
 			const findMotorcycle = await this.prismaService.motorCycle.findFirst({
 				where: {
@@ -148,7 +167,8 @@ export class MotorcycleService {
 				},
 			});
 
-			if (!findMotorcycle) throw new HttpException('Motorcycle not found', HttpStatus.NOT_FOUND);
+			if (!findMotorcycle)
+				throw new HttpException('Motorcycle not found', HttpStatus.NOT_FOUND);
 
 			const motorcycle = await this.prismaService.motorCycle.update({
 				where: {
@@ -156,32 +176,34 @@ export class MotorcycleService {
 				},
 				data: {
 					...body,
-					updated_at: new Date()
+					updated_at: new Date(),
 				},
 				select: {
 					id: true,
-          cor: true,
-          placa: true,
-          ano: true,
-          chassi: true,
-          renavam: true,
-          km: true,
-          valor_compra: true,
-          valor_venda: true,
-          valor_fipe: true,
-          observacao: true,
-          status: true,
-          created_at: true,
-          updated_at: true,
+					cor: true,
+					placa: true,
+					ano: true,
+					chassi: true,
+					renavam: true,
+					km: true,
+					valor_compra: true,
+					valor_venda: true,
+					valor_fipe: true,
+					observacao: true,
+					status: true,
+					created_at: true,
+					updated_at: true,
 				},
 			});
 
 			return motorcycle;
 		} catch (error) {
 			throw new HttpException(
-        'Error updating motorcycle', 
-        error instanceof HttpException ? error.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR
-      );
+				'Error updating motorcycle',
+				error instanceof HttpException
+					? error.getStatus()
+					: HttpStatus.INTERNAL_SERVER_ERROR,
+			);
 		}
 	}
 
@@ -193,7 +215,8 @@ export class MotorcycleService {
 				},
 			});
 
-			if (!findMotorcycle) throw new HttpException('Motorcycle not found', HttpStatus.NOT_FOUND);
+			if (!findMotorcycle)
+				throw new HttpException('Motorcycle not found', HttpStatus.NOT_FOUND);
 
 			await this.prismaService.motorCycle.delete({
 				where: {
@@ -204,10 +227,11 @@ export class MotorcycleService {
 			return { message: 'Motorcycle deleted successfully' };
 		} catch (error) {
 			throw new HttpException(
-        'Error deleting post',
-        error instanceof HttpException ? error.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR
-      );
+				'Error deleting post',
+				error instanceof HttpException
+					? error.getStatus()
+					: HttpStatus.INTERNAL_SERVER_ERROR,
+			);
 		}
 	}
-
 }

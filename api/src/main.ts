@@ -4,24 +4,26 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    forbidNonWhitelisted: true,
-  }))
+	app.useGlobalPipes(
+		new ValidationPipe({
+			transform: true,
+			whitelist: true,
+			forbidNonWhitelisted: true,
+		}),
+	);
 
-  const config = new DocumentBuilder()
-		.setTitle("EzMotoFlow")
-		.setDescription("EzMotoFlow description")
+	const config = new DocumentBuilder()
+		.setTitle('EzMotoFlow')
+		.setDescription('EzMotoFlow description')
 		.addBearerAuth()
-		.setVersion("1.0")
+		.setVersion('1.0')
 		.build();
 
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-	SwaggerModule.setup("docs", app, documentFactory);
-  
-  await app.listen(process.env.PORT ?? 3000);
+	const documentFactory = () => SwaggerModule.createDocument(app, config);
+	SwaggerModule.setup('docs', app, documentFactory);
+
+	await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

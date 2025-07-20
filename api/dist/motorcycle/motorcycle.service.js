@@ -46,7 +46,9 @@ let MotorcycleService = class MotorcycleService {
             return motorcycles;
         }
         catch (error) {
-            throw new common_1.HttpException("Failed to get all motorcycles", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException('Failed to get all motorcycles', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async getOne(id) {
@@ -68,25 +70,27 @@ let MotorcycleService = class MotorcycleService {
                     status: true,
                     created_at: true,
                     updated_at: true,
-                }
+                },
             });
             if (!motorcycle)
                 throw new common_1.HttpException('Motorcycle not found', common_1.HttpStatus.NOT_FOUND);
             return motorcycle;
         }
         catch (error) {
-            throw new common_1.HttpException("Failed to get motorcycle", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException('Failed to get motorcycle', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async createOne(body) {
         try {
             const existingByChassi = await this.prismaService.motorCycle.findUnique({
-                where: { chassi: body.chassi }
+                where: { chassi: body.chassi },
             });
             if (existingByChassi)
                 throw new common_1.HttpException('Chassi is already registered.', common_1.HttpStatus.CONFLICT);
             const existingByRenavam = await this.prismaService.motorCycle.findUnique({
-                where: { renavam: body.renavam }
+                where: { renavam: body.renavam },
             });
             if (existingByRenavam)
                 throw new common_1.HttpException('Renavam is already registered.', common_1.HttpStatus.CONFLICT);
@@ -118,7 +122,7 @@ let MotorcycleService = class MotorcycleService {
                     status: true,
                     created_at: true,
                     updated_at: true,
-                }
+                },
             });
             return newMotorcycle;
         }
@@ -126,7 +130,9 @@ let MotorcycleService = class MotorcycleService {
             if (error instanceof common_1.HttpException) {
                 throw error;
             }
-            throw new common_1.HttpException('Error creating motorcycle', error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException('Error creating motorcycle', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async updateOne(id, body) {
@@ -144,7 +150,7 @@ let MotorcycleService = class MotorcycleService {
                 },
                 data: {
                     ...body,
-                    updated_at: new Date()
+                    updated_at: new Date(),
                 },
                 select: {
                     id: true,
@@ -166,7 +172,9 @@ let MotorcycleService = class MotorcycleService {
             return motorcycle;
         }
         catch (error) {
-            throw new common_1.HttpException('Error updating motorcycle', error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException('Error updating motorcycle', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async deleteOne(id) {
@@ -186,7 +194,9 @@ let MotorcycleService = class MotorcycleService {
             return { message: 'Motorcycle deleted successfully' };
         }
         catch (error) {
-            throw new common_1.HttpException('Error deleting post', error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException('Error deleting post', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };

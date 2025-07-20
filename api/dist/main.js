@@ -12,13 +12,13 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
     }));
     const config = new swagger_1.DocumentBuilder()
-        .setTitle("EzMotoFlow")
-        .setDescription("EzMotoFlow description")
+        .setTitle('EzMotoFlow')
+        .setDescription('EzMotoFlow description')
         .addBearerAuth()
-        .setVersion("1.0")
+        .setVersion('1.0')
         .build();
     const documentFactory = () => swagger_1.SwaggerModule.createDocument(app, config);
-    swagger_1.SwaggerModule.setup("docs", app, documentFactory);
+    swagger_1.SwaggerModule.setup('docs', app, documentFactory);
     await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

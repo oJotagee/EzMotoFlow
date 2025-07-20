@@ -33,17 +33,17 @@ let AuthService = class AuthService {
         try {
             const findUser = await this.prisma.users.findFirst({
                 where: {
-                    email: LoginDto.email
-                }
+                    email: LoginDto.email,
+                },
             });
             if (!findUser)
-                throw new common_1.HttpException("User login error", common_1.HttpStatus.UNAUTHORIZED);
+                throw new common_1.HttpException('User login error', common_1.HttpStatus.UNAUTHORIZED);
             const passwordValidated = await this.hashingService.compare(LoginDto.password, findUser.password);
             if (!passwordValidated)
-                throw new common_1.HttpException("Incorrect username/password", common_1.HttpStatus.UNAUTHORIZED);
+                throw new common_1.HttpException('Incorrect username/password', common_1.HttpStatus.UNAUTHORIZED);
             const token = await this.jwtService.signAsync({
                 sub: findUser.id,
-                email: findUser.email
+                email: findUser.email,
             }, {
                 secret: this.jwtConfiguration.secret,
                 audience: this.jwtConfiguration.audience,
@@ -54,11 +54,13 @@ let AuthService = class AuthService {
                 id: findUser.id,
                 name: findUser.name,
                 email: findUser.email,
-                token: token
+                token: token,
             };
         }
         catch (error) {
-            throw new common_1.HttpException(error.message ? error.message : "Error login", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException(error.message ? error.message : 'Error login', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };

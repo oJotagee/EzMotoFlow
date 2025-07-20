@@ -32,7 +32,7 @@ __decorate([
         minLowercase: 1,
         minUppercase: 1,
         minNumbers: 1,
-        minSymbols: 1
+        minSymbols: 1,
     }),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "password", void 0);

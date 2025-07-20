@@ -17,12 +17,9 @@ let MotorcycleModule = class MotorcycleModule {
 exports.MotorcycleModule = MotorcycleModule;
 exports.MotorcycleModule = MotorcycleModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            prisma_module_1.PrismaModule,
-            auth_module_1.AuthModule
-        ],
+        imports: [prisma_module_1.PrismaModule, auth_module_1.AuthModule],
         controllers: [motorcycle_controller_1.MotorcycleController],
-        providers: [motorcycle_service_1.MotorcycleService]
+        providers: [motorcycle_service_1.MotorcycleService],
     })
 ], MotorcycleModule);
 //# sourceMappingURL=motorcycle.module.js.map

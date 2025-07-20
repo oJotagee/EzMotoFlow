@@ -30,7 +30,7 @@ let AuthController = class AuthController {
 exports.AuthController = AuthController;
 __decorate([
     (0, common_1.Post)(),
-    (0, swagger_1.ApiOperation)({ summary: "Login user" }),
+    (0, swagger_1.ApiOperation)({ summary: 'Login user' }),
     openapi.ApiResponse({ status: 201, type: require("./dto/response.dto").ResponseAuthDto }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

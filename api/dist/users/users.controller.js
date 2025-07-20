@@ -48,7 +48,7 @@ exports.UsersController = UsersController;
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: "Find a user" }),
+    (0, swagger_1.ApiOperation)({ summary: 'Find a user' }),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
     openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").ResponseFindUserDto }),
     __param(0, (0, token_payload_param_1.TokenPayload)()),
@@ -60,7 +60,7 @@ __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: "Create a user" }),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a user' }),
     openapi.ApiResponse({ status: 201, type: require("./dto/response.dto").ResponseCreateUserDto }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -68,22 +68,23 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "createUser", null);
 __decorate([
-    (0, common_1.Patch)(":id"),
+    (0, common_1.Patch)(':id'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: "Update a user" }),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a user' }),
     openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").ResponseUpdateUserDto }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, token_payload_param_1.TokenPayload)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [update_user_dto_1.UpdateUserDto, payload_dto_1.PayloadDto]),
+    __metadata("design:paramtypes", [update_user_dto_1.UpdateUserDto,
+        payload_dto_1.PayloadDto]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "updateUser", null);
 __decorate([
-    (0, common_1.Delete)(":id"),
+    (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: "Delete a user" }),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a user' }),
     openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").ResponseDeleteUserDto }),
     __param(0, (0, token_payload_param_1.TokenPayload)()),
     __metadata("design:type", Function),
@@ -91,31 +92,34 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "deleteUser", null);
 __decorate([
-    (0, common_1.Post)("upload"),
+    (0, common_1.Post)('upload'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiConsumes)("multipart/form-data"),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)("file")),
-    (0, swagger_1.ApiOperation)({ summary: "Update avatar" }),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    (0, swagger_1.ApiOperation)({ summary: 'Update avatar' }),
     (0, swagger_1.ApiBody)({
         schema: {
-            type: "object",
+            type: 'object',
             properties: {
                 file: {
-                    type: "string",
-                    format: 'binary'
-                }
-            }
-        }
+                    type: 'string',
+                    format: 'binary',
+                },
+            },
+        },
     }),
     openapi.ApiResponse({ status: 201, type: require("./dto/response.dto").ResponseUpdateAvatarDto }),
     __param(0, (0, token_payload_param_1.TokenPayload)()),
-    __param(1, (0, common_1.UploadedFile)(new common_1.ParseFilePipeBuilder().addFileTypeValidator({
-        fileType: /jpeg|jpg|png/g
-    }).addMaxSizeValidator({
-        maxSize: 5 * (1024 * 1024)
-    }).build({
-        errorHttpStatusCode: common_1.HttpStatus.UNPROCESSABLE_ENTITY
+    __param(1, (0, common_1.UploadedFile)(new common_1.ParseFilePipeBuilder()
+        .addFileTypeValidator({
+        fileType: /jpeg|jpg|png/g,
+    })
+        .addMaxSizeValidator({
+        maxSize: 5 * (1024 * 1024),
+    })
+        .build({
+        errorHttpStatusCode: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
     }))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [payload_dto_1.PayloadDto, Object]),

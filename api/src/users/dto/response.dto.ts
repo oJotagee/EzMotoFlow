@@ -25,8 +25,8 @@ export class ResponseDeleteUserDto {
 }
 
 export class ResponseUpdateAvatarDto {
-  id: string;
-  name: string;
-  email: string;
-  avatar: string | null
+	id: string;
+	name: string;
+	email: string;
+	avatar: string | null;
 }
