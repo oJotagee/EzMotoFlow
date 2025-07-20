@@ -145,6 +145,16 @@ export class MotorcycleService {
 		try {
 			const fotos = [body.foto1, body.foto2, body.foto3];
 
+			const existingByPlate = await this.prismaService.motorCycle.findUnique({
+				where: { placa: body.placa },
+			});
+
+			if (existingByPlate)
+				throw new HttpException(
+					'Plate is already registered.',
+					HttpStatus.CONFLICT,
+				);
+
 			const existingByChassi = await this.prismaService.motorCycle.findUnique({
 				where: { chassi: body.chassi },
 			});
@@ -233,6 +243,22 @@ export class MotorcycleService {
 		body: UpdateMotorcycleDto,
 	): Promise<ResponseAllMotorcycleDto> {
 		try {
+			if (body.placa) {
+				const existingByPlate = await this.prismaService.motorCycle.findFirst({
+					where: {
+						placa: body.placa,
+						id: { not: id },
+					},
+				});
+
+				if (existingByPlate) {
+					throw new HttpException(
+						'Plate is already registered.',
+						HttpStatus.CONFLICT,
+					);
+				}
+			}
+
 			if (body.chassi) {
 				const existingByChassi = await this.prismaService.motorCycle.findFirst({
 					where: {
@@ -370,6 +396,9 @@ export class MotorcycleService {
 
 			return motorcycle;
 		} catch (error) {
+			if (error instanceof HttpException) {
+				throw error;
+			}
 			throw new HttpException(
 				'Error updating motorcycle',
 				error instanceof HttpException

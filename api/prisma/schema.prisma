@@ -26,7 +26,7 @@ model MotorCycle {
   id           String    @id @default(cuid())
   nome         String
   cor          String
-  placa        String
+  placa        String    @unique
   ano          DateTime
   chassi       String    @unique
   renavam      String    @unique
