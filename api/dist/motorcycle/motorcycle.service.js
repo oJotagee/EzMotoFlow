@@ -17,9 +17,9 @@ let MotorcycleService = class MotorcycleService {
     constructor(prismaService) {
         this.prismaService = prismaService;
     }
-    async getAll(pagination) {
+    async getAll(filter) {
         try {
-            const { limit = 6, offset = 0 } = pagination;
+            const { limit = 6, offset = 0, status = '', placa = '' } = filter;
             const motorcycles = await this.prismaService.motorCycle.findMany({
                 select: {
                     id: true,
@@ -36,6 +36,15 @@ let MotorcycleService = class MotorcycleService {
                     status: true,
                     created_at: true,
                     updated_at: true,
+                },
+                where: {
+                    ...(status && { status }),
+                    ...(placa && {
+                        placa: {
+                            contains: placa,
+                            mode: 'insensitive',
+                        },
+                    }),
                 },
                 take: limit,
                 skip: offset,

@@ -17,9 +17,9 @@ import {
 	ApiQuery,
 } from '@nestjs/swagger';
 import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
-import { PaginationDto } from 'src/commom/dto/pagination.dto';
 import { CreateMotorCycleDto } from './dto/create-motorcycle.dto';
 import { UpdateMotorcycleDto } from './dto/update-motorcycle.dto';
+import { FilterDto } from './dto/filter.dto';
 
 @Controller('motorcycle')
 export class MotorcycleController {
@@ -41,8 +41,20 @@ export class MotorcycleController {
 		example: 0,
 		description: 'Number of motorcycle to skip',
 	})
-	fintAllMotorcycle(@Query() Pagination: PaginationDto) {
-		return this.motorcycleService.getAll(Pagination);
+	@ApiQuery({
+		name: 'status',
+		required: false,
+		example: '',
+		description: 'Filter by motorcycle status: "active" or "inactive"',
+	})
+	@ApiQuery({
+		name: 'placa',
+		required: false,
+		example: '',
+		description: 'Filter motorcycle by license plate (exact or partial search)',
+	})
+	fintAllMotorcycle(@Query() Filter: FilterDto) {
+		return this.motorcycleService.getAll(Filter);
 	}
 
 	@Get(':id')

@@ -18,16 +18,16 @@ const common_1 = require("@nestjs/common");
 const motorcycle_service_1 = require("./motorcycle.service");
 const swagger_1 = require("@nestjs/swagger");
 const auth_token_guard_1 = require("../auth/guard/auth-token.guard");
-const pagination_dto_1 = require("../commom/dto/pagination.dto");
 const create_motorcycle_dto_1 = require("./dto/create-motorcycle.dto");
 const update_motorcycle_dto_1 = require("./dto/update-motorcycle.dto");
+const filter_dto_1 = require("./dto/filter.dto");
 let MotorcycleController = class MotorcycleController {
     motorcycleService;
     constructor(motorcycleService) {
         this.motorcycleService = motorcycleService;
     }
-    fintAllMotorcycle(Pagination) {
-        return this.motorcycleService.getAll(Pagination);
+    fintAllMotorcycle(Filter) {
+        return this.motorcycleService.getAll(Filter);
     }
     findMotorcycleById(id) {
         return this.motorcycleService.getOne(id);
@@ -61,10 +61,22 @@ __decorate([
         example: 0,
         description: 'Number of motorcycle to skip',
     }),
+    (0, swagger_1.ApiQuery)({
+        name: 'status',
+        required: false,
+        example: '',
+        description: 'Filter by motorcycle status: "active" or "inactive"',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'placa',
+        required: false,
+        example: '',
+        description: 'Filter motorcycle by license plate (exact or partial search)',
+    }),
     openapi.ApiResponse({ status: 200, type: [require("./dto/response.dto").ResponseAllMotorcycleDto] }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [pagination_dto_1.PaginationDto]),
+    __metadata("design:paramtypes", [filter_dto_1.FilterDto]),
     __metadata("design:returntype", void 0)
 ], MotorcycleController.prototype, "fintAllMotorcycle", null);
 __decorate([
