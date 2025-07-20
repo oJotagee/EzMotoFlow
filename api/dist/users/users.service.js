@@ -39,11 +39,19 @@ let UsersService = class UsersService {
             return findUser;
         }
         catch (error) {
+            if (error instanceof common_1.HttpException) {
+                throw error;
+            }
             throw new common_1.HttpException("Failed to get user", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async create(createUserDto) {
         try {
+            const existingByEmail = await this.prismaService.users.findUnique({
+                where: { email: createUserDto.email }
+            });
+            if (existingByEmail)
+                throw new common_1.HttpException('A user with this email address is already registered.', common_1.HttpStatus.CONFLICT);
             const passwordHash = await this.hashingService.hash(createUserDto.password);
             const user = await this.prismaService.users.create({
                 data: {
@@ -67,6 +75,11 @@ let UsersService = class UsersService {
     }
     async update(updateUserDto, tokenPayload) {
         try {
+            const existingByEmail = await this.prismaService.users.findUnique({
+                where: { email: updateUserDto.email }
+            });
+            if (existingByEmail && existingByEmail.id !== tokenPayload.sub)
+                throw new common_1.HttpException('A user with this email address is already registered.', common_1.HttpStatus.CONFLICT);
             const findUser = await this.prismaService.users.findFirst({
                 where: {
                     id: tokenPayload.sub,
@@ -102,6 +115,9 @@ let UsersService = class UsersService {
             return user;
         }
         catch (error) {
+            if (error instanceof common_1.HttpException) {
+                throw error;
+            }
             throw new common_1.HttpException("Failed to update user", error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

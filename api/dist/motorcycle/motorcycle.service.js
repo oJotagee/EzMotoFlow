@@ -33,6 +33,7 @@ let MotorcycleService = class MotorcycleService {
                     valor_venda: true,
                     valor_fipe: true,
                     observacao: true,
+                    status: true,
                     created_at: true,
                     updated_at: true,
                 },
@@ -64,6 +65,7 @@ let MotorcycleService = class MotorcycleService {
                     valor_venda: true,
                     valor_fipe: true,
                     observacao: true,
+                    status: true,
                     created_at: true,
                     updated_at: true,
                 }
@@ -78,6 +80,16 @@ let MotorcycleService = class MotorcycleService {
     }
     async createOne(body) {
         try {
+            const existingByChassi = await this.prismaService.motorCycle.findUnique({
+                where: { chassi: body.chassi }
+            });
+            if (existingByChassi)
+                throw new common_1.HttpException('Chassi is already registered.', common_1.HttpStatus.CONFLICT);
+            const existingByRenavam = await this.prismaService.motorCycle.findUnique({
+                where: { renavam: body.renavam }
+            });
+            if (existingByRenavam)
+                throw new common_1.HttpException('Renavam is already registered.', common_1.HttpStatus.CONFLICT);
             const newMotorcycle = await this.prismaService.motorCycle.create({
                 data: {
                     cor: body.cor,
@@ -103,6 +115,7 @@ let MotorcycleService = class MotorcycleService {
                     valor_venda: true,
                     valor_fipe: true,
                     observacao: true,
+                    status: true,
                     created_at: true,
                     updated_at: true,
                 }
@@ -110,6 +123,9 @@ let MotorcycleService = class MotorcycleService {
             return newMotorcycle;
         }
         catch (error) {
+            if (error instanceof common_1.HttpException) {
+                throw error;
+            }
             throw new common_1.HttpException('Error creating motorcycle', error instanceof common_1.HttpException ? error.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -142,6 +158,7 @@ let MotorcycleService = class MotorcycleService {
                     valor_venda: true,
                     valor_fipe: true,
                     observacao: true,
+                    status: true,
                     created_at: true,
                     updated_at: true,
                 },

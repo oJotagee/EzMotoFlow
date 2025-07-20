@@ -33,6 +33,7 @@ let MotorcycleController = class MotorcycleController {
         return this.motorcycleService.getOne(id);
     }
     CreateMotorcycle(body) {
+        console.log(body);
         return this.motorcycleService.createOne(body);
     }
     UpdatePost(id, body) {

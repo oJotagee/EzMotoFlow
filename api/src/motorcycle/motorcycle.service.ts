@@ -29,6 +29,7 @@ export class MotorcycleService {
           valor_venda: true,
           valor_fipe: true,
           observacao: true,
+          status: true,
           created_at: true,
           updated_at: true,
         },
@@ -64,6 +65,7 @@ export class MotorcycleService {
           valor_venda: true,
           valor_fipe: true,
           observacao: true,
+          status: true,
           created_at: true,
           updated_at: true,
         }
@@ -82,6 +84,19 @@ export class MotorcycleService {
 
   async createOne(body: CreateMotorCycleDto): Promise<ResponseAllMotorcycleDto> {
 		try {
+      const existingByChassi = await this.prismaService.motorCycle.findUnique({
+        where: { chassi: body.chassi }
+      });
+
+      if (existingByChassi) throw new HttpException('Chassi is already registered.', HttpStatus.CONFLICT);
+
+      const existingByRenavam = await this.prismaService.motorCycle.findUnique({
+        where: { renavam: body.renavam }
+      });
+      
+      if (existingByRenavam) throw new HttpException('Renavam is already registered.', HttpStatus.CONFLICT);
+    
+
 			const newMotorcycle = await this.prismaService.motorCycle.create({
 				data: {
 					cor: body.cor,
@@ -107,6 +122,7 @@ export class MotorcycleService {
           valor_venda: true,
           valor_fipe: true,
           observacao: true,
+          status: true,
           created_at: true,
           updated_at: true,
 				}
@@ -114,6 +130,9 @@ export class MotorcycleService {
 	
 			return newMotorcycle;
 		} catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
 			throw new HttpException(
         'Error creating motorcycle',
         error instanceof HttpException ? error.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR,
@@ -151,6 +170,7 @@ export class MotorcycleService {
           valor_venda: true,
           valor_fipe: true,
           observacao: true,
+          status: true,
           created_at: true,
           updated_at: true,
 				},

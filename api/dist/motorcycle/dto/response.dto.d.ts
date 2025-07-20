@@ -10,6 +10,7 @@ export declare class ResponseAllMotorcycleDto {
     valor_venda: number;
     valor_fipe: number;
     observacao: string | null;
+    status: string;
     created_at: Date | null;
     updated_at: Date | null;
 }

@@ -35,6 +35,7 @@ model MotorCycle {
   valor_venda  Int
   valor_fipe   Int
   observacao   String?
+  status       String     @default("ativo")
   created_at   DateTime?  @default(now())
   updated_at   DateTime?  @default(now())
 }
