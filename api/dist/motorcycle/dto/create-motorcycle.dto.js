@@ -13,6 +13,7 @@ exports.CreateMotorCycleDto = void 0;
 const openapi = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateMotorCycleDto {
+    nome;
     cor;
     placa;
     ano;
@@ -24,10 +25,15 @@ class CreateMotorCycleDto {
     valor_fipe;
     observacao;
     static _OPENAPI_METADATA_FACTORY() {
-        return { cor: { required: true, type: () => String }, placa: { required: true, type: () => String, maxLength: 7 }, ano: { required: true, type: () => String }, chassi: { required: true, type: () => String, maxLength: 17 }, renavam: { required: true, type: () => String, maxLength: 11 }, km: { required: true, type: () => String }, valor_compra: { required: true, type: () => Number }, valor_venda: { required: true, type: () => Number }, valor_fipe: { required: true, type: () => Number }, observacao: { required: true, type: () => String } };
+        return { nome: { required: true, type: () => String }, cor: { required: true, type: () => String }, placa: { required: true, type: () => String, maxLength: 7 }, ano: { required: true, type: () => String }, chassi: { required: true, type: () => String, maxLength: 17 }, renavam: { required: true, type: () => String, maxLength: 11 }, km: { required: true, type: () => String }, valor_compra: { required: true, type: () => Number }, valor_venda: { required: true, type: () => Number }, valor_fipe: { required: true, type: () => Number }, observacao: { required: true, type: () => String } };
     }
 }
 exports.CreateMotorCycleDto = CreateMotorCycleDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateMotorCycleDto.prototype, "nome", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),

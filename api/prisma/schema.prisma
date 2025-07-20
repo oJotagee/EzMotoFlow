@@ -25,6 +25,7 @@ model Users {
 
 model MotorCycle {
   id           String    @id @default(cuid())
+  nome         String
   cor          String
   placa        String
   ano          DateTime

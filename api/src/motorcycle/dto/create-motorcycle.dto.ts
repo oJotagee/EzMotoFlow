@@ -10,6 +10,10 @@ import {
 export class CreateMotorCycleDto {
 	@IsString()
 	@IsNotEmpty()
+	readonly nome: string;
+
+	@IsString()
+	@IsNotEmpty()
 	readonly cor: string;
 
 	@IsString()

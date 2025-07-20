@@ -14,11 +14,20 @@ export class MotorcycleService {
 
 	async getAll(filter: FilterDto): Promise<ResponseAllMotorcycleDto[]> {
 		try {
-			const { limit = 6, offset = 0, status = '', placa = '' } = filter;
+			const {
+				limit = 6,
+				offset = 0,
+				status = '',
+				placa = '',
+				nome = '',
+				anoMin,
+				anoMax,
+			} = filter;
 
 			const motorcycles = await this.prismaService.motorCycle.findMany({
 				select: {
 					id: true,
+					nome: true,
 					cor: true,
 					placa: true,
 					ano: true,
@@ -41,6 +50,32 @@ export class MotorcycleService {
 							mode: 'insensitive',
 						},
 					}),
+					...(nome && {
+						nome: {
+							contains: nome,
+							mode: 'insensitive',
+						},
+					}),
+					...(anoMin !== undefined && anoMax !== undefined
+						? {
+								ano: {
+									gte: new Date(`${anoMin}-01-01T00:00:00.000Z`),
+									lte: new Date(`${anoMax}-12-31T23:59:59.999Z`),
+								},
+							}
+						: anoMin !== undefined
+							? {
+									ano: {
+										gte: new Date(`${anoMin}-01-01T00:00:00.000Z`),
+									},
+								}
+							: anoMax !== undefined
+								? {
+										ano: {
+											lte: new Date(`${anoMax}-12-31T23:59:59.999Z`),
+										},
+									}
+								: {}),
 				},
 				take: limit,
 				skip: offset,
@@ -66,6 +101,7 @@ export class MotorcycleService {
 				where: { id: id },
 				select: {
 					id: true,
+					nome: true,
 					cor: true,
 					placa: true,
 					ano: true,
@@ -122,6 +158,7 @@ export class MotorcycleService {
 
 			const newMotorcycle = await this.prismaService.motorCycle.create({
 				data: {
+					nome: body.nome,
 					cor: body.cor,
 					placa: body.placa,
 					ano: new Date(body.ano),
@@ -135,6 +172,7 @@ export class MotorcycleService {
 				},
 				select: {
 					id: true,
+					nome: true,
 					cor: true,
 					placa: true,
 					ano: true,
@@ -185,10 +223,12 @@ export class MotorcycleService {
 				},
 				data: {
 					...body,
+					ano: body.ano ? new Date(body.ano) : undefined,
 					updated_at: new Date(),
 				},
 				select: {
 					id: true,
+					nome: true,
 					cor: true,
 					placa: true,
 					ano: true,

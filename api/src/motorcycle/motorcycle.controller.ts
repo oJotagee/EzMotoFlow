@@ -53,6 +53,24 @@ export class MotorcycleController {
 		example: '',
 		description: 'Filter motorcycle by license plate (exact or partial search)',
 	})
+	@ApiQuery({
+		name: 'nome',
+		required: false,
+		example: '',
+		description: 'Filter by motorcycle name',
+	})
+	@ApiQuery({
+		name: 'anoMin',
+		required: false,
+		example: 2021,
+		description: 'Filtrar por ano da motocicleta (exato)',
+	})
+	@ApiQuery({
+		name: 'anoMax',
+		required: false,
+		example: 2021,
+		description: 'Filtrar por ano da motocicleta (exato)',
+	})
 	fintAllMotorcycle(@Query() Filter: FilterDto) {
 		return this.motorcycleService.getAll(Filter);
 	}

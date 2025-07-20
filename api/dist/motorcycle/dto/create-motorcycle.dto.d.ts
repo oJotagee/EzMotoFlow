@@ -1,4 +1,5 @@
 export declare class CreateMotorCycleDto {
+    readonly nome: string;
     readonly cor: string;
     readonly placa: string;
     readonly ano: string;

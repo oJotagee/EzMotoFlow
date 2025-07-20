@@ -19,10 +19,11 @@ let MotorcycleService = class MotorcycleService {
     }
     async getAll(filter) {
         try {
-            const { limit = 6, offset = 0, status = '', placa = '' } = filter;
+            const { limit = 6, offset = 0, status = '', placa = '', nome = '', anoMin, anoMax, } = filter;
             const motorcycles = await this.prismaService.motorCycle.findMany({
                 select: {
                     id: true,
+                    nome: true,
                     cor: true,
                     placa: true,
                     ano: true,
@@ -45,6 +46,32 @@ let MotorcycleService = class MotorcycleService {
                             mode: 'insensitive',
                         },
                     }),
+                    ...(nome && {
+                        nome: {
+                            contains: nome,
+                            mode: 'insensitive',
+                        },
+                    }),
+                    ...(anoMin !== undefined && anoMax !== undefined
+                        ? {
+                            ano: {
+                                gte: new Date(`${anoMin}-01-01T00:00:00.000Z`),
+                                lte: new Date(`${anoMax}-12-31T23:59:59.999Z`),
+                            },
+                        }
+                        : anoMin !== undefined
+                            ? {
+                                ano: {
+                                    gte: new Date(`${anoMin}-01-01T00:00:00.000Z`),
+                                },
+                            }
+                            : anoMax !== undefined
+                                ? {
+                                    ano: {
+                                        lte: new Date(`${anoMax}-12-31T23:59:59.999Z`),
+                                    },
+                                }
+                                : {}),
                 },
                 take: limit,
                 skip: offset,
@@ -66,6 +93,7 @@ let MotorcycleService = class MotorcycleService {
                 where: { id: id },
                 select: {
                     id: true,
+                    nome: true,
                     cor: true,
                     placa: true,
                     ano: true,
@@ -105,6 +133,7 @@ let MotorcycleService = class MotorcycleService {
                 throw new common_1.HttpException('Renavam is already registered.', common_1.HttpStatus.CONFLICT);
             const newMotorcycle = await this.prismaService.motorCycle.create({
                 data: {
+                    nome: body.nome,
                     cor: body.cor,
                     placa: body.placa,
                     ano: new Date(body.ano),
@@ -118,6 +147,7 @@ let MotorcycleService = class MotorcycleService {
                 },
                 select: {
                     id: true,
+                    nome: true,
                     cor: true,
                     placa: true,
                     ano: true,
@@ -159,10 +189,12 @@ let MotorcycleService = class MotorcycleService {
                 },
                 data: {
                     ...body,
+                    ano: body.ano ? new Date(body.ano) : undefined,
                     updated_at: new Date(),
                 },
                 select: {
                     id: true,
+                    nome: true,
                     cor: true,
                     placa: true,
                     ano: true,

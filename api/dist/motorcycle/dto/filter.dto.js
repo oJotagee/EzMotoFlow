@@ -11,13 +11,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FilterDto = void 0;
 const openapi = require("@nestjs/swagger");
+const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 const pagination_dto_1 = require("../../commom/dto/pagination.dto");
 class FilterDto extends pagination_dto_1.PaginationDto {
     status;
     placa;
+    nome;
+    anoMin;
+    anoMax;
     static _OPENAPI_METADATA_FACTORY() {
-        return { status: { required: false, type: () => Object, enum: ['ativo', 'inativo'] }, placa: { required: false, type: () => String } };
+        return { status: { required: false, type: () => Object, enum: ['ativo', 'inativo'] }, placa: { required: false, type: () => String }, nome: { required: false, type: () => String }, anoMin: { required: false, type: () => Number }, anoMax: { required: false, type: () => Number } };
     }
 }
 exports.FilterDto = FilterDto;
@@ -31,4 +35,21 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], FilterDto.prototype, "placa", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], FilterDto.prototype, "nome", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], FilterDto.prototype, "anoMin", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], FilterDto.prototype, "anoMax", void 0);
 //# sourceMappingURL=filter.dto.js.map
