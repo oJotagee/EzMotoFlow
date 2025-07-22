@@ -9,6 +9,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MotorcycleModule } from 'src/motorcycle/motorcycle.module';
 import { AwsS3Module } from 'src/aws/aws-s3.module';
+import { ClientsModule } from 'src/clients/clients.module';
 
 @Module({
 	imports: [
@@ -17,6 +18,7 @@ import { AwsS3Module } from 'src/aws/aws-s3.module';
 		UsersModule,
 		MotorcycleModule,
 		AwsS3Module,
+		ClientsModule,
 		ServeStaticModule.forRoot({
 			rootPath: join(__dirname, '..', '..', 'files'),
 			serveRoot: '/files',

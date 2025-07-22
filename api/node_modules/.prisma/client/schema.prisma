@@ -42,3 +42,31 @@ model MotorCycle {
   created_at   DateTime? @default(now())
   updated_at   DateTime? @default(now())
 }
+
+model Clients {
+  id             String      @id @default(cuid())
+  tipo           TipoCliente
+  fullName       String
+  documento      String      @unique
+  telefone       String?
+  email          String      @unique
+  dataNascimento DateTime?
+  companyName    String?
+
+  cep          String
+  rua          String
+  numero       String
+  bairro       String
+  cidade       String
+  estado       String
+  complementos String?
+
+  status     String    @default("ativo")
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+}
+
+enum TipoCliente {
+  PESSOA_FISICA
+  PESSOA_JURIDICA
+}
