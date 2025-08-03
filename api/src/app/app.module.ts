@@ -10,6 +10,7 @@ import { join } from 'path';
 import { MotorcycleModule } from 'src/motorcycle/motorcycle.module';
 import { AwsS3Module } from 'src/aws/aws-s3.module';
 import { ClientsModule } from 'src/clients/clients.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
 	imports: [
@@ -22,6 +23,9 @@ import { ClientsModule } from 'src/clients/clients.module';
 		ServeStaticModule.forRoot({
 			rootPath: join(__dirname, '..', '..', 'files'),
 			serveRoot: '/files',
+		}),
+		ConfigModule.forRoot({
+			isGlobal: true,
 		}),
 	],
 	controllers: [AppController],

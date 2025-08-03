@@ -19,6 +19,7 @@ const path_1 = require("path");
 const motorcycle_module_1 = require("../motorcycle/motorcycle.module");
 const aws_s3_module_1 = require("../aws/aws-s3.module");
 const clients_module_1 = require("../clients/clients.module");
+const config_1 = require("@nestjs/config");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -34,6 +35,9 @@ exports.AppModule = AppModule = __decorate([
             serve_static_1.ServeStaticModule.forRoot({
                 rootPath: (0, path_1.join)(__dirname, '..', '..', 'files'),
                 serveRoot: '/files',
+            }),
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
             }),
         ],
         controllers: [app_controller_1.AppController],
