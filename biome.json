@@ -10,10 +10,21 @@
         "useNodejsImportProtocol": "off"
       },
       "correctness": {
-        "noUnusedFunctionParameters": "off"
+        "noUnusedFunctionParameters": "off",
+        "useJsxKeyInIterable": "off"
       },
       "suspicious": {
         "noExplicitAny": "off"
+      },
+      "complexity": {
+        "useOptionalChain": "off"
+      },
+      "a11y": {
+        "noLabelWithoutControl": "off",
+        "noStaticElementInteractions": "off",
+        "useKeyWithClickEvents": "off",
+        "useButtonType": "off",
+        "noSvgWithoutTitle": "off"
       }
     }
   },

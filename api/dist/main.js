@@ -12,6 +12,7 @@ async function bootstrap() {
         whitelist: true,
         forbidNonWhitelisted: true,
     }));
+    app.enableCors();
     const config = new swagger_1.DocumentBuilder()
         .setTitle('EzMotoFlow')
         .setDescription('EzMotoFlow description')
