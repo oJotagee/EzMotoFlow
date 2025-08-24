@@ -17,6 +17,206 @@ let ClientsService = class ClientsService {
     constructor(prismaService) {
         this.prismaService = prismaService;
     }
+    async getAll(filter) {
+        try {
+            const { limit = 6, offset = 0, status = '', nome = '', } = filter;
+            const clients = await this.prismaService.clients.findMany({
+                select: {
+                    id: true,
+                    tipo: true,
+                    fullName: true,
+                    documento: true,
+                    telefone: true,
+                    email: true,
+                    dataNascimento: true,
+                    companyName: true,
+                    status: true,
+                },
+                where: {
+                    ...(status && { status }),
+                    ...(nome && {
+                        nome: {
+                            contains: nome,
+                            mode: 'insensitive',
+                        },
+                    })
+                },
+                take: limit,
+                skip: offset,
+                orderBy: {
+                    created_at: 'asc',
+                },
+            });
+            return clients;
+        }
+        catch (error) {
+            throw new common_1.HttpException('Failed to get all clients', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async getOne(id) {
+        try {
+            const clients = await this.prismaService.clients.findFirst({
+                where: { id: id },
+                select: {
+                    id: true,
+                    tipo: true,
+                    fullName: true,
+                    documento: true,
+                    telefone: true,
+                    email: true,
+                    dataNascimento: true,
+                    companyName: true,
+                    status: true,
+                    cep: true,
+                    rua: true,
+                    numero: true,
+                    bairro: true,
+                    cidade: true,
+                    estado: true,
+                    complementos: true,
+                }
+            });
+            if (!clients)
+                throw new common_1.HttpException('Clients not found', common_1.HttpStatus.NOT_FOUND);
+            return clients;
+        }
+        catch (error) {
+            throw new common_1.HttpException('Failed to get clients', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async createOne(body) {
+        try {
+            const existingByDocument = await this.prismaService.clients.findUnique({
+                where: { documento: body.documento },
+            });
+            if (existingByDocument)
+                throw new common_1.HttpException('Document is already registered.', common_1.HttpStatus.CONFLICT);
+            const existingByemail = await this.prismaService.clients.findUnique({
+                where: { email: body.email },
+            });
+            if (existingByemail)
+                throw new common_1.HttpException('Email is already registered.', common_1.HttpStatus.CONFLICT);
+            const newClients = await this.prismaService.clients.create({
+                data: {
+                    tipo: body.tipo,
+                    fullName: body.fullName,
+                    documento: body.documento,
+                    telefone: body.telefone,
+                    email: body.email,
+                    dataNascimento: body.dataNascimento ? new Date(body.dataNascimento) : null,
+                    companyName: body.companyName,
+                    cep: body.cep,
+                    rua: body.rua,
+                    numero: body.numero,
+                    bairro: body.bairro,
+                    cidade: body.cidade,
+                    estado: body.estado,
+                    complementos: body.complementos,
+                },
+                select: {
+                    id: true,
+                    tipo: true,
+                    fullName: true,
+                    documento: true,
+                    telefone: true,
+                    email: true,
+                    dataNascimento: true,
+                    companyName: true,
+                    status: true,
+                },
+            });
+            return newClients;
+        }
+        catch (error) {
+            if (error instanceof common_1.HttpException) {
+                throw error;
+            }
+            throw new common_1.HttpException('Error creating motorcycle', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async updateOne(id, body) {
+        try {
+            if (body.documento) {
+                const existingByDocument = await this.prismaService.clients.findUnique({
+                    where: { documento: body.documento },
+                });
+                if (existingByDocument)
+                    throw new common_1.HttpException('Document is already registered.', common_1.HttpStatus.CONFLICT);
+            }
+            if (body.email) {
+                const existingByemail = await this.prismaService.clients.findUnique({
+                    where: { email: body.email },
+                });
+                if (existingByemail)
+                    throw new common_1.HttpException('Email is already registered.', common_1.HttpStatus.CONFLICT);
+            }
+            const findClient = await this.prismaService.clients.findFirst({
+                where: {
+                    id: id,
+                },
+            });
+            if (!findClient)
+                throw new common_1.HttpException('Clients not found', common_1.HttpStatus.NOT_FOUND);
+            const clientUpdated = await this.prismaService.clients.update({
+                where: {
+                    id: findClient.id,
+                },
+                data: {
+                    ...body,
+                    dataNascimento: body.dataNascimento ? new Date(body.dataNascimento) : undefined,
+                    updated_at: new Date(),
+                },
+                select: {
+                    id: true,
+                    tipo: true,
+                    fullName: true,
+                    documento: true,
+                    telefone: true,
+                    email: true,
+                    dataNascimento: true,
+                    companyName: true,
+                    status: true,
+                },
+            });
+            return clientUpdated;
+        }
+        catch (error) {
+            if (error instanceof common_1.HttpException) {
+                throw error;
+            }
+            throw new common_1.HttpException('Error updating clients', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async deleteOne(id) {
+        try {
+            const findClient = await this.prismaService.clients.findFirst({
+                where: {
+                    id: id,
+                },
+            });
+            if (!findClient)
+                throw new common_1.HttpException('Client not found', common_1.HttpStatus.NOT_FOUND);
+            await this.prismaService.clients.delete({
+                where: {
+                    id: id,
+                },
+            });
+            return { message: 'Client deleted successfully' };
+        }
+        catch (error) {
+            throw new common_1.HttpException('Error deleting client', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 };
 exports.ClientsService = ClientsService;
 exports.ClientsService = ClientsService = __decorate([
