@@ -14,13 +14,13 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientsController = void 0;
 const openapi = require("@nestjs/swagger");
-const common_1 = require("@nestjs/common");
+const auth_token_guard_1 = require("../auth/guard/auth-token.guard");
+const update_clients_dto_1 = require("./dto/update-clients.dto");
+const create_clients_dto_1 = require("./dto/create-clients.dto");
 const clients_service_1 = require("./clients.service");
 const filter_dto_1 = require("./dto/filter.dto");
 const swagger_1 = require("@nestjs/swagger");
-const auth_token_guard_1 = require("../auth/guard/auth-token.guard");
-const create_clients_dto_1 = require("./dto/create-clients.dto");
-const update_clients_dto_1 = require("./dto/update-clients.dto");
+const common_1 = require("@nestjs/common");
 let ClientsController = class ClientsController {
     clientsService;
     constructor(clientsService) {

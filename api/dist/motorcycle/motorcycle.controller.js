@@ -14,13 +14,13 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MotorcycleController = void 0;
 const openapi = require("@nestjs/swagger");
-const common_1 = require("@nestjs/common");
-const motorcycle_service_1 = require("./motorcycle.service");
-const swagger_1 = require("@nestjs/swagger");
-const auth_token_guard_1 = require("../auth/guard/auth-token.guard");
 const create_motorcycle_dto_1 = require("./dto/create-motorcycle.dto");
 const update_motorcycle_dto_1 = require("./dto/update-motorcycle.dto");
+const auth_token_guard_1 = require("../auth/guard/auth-token.guard");
+const motorcycle_service_1 = require("./motorcycle.service");
 const filter_dto_1 = require("./dto/filter.dto");
+const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 let MotorcycleController = class MotorcycleController {
     motorcycleService;
     constructor(motorcycleService) {
@@ -64,7 +64,7 @@ __decorate([
         name: 'status',
         required: false,
         example: '',
-        description: 'Filter by motorcycle status: "active" or "inactive"',
+        description: 'Filter by motorcycle status: "active", "inactive" or "sold"',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'placa',

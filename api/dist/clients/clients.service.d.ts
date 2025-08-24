@@ -1,8 +1,8 @@
-import { ResponseAllClientsDto, ResponseClientDto, ResponseClientsDto } from './dto/response.dto';
 import { UpdateClientsDto } from './dto/update-clients.dto';
 import { CreateClientDto } from './dto/create-clients.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FilterDto } from './dto/filter.dto';
+import { ResponseAllClientsDto, ResponseClientDto, ResponseClientsDto } from './dto/response.dto';
 export declare class ClientsService {
     private prismaService;
     constructor(prismaService: PrismaService);

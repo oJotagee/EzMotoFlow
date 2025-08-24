@@ -13,10 +13,10 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthTokenGuard = void 0;
-const common_1 = require("@nestjs/common");
+const auth_constant_1 = require("../commom/auth.constant");
 const jwt_config_1 = require("../config/jwt.config");
 const jwt_1 = require("@nestjs/jwt");
-const auth_constant_1 = require("../commom/auth.constant");
+const common_1 = require("@nestjs/common");
 let AuthTokenGuard = class AuthTokenGuard {
     jwtService;
     jwtConfiguraton;

@@ -1,10 +1,10 @@
 import { PrismaService } from 'src/prisma/prisma.service';
 import { HashingProtocol } from './hash/hashing.service';
+import { ResponseAuthDto } from './dto/response.dto';
 import jwtConfig from './config/jwt.config';
 import { ConfigType } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
-import { ResponseAuthDto } from './dto/response.dto';
+import { JwtService } from '@nestjs/jwt';
 export declare class AuthService {
     private prisma;
     private readonly hashingService;

@@ -8,8 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const openapi = require("@nestjs/swagger");
-const common_1 = require("@nestjs/common");
 const logger_interceptor_1 = require("../commom/interceptors/logger.interceptor");
+const common_1 = require("@nestjs/common");
 let AppController = class AppController {
 };
 exports.AppController = AppController;

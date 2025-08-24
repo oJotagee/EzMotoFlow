@@ -7,19 +7,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
-const common_1 = require("@nestjs/common");
-const app_controller_1 = require("./app.controller");
-const app_service_1 = require("./app.service");
-const users_module_1 = require("../users/users.module");
-const auth_module_1 = require("../auth/auth.module");
-const core_1 = require("@nestjs/core");
 const exception_filter_1 = require("../commom/filters/exception-filter");
-const serve_static_1 = require("@nestjs/serve-static");
-const path_1 = require("path");
 const motorcycle_module_1 = require("../motorcycle/motorcycle.module");
-const aws_s3_module_1 = require("../aws/aws-s3.module");
+const contract_module_1 = require("../contract/contract.module");
 const clients_module_1 = require("../clients/clients.module");
+const serve_static_1 = require("@nestjs/serve-static");
+const users_module_1 = require("../users/users.module");
+const aws_s3_module_1 = require("../aws/aws-s3.module");
+const auth_module_1 = require("../auth/auth.module");
+const app_controller_1 = require("./app.controller");
 const config_1 = require("@nestjs/config");
+const app_service_1 = require("./app.service");
+const core_1 = require("@nestjs/core");
+const common_1 = require("@nestjs/common");
+const path_1 = require("path");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -32,6 +33,7 @@ exports.AppModule = AppModule = __decorate([
             motorcycle_module_1.MotorcycleModule,
             aws_s3_module_1.AwsS3Module,
             clients_module_1.ClientsModule,
+            contract_module_1.ContractModule,
             serve_static_1.ServeStaticModule.forRoot({
                 rootPath: (0, path_1.join)(__dirname, '..', '..', 'files'),
                 serveRoot: '/files',

@@ -7,12 +7,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MotorcycleModule = void 0;
-const common_1 = require("@nestjs/common");
 const motorcycle_controller_1 = require("./motorcycle.controller");
 const motorcycle_service_1 = require("./motorcycle.service");
 const prisma_module_1 = require("../prisma/prisma.module");
-const auth_module_1 = require("../auth/auth.module");
 const aws_s3_module_1 = require("../aws/aws-s3.module");
+const auth_module_1 = require("../auth/auth.module");
+const common_1 = require("@nestjs/common");
 let MotorcycleModule = class MotorcycleModule {
 };
 exports.MotorcycleModule = MotorcycleModule;

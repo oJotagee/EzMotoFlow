@@ -1,3 +1,8 @@
+import { TOKEN_PAYLOAD } from '../commom/auth.constant';
+import jwtConfig from '../config/jwt.config';
+import { ConfigType } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
 import {
 	CanActivate,
 	ExecutionContext,
@@ -6,11 +11,6 @@ import {
 	Inject,
 	Injectable,
 } from '@nestjs/common';
-import jwtConfig from '../config/jwt.config';
-import { ConfigType } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { TOKEN_PAYLOAD } from '../commom/auth.constant';
-import { Request } from 'express';
 
 @Injectable()
 export class AuthTokenGuard implements CanActivate {

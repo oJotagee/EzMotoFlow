@@ -1,10 +1,10 @@
-import { PayloadDto } from 'src/auth/dto/payload.dto';
 import { TokenPayload } from 'src/auth/params/token-payload.param';
-import { UsersService } from './users.service';
+import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
+import { PayloadDto } from 'src/auth/dto/payload.dto';
+import { UsersService } from './users.service';
 import {
 	Body,
 	Controller,

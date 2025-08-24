@@ -1,11 +1,11 @@
-import { Type } from 'class-transformer';
 import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import { PaginationDto } from 'src/commom/dto/pagination.dto';
+import { Type } from 'class-transformer';
 
 export class FilterDto extends PaginationDto {
 	@IsOptional()
-	@IsIn(['ativo', 'inativo'])
-	status?: 'ativo' | 'inativo';
+	@IsIn(['ativo', 'inativo', 'vendido'])
+	status?: 'ativo' | 'inativo' | 'vendido';
 
 	@IsOptional()
 	@IsString()

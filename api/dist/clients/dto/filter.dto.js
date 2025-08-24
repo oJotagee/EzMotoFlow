@@ -11,8 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FilterDto = void 0;
 const openapi = require("@nestjs/swagger");
-const class_validator_1 = require("class-validator");
 const pagination_dto_1 = require("../../commom/dto/pagination.dto");
+const class_validator_1 = require("class-validator");
 class FilterDto extends pagination_dto_1.PaginationDto {
     status;
     nome;

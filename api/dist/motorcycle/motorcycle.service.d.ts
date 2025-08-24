@@ -1,8 +1,8 @@
-import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMotorCycleDto } from './dto/create-motorcycle.dto';
 import { UpdateMotorcycleDto } from './dto/update-motorcycle.dto';
-import { FilterDto } from './dto/filter.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { AwsS3Service } from 'src/aws/aws-s3.service';
+import { FilterDto } from './dto/filter.dto';
 import { ResponseAllMotorcycleDto, ResponseMotorcycleDto } from './dto/response.dto';
 export declare class MotorcycleService {
     private prismaService;

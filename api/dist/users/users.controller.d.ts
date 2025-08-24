@@ -1,7 +1,7 @@
-import { PayloadDto } from 'src/auth/dto/payload.dto';
-import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { PayloadDto } from 'src/auth/dto/payload.dto';
+import { UsersService } from './users.service';
 export declare class UsersController {
     private readonly userService;
     constructor(userService: UsersService);

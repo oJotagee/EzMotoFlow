@@ -1,3 +1,8 @@
+import { CreateMotorCycleDto } from './dto/create-motorcycle.dto';
+import { UpdateMotorcycleDto } from './dto/update-motorcycle.dto';
+import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
+import { MotorcycleService } from './motorcycle.service';
+import { FilterDto } from './dto/filter.dto';
 import {
 	Body,
 	Controller,
@@ -9,17 +14,12 @@ import {
 	Query,
 	UseGuards,
 } from '@nestjs/common';
-import { MotorcycleService } from './motorcycle.service';
 import {
 	ApiBearerAuth,
 	ApiOperation,
 	ApiParam,
 	ApiQuery,
 } from '@nestjs/swagger';
-import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
-import { CreateMotorCycleDto } from './dto/create-motorcycle.dto';
-import { UpdateMotorcycleDto } from './dto/update-motorcycle.dto';
-import { FilterDto } from './dto/filter.dto';
 
 @Controller('motorcycle')
 export class MotorcycleController {
@@ -45,7 +45,7 @@ export class MotorcycleController {
 		name: 'status',
 		required: false,
 		example: '',
-		description: 'Filter by motorcycle status: "active" or "inactive"',
+		description: 'Filter by motorcycle status: "active", "inactive" or "sold"',
 	})
 	@ApiQuery({
 		name: 'placa',

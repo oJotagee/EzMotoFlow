@@ -1,6 +1,6 @@
-import { MotorcycleService } from './motorcycle.service';
 import { CreateMotorCycleDto } from './dto/create-motorcycle.dto';
 import { UpdateMotorcycleDto } from './dto/update-motorcycle.dto';
+import { MotorcycleService } from './motorcycle.service';
 import { FilterDto } from './dto/filter.dto';
 export declare class MotorcycleController {
     private readonly motorcycleService;

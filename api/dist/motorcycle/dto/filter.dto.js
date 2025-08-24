@@ -11,9 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FilterDto = void 0;
 const openapi = require("@nestjs/swagger");
-const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 const pagination_dto_1 = require("../../commom/dto/pagination.dto");
+const class_transformer_1 = require("class-transformer");
 class FilterDto extends pagination_dto_1.PaginationDto {
     status;
     placa;
@@ -21,13 +21,13 @@ class FilterDto extends pagination_dto_1.PaginationDto {
     anoMin;
     anoMax;
     static _OPENAPI_METADATA_FACTORY() {
-        return { status: { required: false, type: () => Object, enum: ['ativo', 'inativo'] }, placa: { required: false, type: () => String }, nome: { required: false, type: () => String }, anoMin: { required: false, type: () => Number }, anoMax: { required: false, type: () => Number } };
+        return { status: { required: false, type: () => Object, enum: ['ativo', 'inativo', 'vendido'] }, placa: { required: false, type: () => String }, nome: { required: false, type: () => String }, anoMin: { required: false, type: () => Number }, anoMax: { required: false, type: () => Number } };
     }
 }
 exports.FilterDto = FilterDto;
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsIn)(['ativo', 'inativo']),
+    (0, class_validator_1.IsIn)(['ativo', 'inativo', 'vendido']),
     __metadata("design:type", String)
 ], FilterDto.prototype, "status", void 0);
 __decorate([

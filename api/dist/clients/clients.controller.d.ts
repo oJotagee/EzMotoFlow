@@ -1,7 +1,7 @@
+import { UpdateClientsDto } from './dto/update-clients.dto';
+import { CreateClientDto } from './dto/create-clients.dto';
 import { ClientsService } from './clients.service';
 import { FilterDto } from './dto/filter.dto';
-import { CreateClientDto } from './dto/create-clients.dto';
-import { UpdateClientsDto } from './dto/update-clients.dto';
 export declare class ClientsController {
     private readonly clientsService;
     constructor(clientsService: ClientsService);

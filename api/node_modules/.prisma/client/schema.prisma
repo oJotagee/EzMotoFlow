@@ -23,13 +23,13 @@ model Users {
 }
 
 model MotorCycle {
-  id           String    @id @default(cuid())
+  id           String           @id @default(cuid())
   nome         String
   cor          String
-  placa        String    @unique
+  placa        String           @unique
   ano          DateTime
-  chassi       String    @unique
-  renavam      String    @unique
+  chassi       String           @unique
+  renavam      String           @unique
   km           String
   valor_compra Int
   valor_venda  Int
@@ -38,9 +38,11 @@ model MotorCycle {
   foto1        String?
   foto2        String?
   foto3        String?
-  status       String    @default("ativo")
-  created_at   DateTime? @default(now())
-  updated_at   DateTime? @default(now())
+  status       StatusMotorcycle @default(ativo)
+  created_at   DateTime?        @default(now())
+  updated_at   DateTime?        @default(now())
+
+  Contracts Contracts?
 }
 
 model Clients {
@@ -61,12 +63,55 @@ model Clients {
   estado       String
   complementos String?
 
-  status     String    @default("ativo")
-  created_at DateTime? @default(now())
-  updated_at DateTime? @default(now())
+  status     StatusClient @default(ativo)
+  created_at DateTime?    @default(now())
+  updated_at DateTime?    @default(now())
+
+  Contracts Contracts[]
+}
+
+model Contracts {
+  id           String         @id @default(cuid())
+  valor        Int
+  data         DateTime       @default(now())
+  status       StatusContrato @default(ativo)
+  observacao   String?
+  pagamento    Pagamento
+  contractoPdf String?
+  created_at   DateTime?      @default(now())
+  updated_at   DateTime?      @default(now())
+
+  motorcycleId String     @unique
+  motorcycle   MotorCycle @relation(fields: [motorcycleId], references: [id], onDelete: Cascade)
+
+  clientId String
+  client   Clients @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+enum StatusMotorcycle {
+  ativo
+  inativo
+  vendido
 }
 
 enum TipoCliente {
   PESSOA_FISICA
   PESSOA_JURIDICA
+}
+
+enum StatusClient {
+  ativo
+  inativo
+}
+
+enum Pagamento {
+  boleto
+  cartao
+  pix
+}
+
+enum StatusContrato {
+  ativo
+  cancelado
+  finalizado
 }

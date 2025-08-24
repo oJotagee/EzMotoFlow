@@ -7,15 +7,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
-const common_1 = require("@nestjs/common");
-const auth_service_1 = require("./auth.service");
 const hashing_service_1 = require("./hash/hashing.service");
+const prisma_module_1 = require("../prisma/prisma.module");
 const bcrypt_service_1 = require("./hash/bcrypt.service");
+const auth_controller_1 = require("./auth.controller");
+const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const auth_service_1 = require("./auth.service");
 const jwt_config_1 = require("./config/jwt.config");
 const jwt_1 = require("@nestjs/jwt");
-const prisma_module_1 = require("../prisma/prisma.module");
-const auth_controller_1 = require("./auth.controller");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;

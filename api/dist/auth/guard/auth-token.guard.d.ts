@@ -1,8 +1,8 @@
-import { CanActivate, ExecutionContext } from '@nestjs/common';
 import jwtConfig from '../config/jwt.config';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { CanActivate, ExecutionContext } from '@nestjs/common';
 export declare class AuthTokenGuard implements CanActivate {
     private readonly jwtService;
     private jwtConfiguraton;

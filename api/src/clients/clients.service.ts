@@ -1,9 +1,13 @@
-import { ResponseAllClientsDto, ResponseClientDto, ResponseClientsDto } from './dto/response.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UpdateClientsDto } from './dto/update-clients.dto';
 import { CreateClientDto } from './dto/create-clients.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FilterDto } from './dto/filter.dto';
+import {
+	ResponseAllClientsDto,
+	ResponseClientDto,
+	ResponseClientsDto,
+} from './dto/response.dto';
 
 @Injectable()
 export class ClientsService {
@@ -11,12 +15,7 @@ export class ClientsService {
 
 	async getAll(filter: FilterDto): Promise<ResponseAllClientsDto[]> {
 		try {
-			const {
-				limit = 6,
-				offset = 0,
-				status = '',
-				nome = '',
-			} = filter;
+			const { limit = 6, offset = 0, status = '', nome = '' } = filter;
 
 			const clients = await this.prismaService.clients.findMany({
 				select: {
@@ -37,7 +36,7 @@ export class ClientsService {
 							contains: nome,
 							mode: 'insensitive',
 						},
-					})
+					}),
 				},
 				take: limit,
 				skip: offset,
@@ -78,7 +77,7 @@ export class ClientsService {
 					cidade: true,
 					estado: true,
 					complementos: true,
-				}
+				},
 			});
 
 			if (!clients)
@@ -95,9 +94,7 @@ export class ClientsService {
 		}
 	}
 
-	async createOne(
-		body: CreateClientDto,
-	): Promise<ResponseAllClientsDto> {
+	async createOne(body: CreateClientDto): Promise<ResponseAllClientsDto> {
 		try {
 			const existingByDocument = await this.prismaService.clients.findUnique({
 				where: { documento: body.documento },
@@ -126,7 +123,9 @@ export class ClientsService {
 					documento: body.documento,
 					telefone: body.telefone,
 					email: body.email,
-					dataNascimento: body.dataNascimento ? new Date(body.dataNascimento) : null,
+					dataNascimento: body.dataNascimento
+						? new Date(body.dataNascimento)
+						: null,
 					companyName: body.companyName,
 					cep: body.cep,
 					rua: body.rua,
@@ -162,7 +161,7 @@ export class ClientsService {
 			);
 		}
 	}
-	
+
 	async updateOne(
 		id: string,
 		body: UpdateClientsDto,
@@ -207,7 +206,9 @@ export class ClientsService {
 				},
 				data: {
 					...body,
-					dataNascimento: body.dataNascimento ? new Date(body.dataNascimento) : undefined,
+					dataNascimento: body.dataNascimento
+						? new Date(body.dataNascimento)
+						: undefined,
 					updated_at: new Date(),
 				},
 				select: {
@@ -236,7 +237,7 @@ export class ClientsService {
 			);
 		}
 	}
-	
+
 	async deleteOne(id: string): Promise<ResponseClientsDto> {
 		try {
 			const findClient = await this.prismaService.clients.findFirst({
@@ -247,7 +248,6 @@ export class ClientsService {
 
 			if (!findClient)
 				throw new HttpException('Client not found', HttpStatus.NOT_FOUND);
-
 
 			await this.prismaService.clients.delete({
 				where: {

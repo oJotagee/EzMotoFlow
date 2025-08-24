@@ -19,7 +19,7 @@ let ClientsService = class ClientsService {
     }
     async getAll(filter) {
         try {
-            const { limit = 6, offset = 0, status = '', nome = '', } = filter;
+            const { limit = 6, offset = 0, status = '', nome = '' } = filter;
             const clients = await this.prismaService.clients.findMany({
                 select: {
                     id: true,
@@ -39,7 +39,7 @@ let ClientsService = class ClientsService {
                             contains: nome,
                             mode: 'insensitive',
                         },
-                    })
+                    }),
                 },
                 take: limit,
                 skip: offset,
@@ -76,7 +76,7 @@ let ClientsService = class ClientsService {
                     cidade: true,
                     estado: true,
                     complementos: true,
-                }
+                },
             });
             if (!clients)
                 throw new common_1.HttpException('Clients not found', common_1.HttpStatus.NOT_FOUND);
@@ -107,7 +107,9 @@ let ClientsService = class ClientsService {
                     documento: body.documento,
                     telefone: body.telefone,
                     email: body.email,
-                    dataNascimento: body.dataNascimento ? new Date(body.dataNascimento) : null,
+                    dataNascimento: body.dataNascimento
+                        ? new Date(body.dataNascimento)
+                        : null,
                     companyName: body.companyName,
                     cep: body.cep,
                     rua: body.rua,
@@ -169,7 +171,9 @@ let ClientsService = class ClientsService {
                 },
                 data: {
                     ...body,
-                    dataNascimento: body.dataNascimento ? new Date(body.dataNascimento) : undefined,
+                    dataNascimento: body.dataNascimento
+                        ? new Date(body.dataNascimento)
+                        : undefined,
                     updated_at: new Date(),
                 },
                 select: {

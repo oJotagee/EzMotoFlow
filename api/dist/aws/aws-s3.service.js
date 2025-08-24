@@ -10,9 +10,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AwsS3Service = void 0;
+const config_1 = require("@nestjs/config");
 const common_1 = require("@nestjs/common");
 const client_s3_1 = require("@aws-sdk/client-s3");
-const config_1 = require("@nestjs/config");
 let AwsS3Service = class AwsS3Service {
     configService;
     s3;
