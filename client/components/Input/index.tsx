@@ -56,13 +56,11 @@ function InputField(props: InputFieldProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [hasValue, setHasValue] = useState(false);
 
-  // Determinar automaticamente se o input tem valor
   useEffect(() => {
     const inputValue = props.input?.value || props.input?.defaultValue || '';
     setHasValue(!!inputValue);
   }, [props.input?.value, props.input?.defaultValue]);
 
-  // Detectar automaticamente os estados baseado no valor e props nativas
   const isDisabled = props.input?.disabled;
   const isReadOnly = props.input?.readOnly;
 
@@ -82,27 +80,22 @@ function InputField(props: InputFieldProps) {
   };
 
   const getInputClasses = () => {
-    // Estado Disabled (detectado automaticamente)
     if (isDisabled) {
       return "text-gray-400 opacity-40";
     }
     
-    // Estado Read-Only (detectado automaticamente)
     if (isReadOnly) {
       return "text-gray-700 cursor-default";
     }
 
-    // Estado Focused (detectado automaticamente)
     if (isFocused) {
       return "text-gray-900";
     }
 
-    // Estado Filled (detectado automaticamente)
     if (hasValue) {
       return "text-gray-900";
     }
 
-    // Estado Placeholder (padrão)
     return "text-gray-900";
   };
 
@@ -214,11 +207,9 @@ interface MaskInputFieldProps {
   input?: InputHTMLAttributes<HTMLInputElement>
 }
 
-
 function MaskInputField(props: MaskInputFieldProps) {
 	const { mask, input, testID } = props;
 	
-	// Converte a máscara para o formato do react-imask
 	const getIMaskPattern = (maskPattern: string) => {
 		if (maskPattern === '99999-999') {
 			return '00000-000';
@@ -239,7 +230,6 @@ function MaskInputField(props: MaskInputFieldProps) {
     </div>
 	);
 }
-
 
 interface NumberInputFieldProps {
   testID: string
@@ -411,7 +401,7 @@ export function Input(props: InputProps) {
   const finalVariant = errorMessage ? 'error' : variant;
 
   return (
-    <div className={`w-full flex flex-col items-start gap-1 ${className}`}>
+    <div className={`w-full flex flex-col items-start gap-1 text-gray-700 ${className}`}>
       {inputFieldProps.label && (
         <label htmlFor={inputFieldProps.input?.id || inputFieldProps.testID}>
           <Title
@@ -500,6 +490,7 @@ export function PasswordInput(props: PasswordInputProps) {
           <Title
             size='xs'
             bold='normal'
+            className='text-gray-700'
           >
             {props.inputFieldProps.label}
           </Title>
@@ -511,7 +502,7 @@ export function PasswordInput(props: PasswordInputProps) {
           ...props.inputFieldProps.input,
           type: show ? 'text' : 'password'
         }} />
-        <span className='flex items-center justify-center cursor-pointer' onClick={() => setShow(!show)}>
+        <span className='flex items-center justify-center cursor-pointer text-gray-700' onClick={() => setShow(!show)}>
           {show ? <LuEyeOff className='w-6 h-6' /> : <LuEye className='w-6 h-6' />}
         </span>
       </InputRoot>

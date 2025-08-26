@@ -1,4 +1,4 @@
-import { useAuthStore } from '../store/userStore';
+import { useUser } from '../store/userStore';
 import axios, { AxiosResponse } from 'axios';
 
 const api = axios.create({
@@ -11,7 +11,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
 	(config) => {
-		const token = useAuthStore.getState().token;
+		const token = useUser.getState().user.token;
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`;
 		}
@@ -25,10 +25,6 @@ api.interceptors.request.use(
 api.interceptors.response.use(
 	(response: AxiosResponse) => response,
 	(error) => {
-		if (error.response?.status === 401) {
-			useAuthStore.getState().logout();
-			window.location.href = '/login';
-		}
 		return Promise.reject(error);
 	},
 );

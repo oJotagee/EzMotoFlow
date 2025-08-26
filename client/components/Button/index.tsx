@@ -20,7 +20,7 @@ export function Button(props: ButtonProps) {
       data-test-id={props.testID}
       disabled={props.disabled}
       onClick={!props.loading && props.onClick || undefined}
-      className={clsx(`flex items-center h-12 transition-all duration-300 justify-center py-2 px-4 rounded gap-3 disabled:opacity-20  disabled:border-gray-400 ${props.className || ''} ${(props.type === 'primary' || !props.type) ? 'bg-main-500 border-none text-white hover:[&:not(:disabled)]:!bg-main-700 focus:ring-main-300 focus:ring-2' : ''}`, {
+      className={clsx(`flex items-center h-12 transition-all duration-300 justify-center py-2 px-4 rounded gap-3 disabled:opacity-20 cursor-pointer disabled:border-gray-400 ${props.className || ''} ${(props.type === 'primary' || !props.type) ? 'bg-main-500 border-none text-white hover:[&:not(:disabled)]:!bg-main-700 focus:ring-main-300 focus:ring-2' : ''}`, {
         "bg-slate-500 border-none text-white hover:[&:not(:disabled)]:g-slate-700 focus:ring-red-300 focus:ring-2": props.type === 'off',
         "bg-red-500 border-none text-white hover:[&:not(:disabled)]:bg-red-700 focus:ring-red-300 focus:ring-2": props.type === 'error',
         "bg-green-500 border-none text-white hover:[&:not(:disabled)]:bg-green-700 focus:ring-green-300 focus:ring-2": props.type === 'success',

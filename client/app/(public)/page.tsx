@@ -37,37 +37,36 @@ export default function Login() {
   });
 
   const { mutate, isPending: sending } = useMutation({
-    mutationFn: async (values: any) => {
-      const { data } = await api.post("/Auth", {
-        login: values.Email,
-        password: values.Senha,
+    mutationFn: async (values: Register) => {
+      const { data } = await api.post("/auth", {
+        email: values.email,
+        password: values.password,
       });
-
-      console.log(data)
 
       return data
     },
     onSuccess(data) {
+      console.log(data)
       setUser({
-        expiration: data.data.dtExpiration,
-        token: data.data.token,
-        email: data.data.userEmail,
-        id: data.data.userId,
-        nome: data.data.userName,
+        expiration: data.dtExpiration,
+        token: data.token,
+        email: data.userEmail,
+        id: data.userId,
+        nome: data.userName,
       });
 
-      Cookies.set("user-pre-auth", data.data.token);
-      Cookies.set("user-auth", data.data.token);
+      Cookies.set("user-pre-auth", data.token);
+      Cookies.set("user-auth", data.token);
 
-      router.push(`/backoffice/Home`);
+      router.push(`/backoffice/`);
     },
     onError(error) {
       setError("email", {
-        message: "E-mail inválidos, tente novamente!",
+        message: "E-mail inválido, tente novamente!",
       });
 
       setError("password", {
-        message: "Senha inválidos, tente novamente!",
+        message: "Senha inválida, tente novamente!",
       });
     },
   });
@@ -84,7 +83,7 @@ export default function Login() {
         </div>
 
         <Title size="lg" bold="bold" className="text-gray-900 text-center mb-2">
-          ezmotoflow
+          EzMotoFlow
         </Title>
 
         <Title size="base" bold="normal" className="text-gray-600 text-center mb-8">
