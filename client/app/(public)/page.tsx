@@ -4,6 +4,7 @@ import { Input, PasswordInput } from '../../components/Input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '../../components/Button';
+import { Title } from '../../components/Title';
 import { useUser } from '../../store/userStore';
 import { MdOutlineLock } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
@@ -74,71 +75,63 @@ export default function Login() {
   const onSubmit = (values: any) => mutate(values)
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5 px-4">
-      <Card className="w-full max-w-md card-elevated">
-        <CardHeader className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="h-16 w-16 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
-              <Bike className="h-8 w-8 text-white" />
-            </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-2xl p-8">
+        <div className="flex justify-center mb-6">
+          <div className="h-16 w-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
+            <Bike className="h-8 w-8 text-white" />
           </div>
-          <CardTitle className="text-2xl font-bold text-center">
-            Entrar no Sistema
-          </CardTitle>
-          <p className="text-muted-foreground text-center">
-            Faça login para acessar o painel administrativo
-          </p>
-        </CardHeader>
-        
-        <CardContent>
-          <form className="space-y-4 flex w-full flex-col gap-6">
-            <Input
-              inputFieldProps={{
-                testID: "Email",
-                label: "Usuário / e-mail",
-                input: {
-                  ...register("email"),
-                  disabled: isSubmitting,
-                  id: "Email",
-                  placeholder: "Insira seu nome de usuário ou e-mail",
-                },
-              }}
-              leftIcon={<FaRegUser className="w-4 h-4 mx-2" />}
-              errorMessage={(errors.email?.message as string) || undefined}
-            />
-            <PasswordInput
-              inputFieldProps={{
-                testID: "Senha",
-                label: "Senha",
-                input: {
-                  ...register("password"),
-                  disabled: isSubmitting,
-                  id: "Senha",
-                  placeholder: "Insira sua senha",
-                },
-              }}
-              leftIcon={<MdOutlineLock className="w-5 h-5 mx-2" />}
-              errorMessage={(errors.password?.message as string) || undefined}
-              message={
-                <span
-                  className="text-[#FFA200] cursor-pointer hover:underline"
-                  onClick={() => router.push("/esqueceu-sua-senha")}
-                >
-                  Esqueceu sua senha?
-                </span>
-              }
-            />
-            <Button
-              testID="Entrar"
-              onClick={handleSubmit(onSubmit)}
-              loading={sending}
-              color={"#FFA200"}
-            >
-              Entrar
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+        </div>
+
+        <Title size="lg" bold="bold" className="text-gray-900 text-center mb-2">
+          ezmotoflow
+        </Title>
+
+        <Title size="base" bold="normal" className="text-gray-600 text-center mb-8">
+          Faça login para acessar o painel administrativo
+        </Title>
+
+        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          <Input
+            inputFieldProps={{
+              testID: "Email",
+              label: "Email",
+              input: {
+                ...register("email"),
+                disabled: isSubmitting,
+                id: "Email",
+                placeholder: "seu@email.com",
+              },
+            }}
+            leftIcon={<FaRegUser className="w-4 h-4" />}
+            errorMessage={(errors.email?.message as string) || undefined}
+          />
+
+          <PasswordInput
+            inputFieldProps={{
+              testID: "Senha",
+              label: "Senha",
+              input: {
+                ...register("password"),
+                disabled: isSubmitting,
+                id: "Senha",
+                placeholder: "********",
+              },
+            }}
+            leftIcon={<MdOutlineLock className="w-4 h-4 text-gray-400" />}
+            errorMessage={(errors.password?.message as string) || undefined}
+          />
+
+          <Button
+            testID="Entrar"
+            onClick={handleSubmit(onSubmit)}
+            loading={sending}
+            className="w-full bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-medium py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+          >
+            Entrar
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
