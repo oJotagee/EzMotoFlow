@@ -32,7 +32,7 @@ export class ClientsService {
 				where: {
 					...(status && { status }),
 					...(nome && {
-						nome: {
+						fullName: {
 							contains: nome,
 							mode: 'insensitive',
 						},
