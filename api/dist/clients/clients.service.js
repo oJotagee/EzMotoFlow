@@ -19,7 +19,7 @@ let ClientsService = class ClientsService {
     }
     async getAll(filter) {
         try {
-            const { limit = 6, offset = 0, status = '', nome = '' } = filter;
+            const { limit = 6, offset = 0, status = '', nome = '', tipo = '', } = filter;
             const clients = await this.prismaService.clients.findMany({
                 select: {
                     id: true,
@@ -40,6 +40,7 @@ let ClientsService = class ClientsService {
                             mode: 'insensitive',
                         },
                     }),
+                    ...(tipo && { tipo: { equals: tipo } }),
                 },
                 take: limit,
                 skip: offset,

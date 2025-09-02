@@ -15,9 +15,10 @@ const pagination_dto_1 = require("../../commom/dto/pagination.dto");
 const class_validator_1 = require("class-validator");
 class FilterDto extends pagination_dto_1.PaginationDto {
     status;
+    tipo;
     nome;
     static _OPENAPI_METADATA_FACTORY() {
-        return { status: { required: false, type: () => Object, enum: ['ativo', 'inativo'] }, nome: { required: false, type: () => String } };
+        return { status: { required: false, type: () => Object, enum: ['ativo', 'inativo'] }, tipo: { required: false, type: () => Object, enum: ['PESSOA_FISICA', 'PESSOA_JURIDICA'] }, nome: { required: false, type: () => String } };
     }
 }
 exports.FilterDto = FilterDto;
@@ -26,6 +27,11 @@ __decorate([
     (0, class_validator_1.IsIn)(['ativo', 'inativo']),
     __metadata("design:type", String)
 ], FilterDto.prototype, "status", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsIn)(['PESSOA_FISICA', 'PESSOA_JURIDICA']),
+    __metadata("design:type", String)
+], FilterDto.prototype, "tipo", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),

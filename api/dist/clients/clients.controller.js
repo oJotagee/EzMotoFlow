@@ -67,6 +67,12 @@ __decorate([
         description: 'Filter by clients status: "active" or "inactive"',
     }),
     (0, swagger_1.ApiQuery)({
+        name: 'tipo',
+        required: false,
+        example: '',
+        description: 'Filter by type: "PESSOA_FISICA" or "PESSOA_JURIDICA"',
+    }),
+    (0, swagger_1.ApiQuery)({
         name: 'nome',
         required: false,
         example: '',

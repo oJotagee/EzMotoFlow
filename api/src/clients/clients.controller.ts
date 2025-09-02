@@ -48,6 +48,12 @@ export class ClientsController {
 		description: 'Filter by clients status: "active" or "inactive"',
 	})
 	@ApiQuery({
+		name: 'tipo',
+		required: false,
+		example: '',
+		description: 'Filter by type: "PESSOA_FISICA" or "PESSOA_JURIDICA"',
+	})
+	@ApiQuery({
 		name: 'nome',
 		required: false,
 		example: '',
