@@ -76,7 +76,7 @@ export class ContractController {
 		example: 2025,
 		description: 'Filtrar por ano da motocicleta (exato)',
 	})
-	fintAllMotorcycle(@Query() Filter: FilterDto) {
+	fintAllContract(@Query() Filter: FilterDto) {
 		return this.contractsService.getAll(Filter);
 	}
 
@@ -89,7 +89,7 @@ export class ContractController {
 		example: 'dtpysooc8k9p2mk6f09rv5ro',
 		description: 'Contract identifier',
 	})
-	findMotorcycleById(@Query('id') id: string) {
+	findContractId(@Query('id') id: string) {
 		return this.contractsService.getOne(id);
 	}
 

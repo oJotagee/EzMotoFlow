@@ -168,8 +168,11 @@ export class ClientsService {
 	): Promise<ResponseAllClientsDto> {
 		try {
 			if (body.documento) {
-				const existingByDocument = await this.prismaService.clients.findUnique({
-					where: { documento: body.documento },
+				const existingByDocument = await this.prismaService.clients.findFirst({
+					where: {
+						documento: body.documento,
+						id: { not: id },
+					},
 				});
 
 				if (existingByDocument)
@@ -180,8 +183,11 @@ export class ClientsService {
 			}
 
 			if (body.email) {
-				const existingByemail = await this.prismaService.clients.findUnique({
-					where: { email: body.email },
+				const existingByemail = await this.prismaService.clients.findFirst({
+					where: {
+						email: body.email,
+						id: { not: id },
+					},
 				});
 
 				if (existingByemail)

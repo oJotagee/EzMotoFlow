@@ -25,10 +25,10 @@ let ContractController = class ContractController {
     constructor(contractsService) {
         this.contractsService = contractsService;
     }
-    fintAllMotorcycle(Filter) {
+    fintAllContract(Filter) {
         return this.contractsService.getAll(Filter);
     }
-    findMotorcycleById(id) {
+    findContractId(id) {
         return this.contractsService.getOne(id);
     }
     CreateContract(body) {
@@ -103,7 +103,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [filter_dto_1.FilterDto]),
     __metadata("design:returntype", void 0)
-], ContractController.prototype, "fintAllMotorcycle", null);
+], ContractController.prototype, "fintAllContract", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiBearerAuth)(),
@@ -119,7 +119,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], ContractController.prototype, "findMotorcycleById", null);
+], ContractController.prototype, "findContractId", null);
 __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiBearerAuth)(),

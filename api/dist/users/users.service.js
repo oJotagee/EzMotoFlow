@@ -20,6 +20,39 @@ let UsersService = class UsersService {
         this.prismaService = prismaService;
         this.hashingService = hashingService;
     }
+    async getAll(filter) {
+        try {
+            const { limit = 6, offset = 0, nomeUser } = filter;
+            const users = await this.prismaService.users.findMany({
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    created_at: true,
+                    updated_at: true,
+                },
+                where: {
+                    ...(filter.nomeUser && {
+                        name: {
+                            contains: nomeUser,
+                            mode: 'insensitive',
+                        },
+                    }),
+                },
+                take: limit,
+                skip: offset,
+                orderBy: {
+                    created_at: 'asc',
+                },
+            });
+            return users;
+        }
+        catch (error) {
+            throw new common_1.HttpException('Failed to get all users', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     async getUser(tokenPayload) {
         try {
             const findUser = await this.prismaService.users.findFirst({
@@ -77,8 +110,10 @@ let UsersService = class UsersService {
     }
     async update(updateUserDto, tokenPayload) {
         try {
-            const existingByEmail = await this.prismaService.users.findUnique({
-                where: { email: updateUserDto.email },
+            const existingByEmail = await this.prismaService.users.findFirst({
+                where: {
+                    email: updateUserDto.email,
+                },
             });
             if (existingByEmail && existingByEmail.id !== tokenPayload.sub)
                 throw new common_1.HttpException('A user with this email address is already registered.', common_1.HttpStatus.CONFLICT);

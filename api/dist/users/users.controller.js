@@ -22,10 +22,14 @@ const create_user_dto_1 = require("./dto/create-user.dto");
 const payload_dto_1 = require("../auth/dto/payload.dto");
 const users_service_1 = require("./users.service");
 const common_1 = require("@nestjs/common");
+const filter_dto_1 = require("./dto/filter.dto");
 let UsersController = class UsersController {
     userService;
     constructor(userService) {
         this.userService = userService;
+    }
+    fintAllContract(Filter) {
+        return this.userService.getAll(Filter);
     }
     findOneUser(tokenPayload) {
         return this.userService.getUser(tokenPayload);
@@ -41,6 +45,35 @@ let UsersController = class UsersController {
     }
 };
 exports.UsersController = UsersController;
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all users' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'limit',
+        required: false,
+        example: 10,
+        description: 'Limit of users to fetch',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'offset',
+        required: false,
+        example: 0,
+        description: 'Number of users to skip',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'nomeUser',
+        required: false,
+        example: '',
+        description: 'Filter by user name',
+    }),
+    openapi.ApiResponse({ status: 200, type: [require("./dto/response.dto").ResponseFindUserDto] }),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [filter_dto_1.FilterDto]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "fintAllContract", null);
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiBearerAuth)(),

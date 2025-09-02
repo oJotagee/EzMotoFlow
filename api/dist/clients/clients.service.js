@@ -145,15 +145,21 @@ let ClientsService = class ClientsService {
     async updateOne(id, body) {
         try {
             if (body.documento) {
-                const existingByDocument = await this.prismaService.clients.findUnique({
-                    where: { documento: body.documento },
+                const existingByDocument = await this.prismaService.clients.findFirst({
+                    where: {
+                        documento: body.documento,
+                        id: { not: id },
+                    },
                 });
                 if (existingByDocument)
                     throw new common_1.HttpException('Document is already registered.', common_1.HttpStatus.CONFLICT);
             }
             if (body.email) {
-                const existingByemail = await this.prismaService.clients.findUnique({
-                    where: { email: body.email },
+                const existingByemail = await this.prismaService.clients.findFirst({
+                    where: {
+                        email: body.email,
+                        id: { not: id },
+                    },
                 });
                 if (existingByemail)
                     throw new common_1.HttpException('Email is already registered.', common_1.HttpStatus.CONFLICT);

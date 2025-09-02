@@ -1,6 +1,6 @@
 import { TokenPayload } from 'src/auth/params/token-payload.param';
 import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PayloadDto } from 'src/auth/dto/payload.dto';
@@ -12,12 +12,40 @@ import {
 	Get,
 	Patch,
 	Post,
+	Query,
 	UseGuards,
 } from '@nestjs/common';
+import { FilterDto } from './dto/filter.dto';
 
 @Controller('users')
 export class UsersController {
 	constructor(private readonly userService: UsersService) {}
+
+	@Get()
+	@ApiBearerAuth()
+	@UseGuards(AuthTokenGuard)
+	@ApiOperation({ summary: 'Get all users' })
+	@ApiQuery({
+		name: 'limit',
+		required: false,
+		example: 10,
+		description: 'Limit of users to fetch',
+	})
+	@ApiQuery({
+		name: 'offset',
+		required: false,
+		example: 0,
+		description: 'Number of users to skip',
+	})
+	@ApiQuery({
+		name: 'nomeUser',
+		required: false,
+		example: '',
+		description: 'Filter by user name',
+	})
+	fintAllContract(@Query() Filter: FilterDto) {
+		return this.userService.getAll(Filter);
+	}
 
 	@Get()
 	@ApiBearerAuth()
