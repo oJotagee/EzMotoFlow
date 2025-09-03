@@ -4,8 +4,8 @@ import { FilterDto } from './dto/filter.dto';
 export declare class ContractController {
     private readonly contractsService;
     constructor(contractsService: ContractService);
-    fintAllContract(Filter: FilterDto): Promise<import("./dto/response.dto").ResponseAllContractsDto[]>;
-    findContractId(id: string): Promise<import("./dto/response.dto").ResponseAllContractsDto>;
-    CreateContract(body: CreateContractDto): Promise<import("./dto/response.dto").ResponseAllContractsDto>;
-    DeleteContract(id: string): Promise<import("./dto/response.dto").ResponseContractsDto>;
+    findAllContracts(filter: FilterDto): Promise<import("./dto/response.dto").PaginatedContractsResponseDto>;
+    findContractById(id: string): Promise<import("./dto/response.dto").ResponseAllContractsDto>;
+    createContract(body: CreateContractDto): Promise<import("./dto/response.dto").ResponseAllContractsDto>;
+    deleteContract(id: string): Promise<import("./dto/response.dto").ResponseContractsDto>;
 }

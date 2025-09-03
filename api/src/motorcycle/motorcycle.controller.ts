@@ -28,24 +28,24 @@ export class MotorcycleController {
 	@Get()
 	@ApiBearerAuth()
 	@UseGuards(AuthTokenGuard)
-	@ApiOperation({ summary: 'Get all motorcycles' })
+	@ApiOperation({ summary: 'Get all motorcycles with pagination' })
 	@ApiQuery({
 		name: 'limit',
 		required: false,
 		example: 10,
-		description: 'Limit of motorcycle to fetch',
+		description: 'Limit of motorcycles to fetch (max 10)',
 	})
 	@ApiQuery({
 		name: 'offset',
 		required: false,
 		example: 0,
-		description: 'Number of motorcycle to skip',
+		description: 'Number of motorcycles to skip',
 	})
 	@ApiQuery({
 		name: 'status',
 		required: false,
 		example: '',
-		description: 'Filter by motorcycle status: "active", "inactive" or "sold"',
+		description: 'Filter by motorcycle status: "ativo", "inativo" or "vendido"',
 	})
 	@ApiQuery({
 		name: 'placa',
@@ -63,22 +63,22 @@ export class MotorcycleController {
 		name: 'anoMin',
 		required: false,
 		example: 2017,
-		description: 'Filtrar por ano da motocicleta (exato)',
+		description: 'Filter by minimum year (inclusive)',
 	})
 	@ApiQuery({
 		name: 'anoMax',
 		required: false,
 		example: 2025,
-		description: 'Filtrar por ano da motocicleta (exato)',
+		description: 'Filter by maximum year (inclusive)',
 	})
-	fintAllMotorcycle(@Query() Filter: FilterDto) {
-		return this.motorcycleService.getAll(Filter);
+	findAllMotorcycles(@Query() filter: FilterDto) {
+		return this.motorcycleService.getAll(filter);
 	}
 
 	@Get(':id')
 	@ApiBearerAuth()
 	@UseGuards(AuthTokenGuard)
-	@ApiOperation({ summary: 'Find a motorcycle' })
+	@ApiOperation({ summary: 'Find a motorcycle by ID' })
 	@ApiParam({
 		name: 'id',
 		example: 'dtpysooc8k9p2mk6f09rv5ro',
@@ -91,7 +91,8 @@ export class MotorcycleController {
 	@Post()
 	@ApiBearerAuth()
 	@UseGuards(AuthTokenGuard)
-	CreateMotorcycle(@Body() body: CreateMotorCycleDto) {
+	@ApiOperation({ summary: 'Create a new motorcycle' })
+	createMotorcycle(@Body() body: CreateMotorCycleDto) {
 		return this.motorcycleService.createOne(body);
 	}
 
@@ -104,7 +105,7 @@ export class MotorcycleController {
 		example: 'dtpysooc8k9p2mk6f09rv5ro',
 		description: 'Motorcycle identifier',
 	})
-	UpdatePost(@Param('id') id: string, @Body() body: UpdateMotorcycleDto) {
+	updateMotorcycle(@Param('id') id: string, @Body() body: UpdateMotorcycleDto) {
 		return this.motorcycleService.updateOne(id, body);
 	}
 
@@ -117,7 +118,7 @@ export class MotorcycleController {
 		description: 'Motorcycle identifier',
 	})
 	@ApiOperation({ summary: 'Delete a motorcycle' })
-	DeletePost(@Param('id') id: string) {
+	deleteMotorcycle(@Param('id') id: string) {
 		return this.motorcycleService.deleteOne(id);
 	}
 }

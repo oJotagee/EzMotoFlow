@@ -28,7 +28,7 @@ class CreateMotorCycleDto {
     foto2;
     foto3;
     static _OPENAPI_METADATA_FACTORY() {
-        return { nome: { required: true, type: () => String }, cor: { required: true, type: () => String }, placa: { required: true, type: () => String, maxLength: 7 }, ano: { required: true, type: () => String }, chassi: { required: true, type: () => String, maxLength: 17 }, renavam: { required: true, type: () => String, maxLength: 11 }, km: { required: true, type: () => String }, valor_compra: { required: true, type: () => Number }, valor_venda: { required: true, type: () => Number }, valor_fipe: { required: true, type: () => Number }, observacao: { required: true, type: () => String }, foto1: { required: false, type: () => String }, foto2: { required: false, type: () => String }, foto3: { required: false, type: () => String } };
+        return { nome: { required: true, type: () => String }, cor: { required: true, type: () => String }, placa: { required: true, type: () => String, maxLength: 8 }, ano: { required: true, type: () => String }, chassi: { required: true, type: () => String, maxLength: 17 }, renavam: { required: true, type: () => String, maxLength: 11 }, km: { required: true, type: () => String }, valor_compra: { required: true, type: () => Number }, valor_venda: { required: true, type: () => Number }, valor_fipe: { required: true, type: () => Number }, observacao: { required: true, type: () => String }, foto1: { required: false, type: () => String }, foto2: { required: false, type: () => String }, foto3: { required: false, type: () => String } };
     }
 }
 exports.CreateMotorCycleDto = CreateMotorCycleDto;
@@ -44,7 +44,7 @@ __decorate([
 ], CreateMotorCycleDto.prototype, "cor", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MaxLength)(7),
+    (0, class_validator_1.MaxLength)(8),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateMotorCycleDto.prototype, "placa", void 0);

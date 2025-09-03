@@ -28,12 +28,12 @@ export class ClientsController {
 	@Get()
 	@ApiBearerAuth()
 	@UseGuards(AuthTokenGuard)
-	@ApiOperation({ summary: 'Get all clients' })
+	@ApiOperation({ summary: 'Get all clients with pagination' })
 	@ApiQuery({
 		name: 'limit',
 		required: false,
 		example: 10,
-		description: 'Limit of clients to fetch',
+		description: 'Limit of clients to fetch (max 10)',
 	})
 	@ApiQuery({
 		name: 'offset',
@@ -45,7 +45,7 @@ export class ClientsController {
 		name: 'status',
 		required: false,
 		example: '',
-		description: 'Filter by clients status: "active" or "inactive"',
+		description: 'Filter by clients status: "ativo" or "inativo"',
 	})
 	@ApiQuery({
 		name: 'tipo',
@@ -59,27 +59,28 @@ export class ClientsController {
 		example: '',
 		description: 'Filter by clients name',
 	})
-	fintAllMotorcycle(@Query() Filter: FilterDto) {
-		return this.clientsService.getAll(Filter);
+	findAllClients(@Query() filter: FilterDto) {
+		return this.clientsService.getAll(filter);
 	}
 
 	@Get(':id')
 	@ApiBearerAuth()
 	@UseGuards(AuthTokenGuard)
-	@ApiOperation({ summary: 'Find a clients' })
+	@ApiOperation({ summary: 'Find a client by ID' })
 	@ApiParam({
 		name: 'id',
 		example: 'dtpysooc8k9p2mk6f09rv5ro',
-		description: 'Clients identifier',
+		description: 'Client identifier',
 	})
-	findMotorcycleById(@Param('id') id: string) {
+	findClientById(@Param('id') id: string) {
 		return this.clientsService.getOne(id);
 	}
 
 	@Post()
 	@ApiBearerAuth()
 	@UseGuards(AuthTokenGuard)
-	CreateMotorcycle(@Body() body: CreateClientDto) {
+	@ApiOperation({ summary: 'Create a new client' })
+	createClient(@Body() body: CreateClientDto) {
 		return this.clientsService.createOne(body);
 	}
 
@@ -92,7 +93,7 @@ export class ClientsController {
 		example: 'dtpysooc8k9p2mk6f09rv5ro',
 		description: 'Client identifier',
 	})
-	UpdatePost(@Param('id') id: string, @Body() body: UpdateClientsDto) {
+	updateClient(@Param('id') id: string, @Body() body: UpdateClientsDto) {
 		return this.clientsService.updateOne(id, body);
 	}
 
@@ -105,7 +106,7 @@ export class ClientsController {
 		description: 'Client identifier',
 	})
 	@ApiOperation({ summary: 'Delete a client' })
-	DeletePost(@Param('id') id: string) {
+	deleteClient(@Param('id') id: string) {
 		return this.clientsService.deleteOne(id);
 	}
 }

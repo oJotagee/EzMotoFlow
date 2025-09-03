@@ -28,3 +28,11 @@ export class ResponseAllContractsDto {
 export class ResponseContractsDto {
 	message: string;
 }
+
+export class PaginatedContractsResponseDto {
+	data: ResponseAllContractsDto[];
+	total: number;
+	page: number;
+	limit: number;
+	pages: number;
+}

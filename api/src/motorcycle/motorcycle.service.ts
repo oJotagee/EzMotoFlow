@@ -7,6 +7,7 @@ import { FilterDto } from './dto/filter.dto';
 import {
 	ResponseAllMotorcycleDto,
 	ResponseMotorcycleDto,
+	PaginatedMotorcyclesResponseDto,
 } from './dto/response.dto';
 
 @Injectable()
@@ -16,10 +17,10 @@ export class MotorcycleService {
 		private s3Service: AwsS3Service,
 	) {}
 
-	async getAll(filter: FilterDto): Promise<ResponseAllMotorcycleDto[]> {
+	async getAll(filter: FilterDto): Promise<PaginatedMotorcyclesResponseDto> {
 		try {
 			const {
-				limit = 6,
+				limit = 10,
 				offset = 0,
 				status = '',
 				placa = '',
@@ -27,6 +28,48 @@ export class MotorcycleService {
 				anoMin,
 				anoMax,
 			} = filter;
+
+			const page = Math.floor(offset / limit) + 1;
+
+			const whereConditions = {
+				...(status && { status }),
+				...(placa && {
+					placa: {
+						contains: placa,
+						mode: 'insensitive' as const,
+					},
+				}),
+				...(nome && {
+					nome: {
+						contains: nome,
+						mode: 'insensitive' as const,
+					},
+				}),
+				...(anoMin !== undefined && anoMax !== undefined
+					? {
+							ano: {
+								gte: new Date(`${anoMin}-01-01T00:00:00.000Z`),
+								lte: new Date(`${anoMax}-12-31T23:59:59.999Z`),
+							},
+						}
+					: anoMin !== undefined
+						? {
+								ano: {
+									gte: new Date(`${anoMin}-01-01T00:00:00.000Z`),
+								},
+							}
+						: anoMax !== undefined
+							? {
+									ano: {
+										lte: new Date(`${anoMax}-12-31T23:59:59.999Z`),
+									},
+								}
+							: {}),
+			};
+
+			const total = await this.prismaService.motorCycle.count({
+				where: whereConditions,
+			});
 
 			const motorcycles = await this.prismaService.motorCycle.findMany({
 				select: {
@@ -46,41 +89,7 @@ export class MotorcycleService {
 					created_at: true,
 					updated_at: true,
 				},
-				where: {
-					...(status && { status }),
-					...(placa && {
-						placa: {
-							contains: placa,
-							mode: 'insensitive',
-						},
-					}),
-					...(nome && {
-						nome: {
-							contains: nome,
-							mode: 'insensitive',
-						},
-					}),
-					...(anoMin !== undefined && anoMax !== undefined
-						? {
-								ano: {
-									gte: new Date(`${anoMin}-01-01T00:00:00.000Z`),
-									lte: new Date(`${anoMax}-12-31T23:59:59.999Z`),
-								},
-							}
-						: anoMin !== undefined
-							? {
-									ano: {
-										gte: new Date(`${anoMin}-01-01T00:00:00.000Z`),
-									},
-								}
-							: anoMax !== undefined
-								? {
-										ano: {
-											lte: new Date(`${anoMax}-12-31T23:59:59.999Z`),
-										},
-									}
-								: {}),
-				},
+				where: whereConditions,
 				take: limit,
 				skip: offset,
 				orderBy: {
@@ -88,7 +97,15 @@ export class MotorcycleService {
 				},
 			});
 
-			return motorcycles;
+			const pages = Math.ceil(total / limit);
+
+			return {
+				data: motorcycles,
+				total,
+				page,
+				limit,
+				pages,
+			};
 		} catch (error) {
 			throw new HttpException(
 				'Failed to get all motorcycles',
@@ -280,7 +297,7 @@ export class MotorcycleService {
 					{
 						where: {
 							renavam: body.renavam,
-							id: { not: id }, // ignora o próprio registro
+							id: { not: id },
 						},
 					},
 				);
@@ -302,7 +319,6 @@ export class MotorcycleService {
 			if (!findMotorcycle)
 				throw new HttpException('Motorcycle not found', HttpStatus.NOT_FOUND);
 
-			// Atualiza foto1
 			let foto1 = findMotorcycle.foto1;
 			if (body.foto1 !== undefined) {
 				if (

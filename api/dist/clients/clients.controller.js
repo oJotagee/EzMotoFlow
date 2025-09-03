@@ -26,19 +26,19 @@ let ClientsController = class ClientsController {
     constructor(clientsService) {
         this.clientsService = clientsService;
     }
-    fintAllMotorcycle(Filter) {
-        return this.clientsService.getAll(Filter);
+    findAllClients(filter) {
+        return this.clientsService.getAll(filter);
     }
-    findMotorcycleById(id) {
+    findClientById(id) {
         return this.clientsService.getOne(id);
     }
-    CreateMotorcycle(body) {
+    createClient(body) {
         return this.clientsService.createOne(body);
     }
-    UpdatePost(id, body) {
+    updateClient(id, body) {
         return this.clientsService.updateOne(id, body);
     }
-    DeletePost(id) {
+    deleteClient(id) {
         return this.clientsService.deleteOne(id);
     }
 };
@@ -47,12 +47,12 @@ __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: 'Get all clients' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all clients with pagination' }),
     (0, swagger_1.ApiQuery)({
         name: 'limit',
         required: false,
         example: 10,
-        description: 'Limit of clients to fetch',
+        description: 'Limit of clients to fetch (max 10)',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'offset',
@@ -64,7 +64,7 @@ __decorate([
         name: 'status',
         required: false,
         example: '',
-        description: 'Filter by clients status: "active" or "inactive"',
+        description: 'Filter by clients status: "ativo" or "inativo"',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'tipo',
@@ -78,38 +78,39 @@ __decorate([
         example: '',
         description: 'Filter by clients name',
     }),
-    openapi.ApiResponse({ status: 200, type: [require("./dto/response.dto").ResponseAllClientsDto] }),
+    openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").PaginatedClientsResponseDto }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [filter_dto_1.FilterDto]),
     __metadata("design:returntype", void 0)
-], ClientsController.prototype, "fintAllMotorcycle", null);
+], ClientsController.prototype, "findAllClients", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: 'Find a clients' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Find a client by ID' }),
     (0, swagger_1.ApiParam)({
         name: 'id',
         example: 'dtpysooc8k9p2mk6f09rv5ro',
-        description: 'Clients identifier',
+        description: 'Client identifier',
     }),
     openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").ResponseClientDto }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], ClientsController.prototype, "findMotorcycleById", null);
+], ClientsController.prototype, "findClientById", null);
 __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new client' }),
     openapi.ApiResponse({ status: 201, type: require("./dto/response.dto").ResponseAllClientsDto }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_clients_dto_1.CreateClientDto]),
     __metadata("design:returntype", void 0)
-], ClientsController.prototype, "CreateMotorcycle", null);
+], ClientsController.prototype, "createClient", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, swagger_1.ApiBearerAuth)(),
@@ -126,7 +127,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_clients_dto_1.UpdateClientsDto]),
     __metadata("design:returntype", void 0)
-], ClientsController.prototype, "UpdatePost", null);
+], ClientsController.prototype, "updateClient", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiBearerAuth)(),
@@ -142,7 +143,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], ClientsController.prototype, "DeletePost", null);
+], ClientsController.prototype, "deleteClient", null);
 exports.ClientsController = ClientsController = __decorate([
     (0, common_1.Controller)('clients'),
     __metadata("design:paramtypes", [clients_service_1.ClientsService])

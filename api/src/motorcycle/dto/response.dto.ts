@@ -18,3 +18,11 @@ export class ResponseAllMotorcycleDto {
 export class ResponseMotorcycleDto {
 	message: string;
 }
+
+export class PaginatedMotorcyclesResponseDto {
+	data: ResponseAllMotorcycleDto[];
+	total: number;
+	page: number;
+	limit: number;
+	pages: number;
+}

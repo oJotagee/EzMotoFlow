@@ -20,3 +20,10 @@ export declare class ResponseUpdateUserDto {
 export declare class ResponseDeleteUserDto {
     message: string;
 }
+export declare class PaginatedUsersResponseDto {
+    data: ResponseFindUserDto[];
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+}

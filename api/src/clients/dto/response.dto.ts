@@ -32,3 +32,11 @@ export class ResponseClientDto {
 export class ResponseClientsDto {
 	message: string;
 }
+
+export class PaginatedClientsResponseDto {
+	data: ResponseAllClientsDto[];
+	total: number;
+	page: number;
+	limit: number;
+	pages: number;
+}

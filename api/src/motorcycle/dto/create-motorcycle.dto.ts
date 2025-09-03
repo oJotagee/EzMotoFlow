@@ -17,7 +17,7 @@ export class CreateMotorCycleDto {
 	readonly cor: string;
 
 	@IsString()
-	@MaxLength(7)
+	@MaxLength(8)
 	@IsNotEmpty()
 	readonly placa: string;
 

@@ -26,19 +26,19 @@ let MotorcycleController = class MotorcycleController {
     constructor(motorcycleService) {
         this.motorcycleService = motorcycleService;
     }
-    fintAllMotorcycle(Filter) {
-        return this.motorcycleService.getAll(Filter);
+    findAllMotorcycles(filter) {
+        return this.motorcycleService.getAll(filter);
     }
     findMotorcycleById(id) {
         return this.motorcycleService.getOne(id);
     }
-    CreateMotorcycle(body) {
+    createMotorcycle(body) {
         return this.motorcycleService.createOne(body);
     }
-    UpdatePost(id, body) {
+    updateMotorcycle(id, body) {
         return this.motorcycleService.updateOne(id, body);
     }
-    DeletePost(id) {
+    deleteMotorcycle(id) {
         return this.motorcycleService.deleteOne(id);
     }
 };
@@ -47,24 +47,24 @@ __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: 'Get all motorcycles' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all motorcycles with pagination' }),
     (0, swagger_1.ApiQuery)({
         name: 'limit',
         required: false,
         example: 10,
-        description: 'Limit of motorcycle to fetch',
+        description: 'Limit of motorcycles to fetch (max 10)',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'offset',
         required: false,
         example: 0,
-        description: 'Number of motorcycle to skip',
+        description: 'Number of motorcycles to skip',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'status',
         required: false,
         example: '',
-        description: 'Filter by motorcycle status: "active", "inactive" or "sold"',
+        description: 'Filter by motorcycle status: "ativo", "inativo" or "vendido"',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'placa',
@@ -82,25 +82,25 @@ __decorate([
         name: 'anoMin',
         required: false,
         example: 2017,
-        description: 'Filtrar por ano da motocicleta (exato)',
+        description: 'Filter by minimum year (inclusive)',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'anoMax',
         required: false,
         example: 2025,
-        description: 'Filtrar por ano da motocicleta (exato)',
+        description: 'Filter by maximum year (inclusive)',
     }),
-    openapi.ApiResponse({ status: 200, type: [require("./dto/response.dto").ResponseAllMotorcycleDto] }),
+    openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").PaginatedMotorcyclesResponseDto }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [filter_dto_1.FilterDto]),
     __metadata("design:returntype", void 0)
-], MotorcycleController.prototype, "fintAllMotorcycle", null);
+], MotorcycleController.prototype, "findAllMotorcycles", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: 'Find a motorcycle' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Find a motorcycle by ID' }),
     (0, swagger_1.ApiParam)({
         name: 'id',
         example: 'dtpysooc8k9p2mk6f09rv5ro',
@@ -116,12 +116,13 @@ __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new motorcycle' }),
     openapi.ApiResponse({ status: 201, type: require("./dto/response.dto").ResponseAllMotorcycleDto }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_motorcycle_dto_1.CreateMotorCycleDto]),
     __metadata("design:returntype", void 0)
-], MotorcycleController.prototype, "CreateMotorcycle", null);
+], MotorcycleController.prototype, "createMotorcycle", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, swagger_1.ApiBearerAuth)(),
@@ -138,7 +139,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_motorcycle_dto_1.UpdateMotorcycleDto]),
     __metadata("design:returntype", void 0)
-], MotorcycleController.prototype, "UpdatePost", null);
+], MotorcycleController.prototype, "updateMotorcycle", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiBearerAuth)(),
@@ -154,7 +155,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], MotorcycleController.prototype, "DeletePost", null);
+], MotorcycleController.prototype, "deleteMotorcycle", null);
 exports.MotorcycleController = MotorcycleController = __decorate([
     (0, common_1.Controller)('motorcycle'),
     __metadata("design:paramtypes", [motorcycle_service_1.MotorcycleService])

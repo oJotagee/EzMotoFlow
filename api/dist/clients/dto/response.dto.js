@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResponseClientsDto = exports.ResponseClientDto = exports.ResponseAllClientsDto = void 0;
+exports.PaginatedClientsResponseDto = exports.ResponseClientsDto = exports.ResponseClientDto = exports.ResponseAllClientsDto = void 0;
 const openapi = require("@nestjs/swagger");
 class ResponseAllClientsDto {
     id;
@@ -46,4 +46,15 @@ class ResponseClientsDto {
     }
 }
 exports.ResponseClientsDto = ResponseClientsDto;
+class PaginatedClientsResponseDto {
+    data;
+    total;
+    page;
+    limit;
+    pages;
+    static _OPENAPI_METADATA_FACTORY() {
+        return { data: { required: true, type: () => [require("./response.dto").ResponseAllClientsDto] }, total: { required: true, type: () => Number }, page: { required: true, type: () => Number }, limit: { required: true, type: () => Number }, pages: { required: true, type: () => Number } };
+    }
+}
+exports.PaginatedClientsResponseDto = PaginatedClientsResponseDto;
 //# sourceMappingURL=response.dto.js.map

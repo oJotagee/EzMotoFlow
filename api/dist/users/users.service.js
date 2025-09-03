@@ -22,7 +22,19 @@ let UsersService = class UsersService {
     }
     async getAll(filter) {
         try {
-            const { limit = 6, offset = 0, nomeUser } = filter;
+            const { limit = 10, offset = 0, nomeUser } = filter;
+            const page = Math.floor(offset / limit) + 1;
+            const whereConditions = {
+                ...(nomeUser && {
+                    name: {
+                        contains: nomeUser,
+                        mode: 'insensitive',
+                    },
+                }),
+            };
+            const total = await this.prismaService.users.count({
+                where: whereConditions,
+            });
             const users = await this.prismaService.users.findMany({
                 select: {
                     id: true,
@@ -31,21 +43,21 @@ let UsersService = class UsersService {
                     created_at: true,
                     updated_at: true,
                 },
-                where: {
-                    ...(filter.nomeUser && {
-                        name: {
-                            contains: nomeUser,
-                            mode: 'insensitive',
-                        },
-                    }),
-                },
+                where: whereConditions,
                 take: limit,
                 skip: offset,
                 orderBy: {
                     created_at: 'asc',
                 },
             });
-            return users;
+            const pages = Math.ceil(total / limit);
+            return {
+                data: users,
+                total,
+                page,
+                limit,
+                pages,
+            };
         }
         catch (error) {
             throw new common_1.HttpException('Failed to get all users', error instanceof common_1.HttpException
@@ -57,6 +69,31 @@ let UsersService = class UsersService {
         try {
             const findUser = await this.prismaService.users.findFirst({
                 where: { id: tokenPayload.sub },
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    created_at: true,
+                    updated_at: true,
+                },
+            });
+            if (!findUser)
+                throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
+            return findUser;
+        }
+        catch (error) {
+            if (error instanceof common_1.HttpException) {
+                throw error;
+            }
+            throw new common_1.HttpException('Failed to get user', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async getOne(id) {
+        try {
+            const findUser = await this.prismaService.users.findFirst({
+                where: { id: id },
                 select: {
                     id: true,
                     name: true,
@@ -108,23 +145,23 @@ let UsersService = class UsersService {
                 : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    async update(updateUserDto, tokenPayload) {
+    async update(updateUserDto, id) {
         try {
             const existingByEmail = await this.prismaService.users.findFirst({
                 where: {
                     email: updateUserDto.email,
                 },
             });
-            if (existingByEmail && existingByEmail.id !== tokenPayload.sub)
+            if (existingByEmail && existingByEmail.id !== id)
                 throw new common_1.HttpException('A user with this email address is already registered.', common_1.HttpStatus.CONFLICT);
             const findUser = await this.prismaService.users.findFirst({
                 where: {
-                    id: tokenPayload.sub,
+                    id: id,
                 },
             });
             if (!findUser)
                 throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
-            if (findUser.id !== tokenPayload.sub)
+            if (findUser.id !== id)
                 throw new common_1.HttpException('You cannot update this user', common_1.HttpStatus.FORBIDDEN);
             const dataUser = {
                 name: updateUserDto.name ? updateUserDto.name : findUser.name,
@@ -160,17 +197,15 @@ let UsersService = class UsersService {
                 : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    async delete(tokenPayload) {
+    async delete(id) {
         try {
             const findUser = await this.prismaService.users.findFirst({
                 where: {
-                    id: tokenPayload.sub,
+                    id: id,
                 },
             });
             if (!findUser)
                 throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
-            if (findUser.id !== tokenPayload.sub)
-                throw new common_1.HttpException('You cannot delete this user', common_1.HttpStatus.FORBIDDEN);
             this.prismaService.users.delete({
                 where: {
                     id: findUser.id,

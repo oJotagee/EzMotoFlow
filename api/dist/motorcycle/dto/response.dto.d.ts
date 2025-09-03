@@ -17,3 +17,10 @@ export declare class ResponseAllMotorcycleDto {
 export declare class ResponseMotorcycleDto {
     message: string;
 }
+export declare class PaginatedMotorcyclesResponseDto {
+    data: ResponseAllMotorcycleDto[];
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+}

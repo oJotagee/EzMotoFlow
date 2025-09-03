@@ -24,6 +24,14 @@ export class ResponseDeleteUserDto {
 	message: string;
 }
 
+export class PaginatedUsersResponseDto {
+	data: ResponseFindUserDto[];
+	total: number;
+	page: number;
+	limit: number;
+	pages: number;
+}
+
 // export class ResponseUpdateAvatarDto {
 // 	id: string;
 // 	name: string;

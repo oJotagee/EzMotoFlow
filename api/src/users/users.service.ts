@@ -9,6 +9,7 @@ import {
 	ResponseDeleteUserDto,
 	ResponseFindUserDto,
 	ResponseUpdateUserDto,
+	PaginatedUsersResponseDto,
 } from './dto/response.dto';
 import { FilterDto } from './dto/filter.dto';
 
@@ -22,9 +23,24 @@ export class UsersService {
 		private hashingService: HashingProtocol,
 	) {}
 
-	async getAll(filter: FilterDto): Promise<ResponseFindUserDto[]> {
+	async getAll(filter: FilterDto): Promise<PaginatedUsersResponseDto> {
 		try {
-			const { limit = 6, offset = 0, nomeUser } = filter;
+			const { limit = 10, offset = 0, nomeUser } = filter;
+
+			const page = Math.floor(offset / limit) + 1;
+
+			const whereConditions = {
+				...(nomeUser && {
+					name: {
+						contains: nomeUser,
+						mode: 'insensitive' as const,
+					},
+				}),
+			};
+
+			const total = await this.prismaService.users.count({
+				where: whereConditions,
+			});
 
 			const users = await this.prismaService.users.findMany({
 				select: {
@@ -34,14 +50,7 @@ export class UsersService {
 					created_at: true,
 					updated_at: true,
 				},
-				where: {
-					...(filter.nomeUser && {
-						name: {
-							contains: nomeUser,
-							mode: 'insensitive',
-						},
-					}),
-				},
+				where: whereConditions,
 				take: limit,
 				skip: offset,
 				orderBy: {
@@ -49,7 +58,15 @@ export class UsersService {
 				},
 			});
 
-			return users;
+			const pages = Math.ceil(total / limit);
+
+			return {
+				data: users,
+				total,
+				page,
+				limit,
+				pages,
+			};
 		} catch (error) {
 			throw new HttpException(
 				'Failed to get all users',
@@ -64,6 +81,37 @@ export class UsersService {
 		try {
 			const findUser = await this.prismaService.users.findFirst({
 				where: { id: tokenPayload.sub },
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					created_at: true,
+					updated_at: true,
+				},
+			});
+
+			if (!findUser)
+				throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+
+			return findUser;
+		} catch (error) {
+			if (error instanceof HttpException) {
+				throw error;
+			}
+
+			throw new HttpException(
+				'Failed to get user',
+				error instanceof HttpException
+					? error.getStatus()
+					: HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	async getOne(id: string): Promise<ResponseFindUserDto> {
+		try {
+			const findUser = await this.prismaService.users.findFirst({
+				where: { id: id },
 				select: {
 					id: true,
 					name: true,
@@ -135,7 +183,7 @@ export class UsersService {
 
 	async update(
 		updateUserDto: UpdateUserDto,
-		tokenPayload: PayloadDto,
+		id: string,
 	): Promise<ResponseUpdateUserDto> {
 		try {
 			const existingByEmail = await this.prismaService.users.findFirst({
@@ -144,7 +192,7 @@ export class UsersService {
 				},
 			});
 
-			if (existingByEmail && existingByEmail.id !== tokenPayload.sub)
+			if (existingByEmail && existingByEmail.id !== id)
 				throw new HttpException(
 					'A user with this email address is already registered.',
 					HttpStatus.CONFLICT,
@@ -152,14 +200,14 @@ export class UsersService {
 
 			const findUser = await this.prismaService.users.findFirst({
 				where: {
-					id: tokenPayload.sub,
+					id: id,
 				},
 			});
 
 			if (!findUser)
 				throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 
-			if (findUser.id !== tokenPayload.sub)
+			if (findUser.id !== id)
 				throw new HttpException(
 					'You cannot update this user',
 					HttpStatus.FORBIDDEN,
@@ -208,21 +256,16 @@ export class UsersService {
 		}
 	}
 
-	async delete(tokenPayload: PayloadDto): Promise<ResponseDeleteUserDto> {
+	async delete(id: string): Promise<ResponseDeleteUserDto> {
 		try {
 			const findUser = await this.prismaService.users.findFirst({
 				where: {
-					id: tokenPayload.sub,
+					id: id,
 				},
 			});
 
 			if (!findUser)
 				throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-			if (findUser.id !== tokenPayload.sub)
-				throw new HttpException(
-					'You cannot delete this user',
-					HttpStatus.FORBIDDEN,
-				);
 
 			this.prismaService.users.delete({
 				where: {

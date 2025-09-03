@@ -20,12 +20,12 @@ export class ContractController {
 	@Get()
 	@ApiBearerAuth()
 	@UseGuards(AuthTokenGuard)
-	@ApiOperation({ summary: 'Get all contracts' })
+	@ApiOperation({ summary: 'Get all contracts with pagination' })
 	@ApiQuery({
 		name: 'limit',
 		required: false,
 		example: 10,
-		description: 'Limit of contracts to fetch',
+		description: 'Limit of contracts to fetch (max 10)',
 	})
 	@ApiQuery({
 		name: 'offset',
@@ -38,7 +38,7 @@ export class ContractController {
 		required: false,
 		example: '',
 		description:
-			'Filter by contacts status: "active", "canceled" or "finalized"',
+			'Filter by contract status: "ativo", "cancelado" or "finalizado"',
 	})
 	@ApiQuery({
 		name: 'nomeCliente',
@@ -56,48 +56,48 @@ export class ContractController {
 		name: 'placa',
 		required: false,
 		example: '',
-		description: 'Filter by plate',
+		description: 'Filter by motorcycle plate',
 	})
 	@ApiQuery({
 		name: 'renavam',
 		required: false,
 		example: '',
-		description: 'Filter by renavam',
+		description: 'Filter by motorcycle renavam',
 	})
 	@ApiQuery({
 		name: 'dataInicio',
 		required: false,
 		example: 2017,
-		description: 'Filtrar por ano da motocicleta (exato)',
+		description: 'Filter by start year (inclusive)',
 	})
 	@ApiQuery({
 		name: 'dataFim',
 		required: false,
 		example: 2025,
-		description: 'Filtrar por ano da motocicleta (exato)',
+		description: 'Filter by end year (inclusive)',
 	})
-	fintAllContract(@Query() Filter: FilterDto) {
-		return this.contractsService.getAll(Filter);
+	findAllContracts(@Query() filter: FilterDto) {
+		return this.contractsService.getAll(filter);
 	}
 
 	@Get(':id')
 	@ApiBearerAuth()
 	@UseGuards(AuthTokenGuard)
-	@ApiOperation({ summary: 'Find a contract' })
+	@ApiOperation({ summary: 'Find a contract by ID' })
 	@ApiQuery({
 		name: 'id',
 		example: 'dtpysooc8k9p2mk6f09rv5ro',
 		description: 'Contract identifier',
 	})
-	findContractId(@Query('id') id: string) {
+	findContractById(@Query('id') id: string) {
 		return this.contractsService.getOne(id);
 	}
 
 	@Post()
 	@ApiBearerAuth()
 	@UseGuards(AuthTokenGuard)
-	@ApiOperation({ summary: 'Create a contract' })
-	CreateContract(@Body() body: CreateContractDto) {
+	@ApiOperation({ summary: 'Create a new contract' })
+	createContract(@Body() body: CreateContractDto) {
 		return this.contractsService.createOne(body);
 	}
 
@@ -110,7 +110,7 @@ export class ContractController {
 		example: 'dtpysooc8k9p2mk6f09rv5ro',
 		description: 'Contract identifier',
 	})
-	DeleteContract(@Query('id') id: string) {
+	deleteContract(@Query('id') id: string) {
 		return this.contractsService.deleteOne(id);
 	}
 }

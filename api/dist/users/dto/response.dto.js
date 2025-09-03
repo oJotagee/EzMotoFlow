@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResponseDeleteUserDto = exports.ResponseUpdateUserDto = exports.ResponseCreateUserDto = exports.ResponseFindUserDto = void 0;
+exports.PaginatedUsersResponseDto = exports.ResponseDeleteUserDto = exports.ResponseUpdateUserDto = exports.ResponseCreateUserDto = exports.ResponseFindUserDto = void 0;
 const openapi = require("@nestjs/swagger");
 class ResponseFindUserDto {
     id;
@@ -40,4 +40,15 @@ class ResponseDeleteUserDto {
     }
 }
 exports.ResponseDeleteUserDto = ResponseDeleteUserDto;
+class PaginatedUsersResponseDto {
+    data;
+    total;
+    page;
+    limit;
+    pages;
+    static _OPENAPI_METADATA_FACTORY() {
+        return { data: { required: true, type: () => [require("./response.dto").ResponseFindUserDto] }, total: { required: true, type: () => Number }, page: { required: true, type: () => Number }, limit: { required: true, type: () => Number }, pages: { required: true, type: () => Number } };
+    }
+}
+exports.PaginatedUsersResponseDto = PaginatedUsersResponseDto;
 //# sourceMappingURL=response.dto.js.map

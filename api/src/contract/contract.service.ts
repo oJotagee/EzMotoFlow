@@ -5,16 +5,17 @@ import { FilterDto } from './dto/filter.dto';
 import {
 	ResponseAllContractsDto,
 	ResponseContractsDto,
+	PaginatedContractsResponseDto,
 } from './dto/response.dto';
 
 @Injectable()
 export class ContractService {
 	constructor(private prismaService: PrismaService) {}
 
-	async getAll(filter: FilterDto): Promise<ResponseAllContractsDto[]> {
+	async getAll(filter: FilterDto): Promise<PaginatedContractsResponseDto> {
 		try {
 			const {
-				limit = 6,
+				limit = 10,
 				offset = 0,
 				status,
 				nomeCliente,
@@ -24,6 +25,68 @@ export class ContractService {
 				dataInicio,
 				dataFim,
 			} = filter;
+
+			const page = Math.floor(offset / limit) + 1;
+
+			const whereConditions = {
+				...(status && { status }),
+				...(nomeCliente && {
+					client: {
+						fullName: {
+							contains: nomeCliente,
+							mode: 'insensitive' as const,
+						},
+					},
+				}),
+				...(documentoCliente && {
+					client: {
+						documento: {
+							contains: documentoCliente,
+							mode: 'insensitive' as const,
+						},
+					},
+				}),
+				...(placa && {
+					motorcycle: {
+						placa: {
+							contains: placa,
+							mode: 'insensitive' as const,
+						},
+					},
+				}),
+				...(renavam && {
+					motorcycle: {
+						renavam: {
+							contains: renavam,
+							mode: 'insensitive' as const,
+						},
+					},
+				}),
+				...(dataInicio !== undefined && dataFim !== undefined
+					? {
+							data: {
+								gte: new Date(`${dataInicio}-01-01T00:00:00.000Z`),
+								lte: new Date(`${dataFim}-12-31T23:59:59.999Z`),
+							},
+						}
+					: dataInicio !== undefined
+						? {
+								data: {
+									gte: new Date(`${dataInicio}-01-01T00:00:00.000Z`),
+								},
+							}
+						: dataFim !== undefined
+							? {
+									data: {
+										lte: new Date(`${dataFim}-12-31T23:59:59.999Z`),
+									},
+								}
+							: {}),
+			};
+
+			const total = await this.prismaService.contracts.count({
+				where: whereConditions,
+			});
 
 			const contracts = await this.prismaService.contracts.findMany({
 				select: {
@@ -56,61 +119,7 @@ export class ContractService {
 						},
 					},
 				},
-				where: {
-					...(status && { status }),
-					...(nomeCliente && {
-						client: {
-							fullName: {
-								contains: nomeCliente,
-								mode: 'insensitive',
-							},
-						},
-					}),
-					...(documentoCliente && {
-						client: {
-							documento: {
-								contains: documentoCliente,
-								mode: 'insensitive',
-							},
-						},
-					}),
-					...(placa && {
-						motorcycle: {
-							placa: {
-								contains: placa,
-								mode: 'insensitive',
-							},
-						},
-					}),
-					...(renavam && {
-						motorcycle: {
-							renavam: {
-								contains: renavam,
-								mode: 'insensitive',
-							},
-						},
-					}),
-					...(dataInicio !== undefined && dataFim !== undefined
-						? {
-								data: {
-									gte: new Date(`${dataInicio}-01-01T00:00:00.000Z`),
-									lte: new Date(`${dataFim}-12-31T23:59:59.999Z`),
-								},
-							}
-						: dataInicio !== undefined
-							? {
-									data: {
-										gte: new Date(`${dataInicio}-01-01T00:00:00.000Z`),
-									},
-								}
-							: dataFim !== undefined
-								? {
-										data: {
-											lte: new Date(`${dataFim}-12-31T23:59:59.999Z`),
-										},
-									}
-								: {}),
-				},
+				where: whereConditions,
 				take: limit,
 				skip: offset,
 				orderBy: {
@@ -118,7 +127,15 @@ export class ContractService {
 				},
 			});
 
-			return contracts;
+			const pages = Math.ceil(total / limit);
+
+			return {
+				data: contracts,
+				total,
+				page,
+				limit,
+				pages,
+			};
 		} catch (error) {
 			throw new HttpException(
 				'Failed to get all contracts',

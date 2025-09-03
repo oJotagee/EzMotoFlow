@@ -6,9 +6,10 @@ import { FilterDto } from './dto/filter.dto';
 export declare class UsersController {
     private readonly userService;
     constructor(userService: UsersService);
-    fintAllContract(Filter: FilterDto): Promise<import("./dto/response.dto").ResponseFindUserDto[]>;
-    findOneUser(tokenPayload: PayloadDto): Promise<import("./dto/response.dto").ResponseFindUserDto>;
+    findAllUsers(filter: FilterDto): Promise<import("./dto/response.dto").PaginatedUsersResponseDto>;
+    findCurrentUser(tokenPayload: PayloadDto): Promise<import("./dto/response.dto").ResponseFindUserDto>;
+    findMUserById(id: string): Promise<import("./dto/response.dto").ResponseFindUserDto>;
     createUser(body: CreateUserDto): Promise<import("./dto/response.dto").ResponseCreateUserDto>;
-    updateUser(body: UpdateUserDto, tokenPayload: PayloadDto): Promise<import("./dto/response.dto").ResponseUpdateUserDto>;
-    deleteUser(tokenPayload: PayloadDto): Promise<import("./dto/response.dto").ResponseDeleteUserDto>;
+    updateUser(body: UpdateUserDto, id: string): Promise<import("./dto/response.dto").ResponseUpdateUserDto>;
+    deleteUser(id: string): Promise<import("./dto/response.dto").ResponseDeleteUserDto>;
 }

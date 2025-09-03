@@ -22,7 +22,46 @@ let MotorcycleService = class MotorcycleService {
     }
     async getAll(filter) {
         try {
-            const { limit = 6, offset = 0, status = '', placa = '', nome = '', anoMin, anoMax, } = filter;
+            const { limit = 10, offset = 0, status = '', placa = '', nome = '', anoMin, anoMax, } = filter;
+            const page = Math.floor(offset / limit) + 1;
+            const whereConditions = {
+                ...(status && { status }),
+                ...(placa && {
+                    placa: {
+                        contains: placa,
+                        mode: 'insensitive',
+                    },
+                }),
+                ...(nome && {
+                    nome: {
+                        contains: nome,
+                        mode: 'insensitive',
+                    },
+                }),
+                ...(anoMin !== undefined && anoMax !== undefined
+                    ? {
+                        ano: {
+                            gte: new Date(`${anoMin}-01-01T00:00:00.000Z`),
+                            lte: new Date(`${anoMax}-12-31T23:59:59.999Z`),
+                        },
+                    }
+                    : anoMin !== undefined
+                        ? {
+                            ano: {
+                                gte: new Date(`${anoMin}-01-01T00:00:00.000Z`),
+                            },
+                        }
+                        : anoMax !== undefined
+                            ? {
+                                ano: {
+                                    lte: new Date(`${anoMax}-12-31T23:59:59.999Z`),
+                                },
+                            }
+                            : {}),
+            };
+            const total = await this.prismaService.motorCycle.count({
+                where: whereConditions,
+            });
             const motorcycles = await this.prismaService.motorCycle.findMany({
                 select: {
                     id: true,
@@ -41,48 +80,21 @@ let MotorcycleService = class MotorcycleService {
                     created_at: true,
                     updated_at: true,
                 },
-                where: {
-                    ...(status && { status }),
-                    ...(placa && {
-                        placa: {
-                            contains: placa,
-                            mode: 'insensitive',
-                        },
-                    }),
-                    ...(nome && {
-                        nome: {
-                            contains: nome,
-                            mode: 'insensitive',
-                        },
-                    }),
-                    ...(anoMin !== undefined && anoMax !== undefined
-                        ? {
-                            ano: {
-                                gte: new Date(`${anoMin}-01-01T00:00:00.000Z`),
-                                lte: new Date(`${anoMax}-12-31T23:59:59.999Z`),
-                            },
-                        }
-                        : anoMin !== undefined
-                            ? {
-                                ano: {
-                                    gte: new Date(`${anoMin}-01-01T00:00:00.000Z`),
-                                },
-                            }
-                            : anoMax !== undefined
-                                ? {
-                                    ano: {
-                                        lte: new Date(`${anoMax}-12-31T23:59:59.999Z`),
-                                    },
-                                }
-                                : {}),
-                },
+                where: whereConditions,
                 take: limit,
                 skip: offset,
                 orderBy: {
                     created_at: 'asc',
                 },
             });
-            return motorcycles;
+            const pages = Math.ceil(total / limit);
+            return {
+                data: motorcycles,
+                total,
+                page,
+                limit,
+                pages,
+            };
         }
         catch (error) {
             throw new common_1.HttpException('Failed to get all motorcycles', error instanceof common_1.HttpException

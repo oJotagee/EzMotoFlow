@@ -7,21 +7,39 @@ import {
 	ResponseAllClientsDto,
 	ResponseClientDto,
 	ResponseClientsDto,
+	PaginatedClientsResponseDto,
 } from './dto/response.dto';
 
 @Injectable()
 export class ClientsService {
 	constructor(private prismaService: PrismaService) {}
 
-	async getAll(filter: FilterDto): Promise<ResponseAllClientsDto[]> {
+	async getAll(filter: FilterDto): Promise<PaginatedClientsResponseDto> {
 		try {
 			const {
-				limit = 6,
+				limit = 10,
 				offset = 0,
 				status = '',
 				nome = '',
 				tipo = '',
 			} = filter;
+
+			const page = Math.floor(offset / limit) + 1;
+
+			const whereConditions = {
+				...(status && { status }),
+				...(nome && {
+					fullName: {
+						contains: nome,
+						mode: 'insensitive' as const,
+					},
+				}),
+				...(tipo && { tipo: { equals: tipo } }),
+			};
+
+			const total = await this.prismaService.clients.count({
+				where: whereConditions,
+			});
 
 			const clients = await this.prismaService.clients.findMany({
 				select: {
@@ -35,16 +53,7 @@ export class ClientsService {
 					companyName: true,
 					status: true,
 				},
-				where: {
-					...(status && { status }),
-					...(nome && {
-						fullName: {
-							contains: nome,
-							mode: 'insensitive',
-						},
-					}),
-					...(tipo && { tipo: { equals: tipo } }),
-				},
+				where: whereConditions,
 				take: limit,
 				skip: offset,
 				orderBy: {
@@ -52,7 +61,15 @@ export class ClientsService {
 				},
 			});
 
-			return clients;
+			const pages = Math.ceil(total / limit);
+
+			return {
+				data: clients,
+				total,
+				page,
+				limit,
+				pages,
+			};
 		} catch (error) {
 			throw new HttpException(
 				'Failed to get all clients',

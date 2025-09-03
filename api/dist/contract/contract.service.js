@@ -19,7 +19,66 @@ let ContractService = class ContractService {
     }
     async getAll(filter) {
         try {
-            const { limit = 6, offset = 0, status, nomeCliente, documentoCliente, placa, renavam, dataInicio, dataFim, } = filter;
+            const { limit = 10, offset = 0, status, nomeCliente, documentoCliente, placa, renavam, dataInicio, dataFim, } = filter;
+            const page = Math.floor(offset / limit) + 1;
+            const whereConditions = {
+                ...(status && { status }),
+                ...(nomeCliente && {
+                    client: {
+                        fullName: {
+                            contains: nomeCliente,
+                            mode: 'insensitive',
+                        },
+                    },
+                }),
+                ...(documentoCliente && {
+                    client: {
+                        documento: {
+                            contains: documentoCliente,
+                            mode: 'insensitive',
+                        },
+                    },
+                }),
+                ...(placa && {
+                    motorcycle: {
+                        placa: {
+                            contains: placa,
+                            mode: 'insensitive',
+                        },
+                    },
+                }),
+                ...(renavam && {
+                    motorcycle: {
+                        renavam: {
+                            contains: renavam,
+                            mode: 'insensitive',
+                        },
+                    },
+                }),
+                ...(dataInicio !== undefined && dataFim !== undefined
+                    ? {
+                        data: {
+                            gte: new Date(`${dataInicio}-01-01T00:00:00.000Z`),
+                            lte: new Date(`${dataFim}-12-31T23:59:59.999Z`),
+                        },
+                    }
+                    : dataInicio !== undefined
+                        ? {
+                            data: {
+                                gte: new Date(`${dataInicio}-01-01T00:00:00.000Z`),
+                            },
+                        }
+                        : dataFim !== undefined
+                            ? {
+                                data: {
+                                    lte: new Date(`${dataFim}-12-31T23:59:59.999Z`),
+                                },
+                            }
+                            : {}),
+            };
+            const total = await this.prismaService.contracts.count({
+                where: whereConditions,
+            });
             const contracts = await this.prismaService.contracts.findMany({
                 select: {
                     id: true,
@@ -51,68 +110,21 @@ let ContractService = class ContractService {
                         },
                     },
                 },
-                where: {
-                    ...(status && { status }),
-                    ...(nomeCliente && {
-                        client: {
-                            fullName: {
-                                contains: nomeCliente,
-                                mode: 'insensitive',
-                            },
-                        },
-                    }),
-                    ...(documentoCliente && {
-                        client: {
-                            documento: {
-                                contains: documentoCliente,
-                                mode: 'insensitive',
-                            },
-                        },
-                    }),
-                    ...(placa && {
-                        motorcycle: {
-                            placa: {
-                                contains: placa,
-                                mode: 'insensitive',
-                            },
-                        },
-                    }),
-                    ...(renavam && {
-                        motorcycle: {
-                            renavam: {
-                                contains: renavam,
-                                mode: 'insensitive',
-                            },
-                        },
-                    }),
-                    ...(dataInicio !== undefined && dataFim !== undefined
-                        ? {
-                            data: {
-                                gte: new Date(`${dataInicio}-01-01T00:00:00.000Z`),
-                                lte: new Date(`${dataFim}-12-31T23:59:59.999Z`),
-                            },
-                        }
-                        : dataInicio !== undefined
-                            ? {
-                                data: {
-                                    gte: new Date(`${dataInicio}-01-01T00:00:00.000Z`),
-                                },
-                            }
-                            : dataFim !== undefined
-                                ? {
-                                    data: {
-                                        lte: new Date(`${dataFim}-12-31T23:59:59.999Z`),
-                                    },
-                                }
-                                : {}),
-                },
+                where: whereConditions,
                 take: limit,
                 skip: offset,
                 orderBy: {
                     created_at: 'asc',
                 },
             });
-            return contracts;
+            const pages = Math.ceil(total / limit);
+            return {
+                data: contracts,
+                total,
+                page,
+                limit,
+                pages,
+            };
         }
         catch (error) {
             throw new common_1.HttpException('Failed to get all contracts', error instanceof common_1.HttpException

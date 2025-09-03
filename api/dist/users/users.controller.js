@@ -28,20 +28,23 @@ let UsersController = class UsersController {
     constructor(userService) {
         this.userService = userService;
     }
-    fintAllContract(Filter) {
-        return this.userService.getAll(Filter);
+    findAllUsers(filter) {
+        return this.userService.getAll(filter);
     }
-    findOneUser(tokenPayload) {
+    findCurrentUser(tokenPayload) {
         return this.userService.getUser(tokenPayload);
+    }
+    findMUserById(id) {
+        return this.userService.getOne(id);
     }
     createUser(body) {
         return this.userService.create(body);
     }
-    updateUser(body, tokenPayload) {
-        return this.userService.update(body, tokenPayload);
+    updateUser(body, id) {
+        return this.userService.update(body, id);
     }
-    deleteUser(tokenPayload) {
-        return this.userService.delete(tokenPayload);
+    deleteUser(id) {
+        return this.userService.delete(id);
     }
 };
 exports.UsersController = UsersController;
@@ -49,12 +52,12 @@ __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: 'Get all users' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all users with pagination' }),
     (0, swagger_1.ApiQuery)({
         name: 'limit',
         required: false,
         example: 10,
-        description: 'Limit of users to fetch',
+        description: 'Limit of users to fetch (max 10)',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'offset',
@@ -68,28 +71,44 @@ __decorate([
         example: '',
         description: 'Filter by user name',
     }),
-    openapi.ApiResponse({ status: 200, type: [require("./dto/response.dto").ResponseFindUserDto] }),
+    openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").PaginatedUsersResponseDto }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [filter_dto_1.FilterDto]),
     __metadata("design:returntype", void 0)
-], UsersController.prototype, "fintAllContract", null);
+], UsersController.prototype, "findAllUsers", null);
 __decorate([
-    (0, common_1.Get)(),
+    (0, common_1.Get)('me'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Find a user' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Find current user' }),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
     openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").ResponseFindUserDto }),
     __param(0, (0, token_payload_param_1.TokenPayload)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [payload_dto_1.PayloadDto]),
     __metadata("design:returntype", void 0)
-], UsersController.prototype, "findOneUser", null);
+], UsersController.prototype, "findCurrentUser", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Find a user by ID' }),
+    (0, swagger_1.ApiParam)({
+        name: 'id',
+        example: 'dtpysooc8k9p2mk6f09rv5ro',
+        description: 'Users identifier',
+    }),
+    openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").ResponseFindUserDto }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "findMUserById", null);
 __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: 'Create a user' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new user' }),
     openapi.ApiResponse({ status: 201, type: require("./dto/response.dto").ResponseCreateUserDto }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -100,24 +119,23 @@ __decorate([
     (0, common_1.Patch)(':id'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: 'Update a user' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Update user' }),
     openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").ResponseUpdateUserDto }),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, token_payload_param_1.TokenPayload)()),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [update_user_dto_1.UpdateUserDto,
-        payload_dto_1.PayloadDto]),
+    __metadata("design:paramtypes", [update_user_dto_1.UpdateUserDto, String]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "updateUser", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: 'Delete a user' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete user' }),
     openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").ResponseDeleteUserDto }),
-    __param(0, (0, token_payload_param_1.TokenPayload)()),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [payload_dto_1.PayloadDto]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "deleteUser", null);
 exports.UsersController = UsersController = __decorate([

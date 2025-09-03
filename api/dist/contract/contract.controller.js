@@ -25,16 +25,16 @@ let ContractController = class ContractController {
     constructor(contractsService) {
         this.contractsService = contractsService;
     }
-    fintAllContract(Filter) {
-        return this.contractsService.getAll(Filter);
+    findAllContracts(filter) {
+        return this.contractsService.getAll(filter);
     }
-    findContractId(id) {
+    findContractById(id) {
         return this.contractsService.getOne(id);
     }
-    CreateContract(body) {
+    createContract(body) {
         return this.contractsService.createOne(body);
     }
-    DeleteContract(id) {
+    deleteContract(id) {
         return this.contractsService.deleteOne(id);
     }
 };
@@ -43,12 +43,12 @@ __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: 'Get all contracts' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all contracts with pagination' }),
     (0, swagger_1.ApiQuery)({
         name: 'limit',
         required: false,
         example: 10,
-        description: 'Limit of contracts to fetch',
+        description: 'Limit of contracts to fetch (max 10)',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'offset',
@@ -60,7 +60,7 @@ __decorate([
         name: 'status',
         required: false,
         example: '',
-        description: 'Filter by contacts status: "active", "canceled" or "finalized"',
+        description: 'Filter by contract status: "ativo", "cancelado" or "finalizado"',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'nomeCliente',
@@ -78,37 +78,37 @@ __decorate([
         name: 'placa',
         required: false,
         example: '',
-        description: 'Filter by plate',
+        description: 'Filter by motorcycle plate',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'renavam',
         required: false,
         example: '',
-        description: 'Filter by renavam',
+        description: 'Filter by motorcycle renavam',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'dataInicio',
         required: false,
         example: 2017,
-        description: 'Filtrar por ano da motocicleta (exato)',
+        description: 'Filter by start year (inclusive)',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'dataFim',
         required: false,
         example: 2025,
-        description: 'Filtrar por ano da motocicleta (exato)',
+        description: 'Filter by end year (inclusive)',
     }),
-    openapi.ApiResponse({ status: 200, type: [require("./dto/response.dto").ResponseAllContractsDto] }),
+    openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").PaginatedContractsResponseDto }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [filter_dto_1.FilterDto]),
     __metadata("design:returntype", void 0)
-], ContractController.prototype, "fintAllContract", null);
+], ContractController.prototype, "findAllContracts", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: 'Find a contract' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Find a contract by ID' }),
     (0, swagger_1.ApiQuery)({
         name: 'id',
         example: 'dtpysooc8k9p2mk6f09rv5ro',
@@ -119,18 +119,18 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], ContractController.prototype, "findContractId", null);
+], ContractController.prototype, "findContractById", null);
 __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
-    (0, swagger_1.ApiOperation)({ summary: 'Create a contract' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new contract' }),
     openapi.ApiResponse({ status: 201, type: require("./dto/response.dto").ResponseAllContractsDto }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_contract_dto_1.CreateContractDto]),
     __metadata("design:returntype", void 0)
-], ContractController.prototype, "CreateContract", null);
+], ContractController.prototype, "createContract", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiBearerAuth)(),
@@ -146,7 +146,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], ContractController.prototype, "DeleteContract", null);
+], ContractController.prototype, "deleteContract", null);
 exports.ContractController = ContractController = __decorate([
     (0, common_1.Controller)('contract'),
     __metadata("design:paramtypes", [contract_service_1.ContractService])

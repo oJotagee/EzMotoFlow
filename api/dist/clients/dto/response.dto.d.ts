@@ -30,3 +30,10 @@ export declare class ResponseClientDto {
 export declare class ResponseClientsDto {
     message: string;
 }
+export declare class PaginatedClientsResponseDto {
+    data: ResponseAllClientsDto[];
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+}
