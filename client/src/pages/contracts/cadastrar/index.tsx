@@ -1,13 +1,13 @@
 "use client"
 
+import { PaymentMethod, Client, Motorcycle, PaginatedResponse } from '@/types';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { FileText, Save, ArrowLeft, CreditCard, Upload } from 'lucide-react';
-import { Input, NumberInput, Textarea } from '@/components/ui/Input';
-import { PaymentMethod, Client, Motorcycle } from '@/types';
+import { FileText, Save, ArrowLeft } from 'lucide-react';
 import { Selectize } from '@/components/ui/Selectize';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { Subtitle } from '@/components/ui/Subtitle';
+import { Textarea } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Title } from '@/components/ui/Title';
 import { useForm } from 'react-hook-form';
@@ -17,11 +17,8 @@ import api from '@/lib/api';
 import { z } from 'zod';
 
 const contractSchema = z.object({
-  valor: z.number().min(0, 'Valor deve ser positivo'),
-  data: z.string().min(1, 'Data é obrigatória'),
   observacao: z.string().optional(),
   pagamento: z.string().min(1, 'Forma de pagamento é obrigatória'),
-  contractoPdf: z.string().optional(),
   motorcycleId: z.string().min(1, 'Motocicleta é obrigatória'),
   clientId: z.string().min(1, 'Cliente é obrigatório'),
 });
@@ -55,20 +52,17 @@ export default function CreateContractPage() {
 
   const { mutate: save, isPending: sending } = useMutation({
     mutationFn: async (values: ContractForm) => {
-      await api.post('/contracts', {
-        valor: values.valor,
-        data: values.data,
+      await api.post('/contract', {
         observacao: values.observacao,
         pagamento: values.pagamento,
-        contractoPdf: values.contractoPdf,
         motorcycleId: values.motorcycleId,
         clientId: values.clientId,
       });
     },
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: ['get-contracts'] });
+      queryClient.invalidateQueries({ queryKey: ['get-motorcycles'] });
       toast.success('Contrato criado com sucesso!');
-      toast.info('Para integração com Clicksign, conecte seu projeto ao Supabase!');
       navigate('/contracts');
     },
     onError() {
@@ -79,8 +73,8 @@ export default function CreateContractPage() {
   const { data: clientsData } = useQuery({
     queryKey: ['get-clients'],
     queryFn: async () => {
-      const { data } = await api.get<Client[]>('/clients?limit=1000');
-      return data;
+      const { data } = await api.get<PaginatedResponse<Client>>('/clients?limit=9999&offset=0');
+      return data.data;
     },
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
@@ -89,8 +83,8 @@ export default function CreateContractPage() {
   const { data: motorcyclesData } = useQuery({
     queryKey: ['get-motorcycles'],
     queryFn: async () => {
-      const { data } = await api.get<Motorcycle[]>('/motorcycles?limit=1000');
-      return data;
+      const { data } = await api.get<PaginatedResponse<Motorcycle>>('/motorcycle?status=ativo&limit=9999&offset=0');
+      return data.data;
     },
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
@@ -197,38 +191,6 @@ export default function CreateContractPage() {
               Detalhes do Contrato
             </Title>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <NumberInput
-                inputFieldProps={{
-                  testID: 'valor-input',
-                  label: 'Valor do Contrato',
-                  input: {
-                    value: watch('valor') || 0,
-                    onValueChange: (values) => setValue('valor', parseFloat(values.value) || 0),
-                    thousandSeparator: ".",
-                    decimalSeparator: ",",
-                    prefix: "R$ ",
-                    decimalScale: 2,
-                    fixedDecimalScale: true,
-                    placeholder: "R$ 0,00"
-                  }
-                }}
-                leftIcon={<CreditCard className="w-5 h-5 text-muted-foreground" />}
-                errorMessage={errors.valor?.message}
-              />
-
-              <Input
-                inputFieldProps={{
-                  testID: 'data-input',
-                  label: 'Data do Contrato',
-                  input: {
-                    ...register('data'),
-                    type: 'date'
-                  }
-                }}
-                errorMessage={errors.data?.message}
-                required
-              />
-
               <Selectize
                 label="Forma de Pagamento"
                 allOptions={[
@@ -256,19 +218,6 @@ export default function CreateContractPage() {
                 error={!!errors.pagamento}
                 errorMessage={errors.pagamento?.message}
                 placeholder="Selecione a forma de pagamento"
-              />
-
-              <Input
-                inputFieldProps={{
-                  testID: 'contractoPdf-input',
-                  label: 'PDF do Contrato (URL)',
-                  input: {
-                    ...register('contractoPdf'),
-                    placeholder: 'https://exemplo.com/contrato.pdf'
-                  }
-                }}
-                leftIcon={<Upload className="w-5 h-5 text-muted-foreground" />}
-                errorMessage={errors.contractoPdf?.message}
               />
             </div>
           </div>

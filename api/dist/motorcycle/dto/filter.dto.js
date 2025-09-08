@@ -21,13 +21,13 @@ class FilterDto extends pagination_dto_1.PaginationDto {
     anoMin;
     anoMax;
     static _OPENAPI_METADATA_FACTORY() {
-        return { status: { required: false, type: () => Object, enum: ['ativo', 'inativo', 'vendido'] }, placa: { required: false, type: () => String }, nome: { required: false, type: () => String }, anoMin: { required: false, type: () => Number }, anoMax: { required: false, type: () => Number } };
+        return { status: { required: false, type: () => Object, enum: ['ativo', 'inativo', 'vendido', 'andamento'] }, placa: { required: false, type: () => String }, nome: { required: false, type: () => String }, anoMin: { required: false, type: () => Number }, anoMax: { required: false, type: () => Number } };
     }
 }
 exports.FilterDto = FilterDto;
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsIn)(['ativo', 'inativo', 'vendido']),
+    (0, class_validator_1.IsIn)(['ativo', 'inativo', 'vendido', 'andamento']),
     __metadata("design:type", String)
 ], FilterDto.prototype, "status", void 0);
 __decorate([

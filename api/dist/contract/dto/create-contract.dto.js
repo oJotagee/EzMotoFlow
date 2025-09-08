@@ -21,11 +21,10 @@ var Pagamento;
 class CreateContractDto {
     observacao;
     pagamento;
-    contractoPdf;
     motorcycleId;
     clientId;
     static _OPENAPI_METADATA_FACTORY() {
-        return { observacao: { required: false, type: () => String }, pagamento: { required: true, enum: require("./create-contract.dto").Pagamento }, contractoPdf: { required: true, type: () => String }, motorcycleId: { required: true, type: () => String }, clientId: { required: true, type: () => String } };
+        return { observacao: { required: false, type: () => String }, pagamento: { required: true, enum: require("./create-contract.dto").Pagamento }, motorcycleId: { required: true, type: () => String }, clientId: { required: true, type: () => String } };
     }
 }
 exports.CreateContractDto = CreateContractDto;
@@ -39,11 +38,6 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateContractDto.prototype, "pagamento", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], CreateContractDto.prototype, "contractoPdf", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),

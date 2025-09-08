@@ -17,10 +17,6 @@ export class CreateContractDto {
 
 	@IsString()
 	@IsNotEmpty()
-	readonly contractoPdf: string;
-
-	@IsString()
-	@IsNotEmpty()
 	readonly motorcycleId: string;
 
 	@IsString()

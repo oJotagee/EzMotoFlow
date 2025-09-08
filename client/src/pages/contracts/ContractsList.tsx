@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ContractStatus, PaymentMethod, Contract } from '@/types';
+import { ContractStatus, PaymentMethod, Contract, PaginatedResponse } from '@/types';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Selectize } from '@/components/ui/Selectize';
 import { Subtitle } from '@/components/ui/Subtitle';
@@ -12,11 +12,11 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
-import { 
-  FileText, 
-  Plus, 
+import {
+  FileText,
+  Plus,
   Search,
-  Trash2, 
+  Trash2,
   Eye,
   MoreVertical,
   Filter,
@@ -30,9 +30,8 @@ export default function ContractsList() {
   const [anoMin, setAnoMin] = useState('');
   const [anoMax, setAnoMax] = useState('');
   const [page, setPage] = useState(1);
-  const [count, setCount] = useState(0);
   const queryClient = useQueryClient();
-  
+
   const { data: contractsData, isLoading } = useQuery({
     queryKey: [
       'get-contracts',
@@ -55,14 +54,12 @@ export default function ContractsList() {
       if (anoMin) params.append('dataInicio', anoMin);
       if (anoMax) params.append('dataFim', anoMax);
 
-      const { data } = await api.get<Contract[]>(`/contract?${params.toString()}`);
+      const { data } = await api.get<PaginatedResponse<Contract>>(`/contract?${params.toString()}`);
 
-      const total = data.length;
-      
       queryClient.setQueryData(['GetContractsListing'], {
-        page,
-        limit: 10,
-        count: total,
+        page: data.page,
+        limit: data.limit,
+        count: data.total,
         search,
         status,
         pagamento,
@@ -70,7 +67,6 @@ export default function ContractsList() {
         anoMax,
       });
 
-      setCount(total);
       return data;
     },
     refetchOnReconnect: false,
@@ -79,10 +75,11 @@ export default function ContractsList() {
 
   const { mutate: deleteContract } = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/contracts/${id}`);
+      await api.delete(`/contract/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['get-contracts'] });
+      queryClient.invalidateQueries({ queryKey: ['get-motorcycles'] });
       toast.success('Contrato excluído com sucesso!');
       setShowDeleteModal(false);
       setContractToDelete(null);
@@ -137,6 +134,10 @@ export default function ContractsList() {
     }
   };
 
+  const contractData = contractsData?.data || [];
+  const total = contractsData?.total || 0;
+  const pages = contractsData?.pages || 0;
+
   return (
     <div className="space-y-6">
       <motion.div
@@ -153,7 +154,7 @@ export default function ContractsList() {
             Gerencie os contratos de venda
           </Subtitle>
         </div>
-        
+
         <Link to="/contracts/cadastrar">
           <Button testID="new-contract" type="primary" className="shadow-primary">
             <Plus className="w-5 h-5 mr-2" />
@@ -174,7 +175,7 @@ export default function ContractsList() {
             Filtros
           </Title>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <Input
             inputFieldProps={{
@@ -188,7 +189,7 @@ export default function ContractsList() {
             }}
             leftIcon={<Search className="w-5 h-5 text-muted-foreground" />}
           />
-          
+
           <Selectize
             label="Status"
             allOptions={[
@@ -198,10 +199,10 @@ export default function ContractsList() {
               { text: 'Finalizado', value: ContractStatus.FINALIZADO }
             ]}
             selectedOptions={status ? [
-              { 
-                text: status === ContractStatus.ATIVO ? 'Ativo' : 
-                status === ContractStatus.CANCELADO ? 'Cancelado' : 'Finalizado',
-                value: status 
+              {
+                text: status === ContractStatus.ATIVO ? 'Ativo' :
+                  status === ContractStatus.CANCELADO ? 'Cancelado' : 'Finalizado',
+                value: status
               }
             ] : []}
             setSelectedOptions={(options) => setStatus(options.length > 0 ? options[0].value as ContractStatus : '')}
@@ -209,7 +210,7 @@ export default function ContractsList() {
             search={false}
             placeholder="Todos os status"
           />
-          
+
           <Selectize
             label="Pagamento"
             allOptions={[
@@ -219,10 +220,10 @@ export default function ContractsList() {
               { text: 'Boleto', value: PaymentMethod.BOLETO }
             ]}
             selectedOptions={pagamento ? [
-              { 
-                text: pagamento === PaymentMethod.PIX ? 'PIX' : 
-                pagamento === PaymentMethod.CARTAO ? 'Cartão' : 'Boleto',
-                value: pagamento 
+              {
+                text: pagamento === PaymentMethod.PIX ? 'PIX' :
+                  pagamento === PaymentMethod.CARTAO ? 'Cartão' : 'Boleto',
+                value: pagamento
               }
             ] : []}
             setSelectedOptions={(options) => setPagamento(options.length > 0 ? options[0].value as PaymentMethod : '')}
@@ -230,7 +231,7 @@ export default function ContractsList() {
             search={false}
             placeholder="Todas as formas"
           />
-          
+
           <Input
             inputFieldProps={{
               testID: 'data-inicio-input',
@@ -242,7 +243,7 @@ export default function ContractsList() {
               }
             }}
           />
-          
+
           <Input
             inputFieldProps={{
               testID: 'data-fim-input',
@@ -311,8 +312,8 @@ export default function ContractsList() {
                     </td>
                   </tr>
                 ))
-              ) : contractsData?.length ? (
-                contractsData.map((contract, index) => (
+              ) : contractData?.length ? (
+                contractData.map((contract, index) => (
                   <motion.tr
                     key={contract.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -359,9 +360,9 @@ export default function ContractsList() {
                               <MoreVertical className="w-4 h-4 text-muted-foreground" />
                             </button>
                           </Popover.Trigger>
-                          
+
                           <Popover.Portal>
-                            <Popover.Content 
+                            <Popover.Content
                               className="bg-background border border-border rounded-lg shadow-lg p-2 w-48 z-50"
                               sideOffset={5}
                               align="end"
@@ -372,11 +373,11 @@ export default function ContractsList() {
                                   <span className="text-sm">Visualizar</span>
                                 </button>
                               </Link>
-                              
+
                               {contract.contractoPdf && (
-                                <a 
-                                  href={contract.contractoPdf} 
-                                  target="_blank" 
+                                <a
+                                  href={contract.contractoPdf}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                   className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors"
                                 >
@@ -384,8 +385,8 @@ export default function ContractsList() {
                                   <span className="text-sm">Baixar PDF</span>
                                 </a>
                               )}
-                              
-                              <button 
+
+                              <button
                                 onClick={() => handleDeleteClick(contract)}
                                 className="flex items-center gap-2 w-full p-2 text-left hover:bg-destructive/10 hover:text-destructive rounded transition-colors"
                               >
@@ -429,10 +430,10 @@ export default function ContractsList() {
           </table>
         </div>
 
-        {count > 0 && Math.ceil(count / 10) > 1 && (
+        {total > 0 && pages > 1 && (
           <div className="flex items-center justify-between p-4 border-t border-border">
             <div className="text-sm text-muted-foreground">
-              Mostrando {((page - 1) * 10) + 1} até {Math.min(page * 10, count)} de {count} contratos
+              Mostrando {((page - 1) * 10) + 1} até {Math.min(page * 10, total)} de {total} clientes
             </div>
             
             <div className="flex items-center gap-2">
@@ -446,13 +447,13 @@ export default function ContractsList() {
               </Button>
               
               <span className="px-4 py-2 text-sm">
-                {page} de {Math.ceil(count / 10)}
+                {page} de {pages}
               </span>
               
               <Button
                 testID="next-page"
                 type="secondary"
-                disabled={page === Math.ceil(count / 10)}
+                disabled={page === pages}
                 onClick={() => setPage(page + 1)}
               >
                 Próximo
@@ -460,48 +461,48 @@ export default function ContractsList() {
             </div>
           </div>
         )}
-      </motion.div>
 
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-background border border-border rounded-lg p-6 w-full max-w-md mx-4">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto">
-                <Trash2 className="w-8 h-8 text-destructive" />
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  Excluir Contrato
-                </h3>
-                <p className="text-muted-foreground mt-2">
-                  Tem certeza que deseja excluir o contrato do cliente <strong>{contractToDelete?.client?.fullName || 'Cliente'}</strong>?
-                  Esta ação não pode ser desfeita.
-                </p>
-              </div>
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-background border border-border rounded-lg p-6 w-full max-w-md mx-4">
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto">
+                  <Trash2 className="w-8 h-8 text-destructive" />
+                </div>
 
-              <div className="flex items-center gap-3 pt-4">
-                <Button
-                  testID="cancel-delete"
-                  type="secondary"
-                  onClick={handleCancelDelete}
-                  className="flex-1"
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  testID="confirm-delete"
-                  type="primary"
-                  onClick={handleConfirmDelete}
-                  className="flex-1 bg-destructive hover:bg-destructive/90"
-                >
-                  Excluir
-                </Button>
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Excluir Contrato
+                  </h3>
+                  <p className="text-muted-foreground mt-2">
+                    Tem certeza que deseja excluir o contrato do cliente <strong>{contractToDelete?.client?.fullName || 'Cliente'}</strong>?
+                    Esta ação não pode ser desfeita.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3 pt-4">
+                  <Button
+                    testID="cancel-delete"
+                    type="secondary"
+                    onClick={handleCancelDelete}
+                    className="flex-1"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    testID="confirm-delete"
+                    type="primary"
+                    onClick={handleConfirmDelete}
+                    className="flex-1 bg-destructive hover:bg-destructive/90"
+                  >
+                    Excluir
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </motion.div>
     </div>
   );
 }

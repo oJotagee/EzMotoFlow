@@ -45,7 +45,8 @@ export class MotorcycleController {
 		name: 'status',
 		required: false,
 		example: '',
-		description: 'Filter by motorcycle status: "ativo", "inativo" or "vendido"',
+		description:
+			'Filter by motorcycle status: "ativo", "inativo", "vendido" or "andamento"',
 	})
 	@ApiQuery({
 		name: 'placa',

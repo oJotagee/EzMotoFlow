@@ -64,7 +64,7 @@ __decorate([
         name: 'status',
         required: false,
         example: '',
-        description: 'Filter by motorcycle status: "ativo", "inativo" or "vendido"',
+        description: 'Filter by motorcycle status: "ativo", "inativo", "vendido" or "andamento"',
     }),
     (0, swagger_1.ApiQuery)({
         name: 'placa',

@@ -42,7 +42,7 @@ model MotorCycle {
   created_at   DateTime?        @default(now())
   updated_at   DateTime?        @default(now())
 
-  Contracts Contracts?
+  Contracts Contracts[]
 }
 
 model Clients {
@@ -81,7 +81,7 @@ model Contracts {
   created_at   DateTime?      @default(now())
   updated_at   DateTime?      @default(now())
 
-  motorcycleId String     @unique
+  motorcycleId String
   motorcycle   MotorCycle @relation(fields: [motorcycleId], references: [id], onDelete: Cascade)
 
   clientId String
@@ -92,6 +92,7 @@ enum StatusMotorcycle {
   ativo
   inativo
   vendido
+  andamento
 }
 
 enum TipoCliente {

@@ -17,7 +17,7 @@ class PaginationDto {
     limit;
     offset;
     static _OPENAPI_METADATA_FACTORY() {
-        return { limit: { required: true, type: () => Number, minimum: 1, maximum: 10 }, offset: { required: true, type: () => Number, minimum: 0 } };
+        return { limit: { required: true, type: () => Number, minimum: 1 }, offset: { required: true, type: () => Number, minimum: 0 } };
     }
 }
 exports.PaginationDto = PaginationDto;
@@ -25,7 +25,6 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(1),
-    (0, class_validator_1.Max)(10),
     (0, class_transformer_1.Type)(() => Number),
     __metadata("design:type", Number)
 ], PaginationDto.prototype, "limit", void 0);

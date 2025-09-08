@@ -1,96 +1,171 @@
 import { motion } from 'framer-motion';
-import { 
-  Users, 
-  UserCheck, 
-  Bike, 
-  FileText, 
-  TrendingUp,
-  DollarSign,
+import {
+  Users,
+  UserCheck,
+  Bike,
+  FileText,
   Calendar,
-  ArrowRight
+  Loader2
 } from 'lucide-react';
 import { Title } from '@/components/ui/Title';
 import { Subtitle } from '@/components/ui/Subtitle';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/stores/auth';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
+import { PaginatedResponse, User, Client, Motorcycle, Contract, ClientStatus, ContractStatus } from '@/types';
+import { formatCurrency } from '@/lib/utils';
 
-const statsData = [
-  {
-    title: 'Total de Usuários',
-    value: '24',
-    change: '+12%',
-    changeType: 'increase' as const,
-    icon: Users,
-    color: 'bg-primary',
-    path: '/users'
-  },
-  {
-    title: 'Clientes Ativos',
-    value: '145',
-    change: '+8%',
-    changeType: 'increase' as const,
-    icon: UserCheck,
-    color: 'bg-secondary',
-    path: '/clients'
-  },
-  {
-    title: 'Motocicletas',
-    value: '89',
-    change: '+15%',
-    changeType: 'increase' as const,
-    icon: Bike,
-    color: 'bg-accent',
-    path: '/motorcycles'
-  },
-  {
-    title: 'Contratos Ativos',
-    value: '67',
-    change: '-3%',
-    changeType: 'decrease' as const,
-    icon: FileText,
-    color: 'bg-warning',
-    path: '/contracts'
-  }
-];
+interface DashboardStats {
+  totalUsers: number;
+  activeClients: number;
+  totalMotorcycles: number;
+  activeContracts: number;
+  monthlyRevenue: number;
+  pendingContracts: number;
+  monthlyGoal: number;
+}
 
-const recentActivities = [
-  {
-    id: 1,
-    action: 'Novo contrato criado',
-    client: 'João Silva',
-    motorcycle: 'Honda CB600F',
-    time: 'há 2 horas',
-    value: 'R$ 25.000,00'
-  },
-  {
-    id: 2,
-    action: 'Cliente cadastrado',
-    client: 'Maria Santos',
-    motorcycle: null,
-    time: 'há 4 horas',
-    value: null
-  },
-  {
-    id: 3,
-    action: 'Motocicleta adicionada',
-    client: null,
-    motorcycle: 'Yamaha MT-03',
-    time: 'há 6 horas',
-    value: 'R$ 18.500,00'
-  },
-  {
-    id: 4,
-    action: 'Contrato finalizado',
-    client: 'Carlos Oliveira',
-    motorcycle: 'Kawasaki Ninja 400',
-    time: 'há 1 dia',
-    value: 'R$ 22.000,00'
-  }
-];
+interface RecentActivity {
+  id: string;
+  action: string;
+  client?: string;
+  motorcycle?: string;
+  time: string;
+  value?: string;
+}
 
 export default function Dashboard() {
   const { user } = useAuth();
+
+  const { data: usersData, isLoading: usersLoading } = useQuery({
+    queryKey: ['dashboard-users'],
+    queryFn: async () => {
+      const { data } = await api.get<PaginatedResponse<User>>('/users?limit=999&offset=0');
+      return data;
+    },
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: clientsData, isLoading: clientsLoading } = useQuery({
+    queryKey: ['dashboard-clients'],
+    queryFn: async () => {
+      const { data } = await api.get<PaginatedResponse<Client>>('/clients?limit=9999&offset=0');
+      return data;
+    },
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: motorcyclesData, isLoading: motorcyclesLoading } = useQuery({
+    queryKey: ['dashboard-motorcycles'],
+    queryFn: async () => {
+      const { data } = await api.get<PaginatedResponse<Motorcycle>>('/motorcycle?limit=9999&offset=0');
+      return data;
+    },
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: contractsData, isLoading: contractsLoading } = useQuery({
+    queryKey: ['dashboard-contracts'],
+    queryFn: async () => {
+      const { data } = await api.get<PaginatedResponse<Contract>>('/contract?limit=999&offset=0');
+      return data;
+    },
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const stats: DashboardStats = {
+    totalUsers: usersData?.total || 0,
+    activeClients: clientsData?.data?.filter(client => client.status === ClientStatus.ATIVO).length || 0,
+    totalMotorcycles: motorcyclesData?.total || 0,
+    activeContracts: contractsData?.data?.filter(contract => contract.status === ContractStatus.ATIVO).length || 0,
+    monthlyRevenue: contractsData?.data?.filter(contract => {
+      const contractDate = new Date(contract.data);
+      const currentDate = new Date();
+      return contractDate.getMonth() === currentDate.getMonth() &&
+        contractDate.getFullYear() === currentDate.getFullYear() &&
+        contract.status === ContractStatus.ATIVO;
+    }).reduce((sum, contract) => sum + contract.valor, 0) || 0,
+    pendingContracts: contractsData?.data?.filter(contract => contract.status === ContractStatus.ATIVO).length || 0,
+    monthlyGoal: 15000000,
+  };
+
+  const recentActivities: RecentActivity[] = [
+    ...(contractsData?.data?.slice(0, 2).map(contract => ({
+      id: contract.id,
+      action: 'Novo contrato criado',
+      client: contract.client?.fullName,
+      motorcycle: contract.motorcycle?.nome,
+      time: new Date(contract.created_at).toLocaleDateString('pt-BR'),
+      value: formatCurrency(contract.valor)
+    })) || []),
+    ...(clientsData?.data?.slice(0, 1).map(client => ({
+      id: client.id,
+      action: 'Cliente cadastrado',
+      client: client.fullName,
+      time: new Date(client.created_at).toLocaleDateString('pt-BR'),
+    })) || []),
+    ...(motorcyclesData?.data?.slice(0, 1).map(motorcycle => ({
+      id: motorcycle.id,
+      action: 'Motocicleta adicionada',
+      motorcycle: motorcycle.nome,
+      time: new Date(motorcycle.created_at).toLocaleDateString('pt-BR'),
+      value: formatCurrency(motorcycle.valor_venda)
+    })) || [])
+  ].slice(0, 4);
+
+  const isLoading = usersLoading || clientsLoading || motorcyclesLoading || contractsLoading;
+
+  const statsData = [
+    {
+      title: 'Total de Usuários',
+      value: stats.totalUsers.toString(),
+      changeType: 'increase' as const,
+      icon: Users,
+      color: 'bg-primary',
+      path: '/users'
+    },
+    {
+      title: 'Clientes Ativos',
+      value: stats.activeClients.toString(),
+      changeType: 'increase' as const,
+      icon: UserCheck,
+      color: 'bg-secondary',
+      path: '/clients'
+    },
+    {
+      title: 'Motocicletas',
+      value: stats.totalMotorcycles.toString(),
+      changeType: 'increase' as const,
+      icon: Bike,
+      color: 'bg-accent',
+      path: '/motorcycles'
+    },
+    {
+      title: 'Contratos Ativos',
+      value: stats.activeContracts.toString(),
+      changeType: 'decrease' as const,
+      icon: FileText,
+      color: 'bg-warning',
+      path: '/contracts'
+    }
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Carregando dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -125,19 +200,6 @@ export default function Dashboard() {
                     <p className="text-2xl font-bold text-card-foreground mt-1">
                       {stat.value}
                     </p>
-                    <div className="flex items-center mt-2 gap-1">
-                      <TrendingUp className={`w-4 h-4 ${
-                        stat.changeType === 'increase' ? 'text-success' : 'text-destructive'
-                      }`} />
-                      <span className={`text-sm font-medium ${
-                        stat.changeType === 'increase' ? 'text-success' : 'text-destructive'
-                      }`}>
-                        {stat.change}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        vs mês anterior
-                      </span>
-                    </div>
                   </div>
                   <div className={`${stat.color} p-3 rounded-lg shadow-lg`}>
                     <stat.icon className="w-6 h-6 text-white" />
@@ -166,10 +228,6 @@ export default function Dashboard() {
                   Últimas movimentações do sistema
                 </Subtitle>
               </div>
-              <Button testID="view-all" type="secondary" className="text-sm">
-                Ver todas
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
             </div>
 
             <div className="space-y-4">
@@ -225,29 +283,29 @@ export default function Dashboard() {
               Acesso rápido às principais funcionalidades
             </Subtitle>
 
-            <div className="space-y-3">
-              <Link to="/clients/new">
+            <div className="flex flex-col gap-4">
+              <Link to="/clients/cadastrar">
                 <Button testID="new-client" type="primary" className="w-full justify-start">
                   <UserCheck className="w-5 h-5 mr-3" />
                   Novo Cliente
                 </Button>
               </Link>
 
-              <Link to="/motorcycles/new">
+              <Link to="/motorcycles/cadastrar">
                 <Button testID="new-motorcycle" type="secondary" className="w-full justify-start">
                   <Bike className="w-5 h-5 mr-3" />
                   Nova Motocicleta
                 </Button>
               </Link>
 
-              <Link to="/contracts/new">
+              <Link to="/contracts/cadastrar">
                 <Button testID="new-contract" type="accent" className="w-full justify-start">
                   <FileText className="w-5 h-5 mr-3" />
                   Novo Contrato
                 </Button>
               </Link>
 
-              <Link to="/users/new">
+              <Link to="/users/cadastrar">
                 <Button testID="new-user" type="off" className="w-full justify-start">
                   <Users className="w-5 h-5 mr-3" />
                   Novo Usuário
@@ -255,36 +313,36 @@ export default function Dashboard() {
               </Link>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-border">
+            {/* <div className="mt-6 pt-6 border-t border-border">
               <Title size="md" className="text-card-foreground mb-4">
                 Resumo Financeiro
               </Title>
-              
+
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Receita Mensal</span>
-                  <span className="font-semibold text-success">R$ 125.450,00</span>
+                  <span className="font-semibold text-success">{formatCurrency(stats.monthlyRevenue)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Contratos Pendentes</span>
-                  <span className="font-semibold text-warning">R$ 45.200,00</span>
+                  <span className="font-semibold text-warning">{stats.pendingContracts}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Meta do Mês</span>
-                  <span className="font-semibold text-primary">R$ 150.000,00</span>
+                  <span className="font-semibold text-primary">{formatCurrency(stats.monthlyGoal)}</span>
                 </div>
               </div>
 
               <div className="mt-4 bg-muted rounded-full h-2">
-                <div 
+                <div
                   className="bg-gradient-primary h-2 rounded-full transition-all duration-500"
-                  style={{ width: '83%' }}
+                  style={{ width: `${Math.min((stats.monthlyRevenue / stats.monthlyGoal) * 100, 100)}%` }}
                 />
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                83% da meta atingida
+                {Math.round((stats.monthlyRevenue / stats.monthlyGoal) * 100)}% da meta atingida
               </p>
-            </div>
+            </div> */}
           </div>
         </motion.div>
       </div>

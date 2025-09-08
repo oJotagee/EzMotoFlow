@@ -118,6 +118,8 @@ export class ContractService {
 							companyName: true,
 						},
 					},
+					created_at: true,
+					updated_at: true,
 				},
 				where: whereConditions,
 				take: limit,
@@ -158,6 +160,7 @@ export class ContractService {
 					observacao: true,
 					pagamento: true,
 					contractoPdf: true,
+					motorcycleId: true,
 					motorcycle: {
 						select: {
 							id: true,
@@ -199,39 +202,49 @@ export class ContractService {
 
 	async createOne(body: CreateContractDto): Promise<ResponseAllContractsDto> {
 		try {
-			const existingByContract = await this.prismaService.contracts.findFirst({
-				where: {
-					motorcycleId: body.motorcycleId,
-					clientId: body.clientId,
-				},
-			});
-
-			if (existingByContract)
-				throw new HttpException(
-					'Contract already exists for this client and motorcycle',
-					HttpStatus.BAD_REQUEST,
-				);
-
 			const findMotorcycle = await this.prismaService.motorCycle.findFirst({
 				where: { id: body.motorcycleId },
 			});
 
-			if (!findMotorcycle)
-				throw new HttpException('Motorcycle not found', HttpStatus.NOT_FOUND);
+			if (!findMotorcycle) {
+				throw new HttpException(
+					`Motorcycle with ID ${body.motorcycleId} not found`,
+					HttpStatus.NOT_FOUND,
+				);
+			}
 
 			const findClient = await this.prismaService.clients.findFirst({
 				where: { id: body.clientId },
 			});
 
-			if (!findClient)
-				throw new HttpException('Client not found', HttpStatus.NOT_FOUND);
+			if (!findClient) {
+				throw new HttpException(
+					`Client with ID ${body.clientId} not found`,
+					HttpStatus.NOT_FOUND,
+				);
+			}
+
+			const existingActiveContract =
+				await this.prismaService.contracts.findFirst({
+					where: {
+						motorcycleId: body.motorcycleId,
+						status: 'ativo',
+					},
+				});
+
+			if (existingActiveContract) {
+				throw new HttpException(
+					'There is already an active contract for this motorcycle',
+					HttpStatus.BAD_REQUEST,
+				);
+			}
 
 			const newContract = await this.prismaService.contracts.create({
 				data: {
 					valor: findMotorcycle.valor_venda,
 					observacao: body.observacao,
 					pagamento: body.pagamento,
-					contractoPdf: body.contractoPdf,
+					contractoPdf: '',
 					motorcycleId: body.motorcycleId,
 					clientId: body.clientId,
 				},
@@ -267,13 +280,20 @@ export class ContractService {
 				},
 			});
 
+			await this.prismaService.motorCycle.update({
+				where: { id: body.motorcycleId },
+				data: { status: 'andamento' },
+			});
+
 			return newContract;
 		} catch (error) {
+			if (error instanceof HttpException) {
+				throw error;
+			}
+
 			throw new HttpException(
 				'Failed to create the contract',
-				error instanceof HttpException
-					? error.getStatus()
-					: HttpStatus.INTERNAL_SERVER_ERROR,
+				HttpStatus.INTERNAL_SERVER_ERROR,
 			);
 		}
 	}
@@ -290,10 +310,16 @@ export class ContractService {
 				throw new HttpException('Contract not found', HttpStatus.NOT_FOUND);
 			}
 
-			await this.prismaService.contracts.delete({
+			await this.prismaService.contracts.update({
 				where: {
 					id: findContract.id,
 				},
+				data: { status: 'cancelado' },
+			});
+
+			await this.prismaService.motorCycle.update({
+				where: { id: findContract.motorcycleId },
+				data: { status: 'ativo' },
 			});
 
 			return { message: 'Contract deleted successfully' };

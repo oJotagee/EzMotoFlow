@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { RxExit } from "react-icons/rx"
 import { useAuth } from "@/stores/auth"
 import { Subtitle } from "@/components/ui/Subtitle"
-import { User, Bell, Settings } from "lucide-react"
+import { User } from "lucide-react"
 import { Title } from "@/components/ui/Title"
 import { MobileMenuButton } from './Sidebar'
 import { ToggleDarkModeButton } from './DarkModeToggle'
@@ -16,8 +16,6 @@ export function Navbar() {
   const { user } = useAuth();
   const [isMounted, setIsMounted] = useState(false);
   const { mutate: logout, isPending } = useLogout();
-
-  console.log(user);
 
   useEffect(() => {
     setIsMounted(true)

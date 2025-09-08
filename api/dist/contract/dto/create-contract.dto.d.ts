@@ -6,7 +6,6 @@ export declare enum Pagamento {
 export declare class CreateContractDto {
     readonly observacao?: string;
     readonly pagamento: Pagamento;
-    readonly contractoPdf: string;
     readonly motorcycleId: string;
     readonly clientId: string;
 }

@@ -11,15 +11,16 @@ const contract_controller_1 = require("./contract.controller");
 const prisma_module_1 = require("../prisma/prisma.module");
 const contract_service_1 = require("./contract.service");
 const auth_module_1 = require("../auth/auth.module");
+const axios_1 = require("@nestjs/axios");
 const common_1 = require("@nestjs/common");
 let ContractModule = class ContractModule {
 };
 exports.ContractModule = ContractModule;
 exports.ContractModule = ContractModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, auth_module_1.AuthModule],
+        imports: [prisma_module_1.PrismaModule, auth_module_1.AuthModule, axios_1.HttpModule],
         controllers: [contract_controller_1.ContractController],
-        providers: [contract_service_1.ContractService]
+        providers: [contract_service_1.ContractService],
     })
 ], ContractModule);
 //# sourceMappingURL=contract.module.js.map

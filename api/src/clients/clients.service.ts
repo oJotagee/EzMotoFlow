@@ -52,6 +52,8 @@ export class ClientsService {
 					dataNascimento: true,
 					companyName: true,
 					status: true,
+					created_at: true,
+					updated_at: true,
 				},
 				where: whereConditions,
 				take: limit,

@@ -4,8 +4,8 @@ import { Type } from 'class-transformer';
 
 export class FilterDto extends PaginationDto {
 	@IsOptional()
-	@IsIn(['ativo', 'inativo', 'vendido'])
-	status?: 'ativo' | 'inativo' | 'vendido';
+	@IsIn(['ativo', 'inativo', 'vendido', 'andamento'])
+	status?: 'ativo' | 'inativo' | 'vendido' | 'andamento';
 
 	@IsOptional()
 	@IsString()
