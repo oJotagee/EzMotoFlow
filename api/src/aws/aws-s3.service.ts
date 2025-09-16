@@ -36,27 +36,22 @@ export class AwsS3Service {
 
 	async uploadBase64Image(base64: string): Promise<string> {
 		try {
-			// Regex para capturar o mimeType e o conteúdo base64 (apenas imagens)
 			const matches = base64.match(/^data:(image\/.+);base64,(.+)$/);
 			if (!matches) throw new Error('Base64 inválido ou não é uma imagem');
 
-			const mimeType = matches[1]; // ex: image/jpeg
+			const mimeType = matches[1];
 			const base64Data = matches[2];
 
-			// Cria buffer a partir do base64
 			const buffer = Buffer.from(base64Data, 'base64');
 
-			// Extrai a extensão do mimeType (ex: jpeg, png, gif)
 			let extension = mimeType.split('/')[1];
-			// Tratamento para mime types com "+", ex: svg+xml -> svg
+
 			if (extension.includes('+')) {
 				extension = extension.split('+')[0];
 			}
 
-			// Gera nome de arquivo único
 			const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${extension}`;
 
-			// Cria o comando para envio ao S3
 			const command = new PutObjectCommand({
 				Bucket: this.bucket,
 				Key: fileName,
@@ -64,13 +59,10 @@ export class AwsS3Service {
 				ContentType: mimeType,
 			});
 
-			// Envia para o S3
 			await this.s3.send(command);
 
-			// Retorna a URL pública do arquivo
 			return `https://${this.bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
 		} catch (error) {
-			// Log ou tratamento específico que quiser
 			console.error('Erro ao fazer upload da imagem:', error);
 			throw new Error('Falha no upload da imagem');
 		}
@@ -78,7 +70,7 @@ export class AwsS3Service {
 
 	async deleteImage(fileUrl: string): Promise<void> {
 		try {
-			const fileName = fileUrl.split('/').pop(); // extrai o nome do arquivo
+			const fileName = fileUrl.split('/').pop();
 			const command = new DeleteObjectCommand({
 				Bucket: this.bucket,
 				Key: fileName,
