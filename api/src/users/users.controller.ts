@@ -94,6 +94,11 @@ export class UsersController {
 	@ApiBearerAuth()
 	@UseGuards(AuthTokenGuard)
 	@ApiOperation({ summary: 'Delete user' })
+	@ApiParam({
+		name: 'id',
+		example: 'dtpysooc8k9p2mk6f09rv5ro',
+		description: 'User identifier',
+	})
 	deleteUser(@Param('id') id: string) {
 		return this.userService.delete(id);
 	}

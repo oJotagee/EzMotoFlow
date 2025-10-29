@@ -67,13 +67,6 @@ export function Navbar() {
                   {user?.email || 'user@email.com'}
                 </Subtitle>
               </div>
-
-              <button className='flex items-center gap-3 transition-colors duration-300 py-3 px-3 hover:bg-muted rounded-lg'>
-                <User className='w-5 h-5 text-muted-foreground' />
-                <span className="text-sm text-foreground">Meu Perfil</span>
-              </button>
-              
-              <div className="border-t border-border my-1"></div>
               
               <button
                 className='flex items-center gap-3 transition-colors duration-300 py-3 px-3 hover:bg-destructive/10 hover:text-destructive rounded-lg'

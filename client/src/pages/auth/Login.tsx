@@ -51,15 +51,6 @@ export default function Login() {
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-            className="w-20 h-20 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-glow"
-          >
-            <Bike className="w-10 h-10 text-white" />
-          </motion.div>
-          
           <Title size="3xl" className="text-foreground mb-2">
             EzMotoFlow
           </Title>
@@ -121,33 +112,7 @@ export default function Login() {
             >
               {isPending ? 'Entrando...' : 'Entrar'}
             </Button>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="mt-6 p-4 bg-muted/50 border border-border rounded-lg"
-            >
-              <Title size="xs" className="text-muted-foreground mb-2">
-                Credenciais de Teste:
-              </Title>
-              <div className="space-y-1 text-xs text-muted-foreground">
-                <p><strong>Email:</strong> admin@ezmotoflow.com</p>
-                <p><strong>Senha:</strong> 123456</p>
-              </div>
-            </motion.div>
           </form>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="text-center mt-8"
-        >
-          <Subtitle size="sm" className="text-muted-foreground">
-            © 2024 EzMotoFlow. Todos os direitos reservados.
-          </Subtitle>
         </motion.div>
       </motion.div>
     </div>

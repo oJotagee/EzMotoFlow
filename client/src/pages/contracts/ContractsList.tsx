@@ -80,7 +80,9 @@ export default function ContractsList() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['get-contracts'] });
       queryClient.invalidateQueries({ queryKey: ['get-motorcycles'] });
+
       toast.success('Contrato excluído com sucesso!');
+
       setShowDeleteModal(false);
       setContractToDelete(null);
     },
@@ -99,6 +101,7 @@ export default function ContractsList() {
 
   const handleConfirmDelete = () => {
     if (contractToDelete) {
+      console.log(contractToDelete.id)
       deleteContract(contractToDelete.id);
     }
   };
@@ -391,7 +394,7 @@ export default function ContractsList() {
                                 className="flex items-center gap-2 w-full p-2 text-left hover:bg-destructive/10 hover:text-destructive rounded transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
-                                <span className="text-sm">Excluir</span>
+                                <span className="text-sm">Cancelar</span>
                               </button>
                             </Popover.Content>
                           </Popover.Portal>
@@ -475,7 +478,7 @@ export default function ContractsList() {
                     Excluir Contrato
                   </h3>
                   <p className="text-muted-foreground mt-2">
-                    Tem certeza que deseja excluir o contrato do cliente <strong>{contractToDelete?.client?.fullName || 'Cliente'}</strong>?
+                    Tem certeza que deseja cancelar o contrato do cliente <strong>{contractToDelete?.client?.fullName || 'Cliente'}</strong>?
                     Esta ação não pode ser desfeita.
                   </p>
                 </div>
@@ -495,7 +498,7 @@ export default function ContractsList() {
                     onClick={handleConfirmDelete}
                     className="flex-1 bg-destructive hover:bg-destructive/90"
                   >
-                    Excluir
+                    Confirmar
                   </Button>
                 </div>
               </div>

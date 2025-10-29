@@ -79,14 +79,10 @@ export function Sidebar() {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center shadow-glow">
-              <Bike className="w-6 h-6 text-white" />
-            </div>
             <div>
               <Title size="lg" className="text-sidebar-foreground font-bold">
-                EzMoto
+                EzMotoFlow
               </Title>
-              <p className="text-xs text-sidebar-foreground/70">Flow System</p>
             </div>
           </div>
           

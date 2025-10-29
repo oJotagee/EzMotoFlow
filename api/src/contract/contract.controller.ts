@@ -1,4 +1,9 @@
-import { ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import {
+	ApiBearerAuth,
+	ApiOperation,
+	ApiParam,
+	ApiQuery,
+} from '@nestjs/swagger';
 import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { ContractService } from './contract.service';
@@ -8,6 +13,7 @@ import {
 	Controller,
 	Delete,
 	Get,
+	Param,
 	Post,
 	Query,
 	UseGuards,
@@ -105,12 +111,12 @@ export class ContractController {
 	@ApiBearerAuth()
 	@UseGuards(AuthTokenGuard)
 	@ApiOperation({ summary: 'Delete a contract' })
-	@ApiQuery({
+	@ApiParam({
 		name: 'id',
 		example: 'dtpysooc8k9p2mk6f09rv5ro',
 		description: 'Contract identifier',
 	})
-	deleteContract(@Query('id') id: string) {
+	deleteContract(@Param('id') id: string) {
 		return this.contractsService.deleteOne(id);
 	}
 }

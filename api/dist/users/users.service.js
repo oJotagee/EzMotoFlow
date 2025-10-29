@@ -206,7 +206,7 @@ let UsersService = class UsersService {
             });
             if (!findUser)
                 throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
-            this.prismaService.users.delete({
+            await this.prismaService.users.delete({
                 where: {
                     id: findUser.id,
                 },

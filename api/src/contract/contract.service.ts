@@ -203,7 +203,7 @@ export class ContractService {
 	async createOne(body: CreateContractDto): Promise<ResponseAllContractsDto> {
 		try {
 			const findMotorcycle = await this.prismaService.motorCycle.findFirst({
-				where: { id: body.motorcycleId },
+				where: { id: body.motorcycleId, status: 'ativo' },
 			});
 
 			if (!findMotorcycle) {

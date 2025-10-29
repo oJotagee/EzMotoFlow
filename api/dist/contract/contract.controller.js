@@ -136,13 +136,13 @@ __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
     (0, swagger_1.ApiOperation)({ summary: 'Delete a contract' }),
-    (0, swagger_1.ApiQuery)({
+    (0, swagger_1.ApiParam)({
         name: 'id',
         example: 'dtpysooc8k9p2mk6f09rv5ro',
         description: 'Contract identifier',
     }),
     openapi.ApiResponse({ status: 200, type: require("./dto/response.dto").ResponseContractsDto }),
-    __param(0, (0, common_1.Query)('id')),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)

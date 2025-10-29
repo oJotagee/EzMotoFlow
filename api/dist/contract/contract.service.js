@@ -184,7 +184,7 @@ let ContractService = class ContractService {
     async createOne(body) {
         try {
             const findMotorcycle = await this.prismaService.motorCycle.findFirst({
-                where: { id: body.motorcycleId },
+                where: { id: body.motorcycleId, status: 'ativo' },
             });
             if (!findMotorcycle) {
                 throw new common_1.HttpException(`Motorcycle with ID ${body.motorcycleId} not found`, common_1.HttpStatus.NOT_FOUND);
