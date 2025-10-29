@@ -26,7 +26,6 @@ import {
 export default function ContractsList() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<ContractStatus | ''>('');
-  const [pagamento, setPagamento] = useState<PaymentMethod | ''>('');
   const [anoMin, setAnoMin] = useState('');
   const [anoMax, setAnoMax] = useState('');
   const [page, setPage] = useState(1);
@@ -38,7 +37,6 @@ export default function ContractsList() {
       10,
       search,
       status,
-      pagamento,
       anoMin,
       anoMax,
     ],
@@ -50,7 +48,6 @@ export default function ContractsList() {
 
       if (search) params.append('nomeCliente', search);
       if (status) params.append('status', status);
-      if (pagamento) params.append('pagamento', pagamento);
       if (anoMin) params.append('dataInicio', anoMin);
       if (anoMax) params.append('dataFim', anoMax);
 
@@ -62,7 +59,6 @@ export default function ContractsList() {
         count: data.total,
         search,
         status,
-        pagamento,
         anoMin,
         anoMax,
       });
@@ -179,7 +175,7 @@ export default function ContractsList() {
           </Title>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Input
             inputFieldProps={{
               testID: 'search-input',
@@ -212,27 +208,6 @@ export default function ContractsList() {
             multiple={false}
             search={false}
             placeholder="Todos os status"
-          />
-
-          <Selectize
-            label="Pagamento"
-            allOptions={[
-              { text: 'Todas as formas', value: '' },
-              { text: 'PIX', value: PaymentMethod.PIX },
-              { text: 'Cartão', value: PaymentMethod.CARTAO },
-              { text: 'Boleto', value: PaymentMethod.BOLETO }
-            ]}
-            selectedOptions={pagamento ? [
-              {
-                text: pagamento === PaymentMethod.PIX ? 'PIX' :
-                  pagamento === PaymentMethod.CARTAO ? 'Cartão' : 'Boleto',
-                value: pagamento
-              }
-            ] : []}
-            setSelectedOptions={(options) => setPagamento(options.length > 0 ? options[0].value as PaymentMethod : '')}
-            multiple={false}
-            search={false}
-            placeholder="Todas as formas"
           />
 
           <Input
@@ -413,7 +388,7 @@ export default function ContractsList() {
                           Nenhum contrato encontrado
                         </p>
                         <p className="text-muted-foreground text-sm">
-                          {search || status || pagamento || anoMin || anoMax
+                          {search || status || anoMin || anoMax
                             ? 'Tente ajustar os filtros de busca'
                             : 'Comece criando o primeiro contrato'
                           }

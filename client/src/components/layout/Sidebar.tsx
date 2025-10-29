@@ -11,7 +11,6 @@ import {
   X
 } from 'lucide-react';
 import { useSidebar } from '@/stores/sidebar';
-import { useThemeStore } from '@/stores/theme';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
 import { Title } from '@/components/ui/Title';
@@ -46,8 +45,7 @@ const menuItems = [
 ];
 
 export function Sidebar() {
-  const { isOpen, toggle, close, isMobile, setMobile } = useSidebar();
-  const { darkMode } = useThemeStore();
+  const { isOpen, close, isMobile, setMobile } = useSidebar();
   const location = useLocation();
 
   useEffect(() => {
@@ -187,7 +185,7 @@ export function Sidebar() {
 }
 
 export function MobileMenuButton() {
-  const { toggle, isOpen } = useSidebar();
+  const { toggle } = useSidebar();
   
   return (
     <button

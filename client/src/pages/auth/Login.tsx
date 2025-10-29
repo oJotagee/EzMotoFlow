@@ -2,7 +2,7 @@ import { Input, PasswordInput } from '@/components/ui/Input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Subtitle } from '@/components/ui/Subtitle';
 import { useLogin } from '@/services/auth.service';
-import { Bike, Mail, Lock } from 'lucide-react';
+import { Mail, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useNavigate } from 'react-router-dom';
 import { Title } from '@/components/ui/Title';
