@@ -37,6 +37,15 @@ let ContractController = class ContractController {
     deleteContract(id) {
         return this.contractsService.deleteOne(id);
     }
+    resendSignatureEmail(id) {
+        return this.contractsService.resendSignatureEmail(id);
+    }
+    getContractForSignature(id, token) {
+        return this.contractsService.getContractForSignature(id, token);
+    }
+    signContract(id, token, signatureData) {
+        return this.contractsService.signContract(id, token, signatureData);
+    }
 };
 exports.ContractController = ContractController;
 __decorate([
@@ -147,6 +156,38 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ContractController.prototype, "deleteContract", null);
+__decorate([
+    (0, common_1.Post)(':id/resend-signature'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(auth_token_guard_1.AuthTokenGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Resend signature email for contract' }),
+    openapi.ApiResponse({ status: 201 }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ContractController.prototype, "resendSignatureEmail", null);
+__decorate([
+    (0, common_1.Get)('sign/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get contract for signature (public route)' }),
+    openapi.ApiResponse({ status: 200, type: Object }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Query)('token')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], ContractController.prototype, "getContractForSignature", null);
+__decorate([
+    (0, common_1.Post)('sign/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Sign contract (public route)' }),
+    openapi.ApiResponse({ status: 201 }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Query)('token')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", void 0)
+], ContractController.prototype, "signContract", null);
 exports.ContractController = ContractController = __decorate([
     (0, common_1.Controller)('contract'),
     __metadata("design:paramtypes", [contract_service_1.ContractService])

@@ -71,15 +71,18 @@ model Clients {
 }
 
 model Contracts {
-  id           String         @id @default(cuid())
-  valor        Int
-  data         DateTime       @default(now())
-  status       StatusContrato @default(ativo)
-  observacao   String?
-  pagamento    Pagamento
-  contractoPdf String?
-  created_at   DateTime?      @default(now())
-  updated_at   DateTime?      @default(now())
+  id                   String         @id @default(cuid())
+  valor                Int
+  data                 DateTime       @default(now())
+  status               StatusContrato @default(ativo)
+  observacao           String?
+  pagamento            Pagamento
+  contractoPdf         String?
+  signatures           Json?
+  signatureToken       String?
+  signatureTokenExpiry DateTime?
+  created_at           DateTime?      @default(now())
+  updated_at           DateTime?      @default(now())
 
   motorcycleId String
   motorcycle   MotorCycle @relation(fields: [motorcycleId], references: [id], onDelete: Cascade)

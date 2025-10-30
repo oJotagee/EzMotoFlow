@@ -12,10 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContractService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const mail_service_1 = require("../mail/mail.service");
 let ContractService = class ContractService {
     prismaService;
-    constructor(prismaService) {
+    emailService;
+    constructor(prismaService, emailService) {
         this.prismaService = prismaService;
+        this.emailService = emailService;
     }
     async getAll(filter) {
         try {
@@ -204,12 +207,17 @@ let ContractService = class ContractService {
             if (existingActiveContract) {
                 throw new common_1.HttpException('There is already an active contract for this motorcycle', common_1.HttpStatus.BAD_REQUEST);
             }
+            const signatureToken = crypto.randomUUID();
+            const tokenExpiry = new Date();
+            tokenExpiry.setHours(tokenExpiry.getHours() + 48);
             const newContract = await this.prismaService.contracts.create({
                 data: {
                     valor: findMotorcycle.valor_venda,
                     observacao: body.observacao,
                     pagamento: body.pagamento,
                     contractoPdf: '',
+                    signatureToken,
+                    signatureTokenExpiry: tokenExpiry,
                     motorcycleId: body.motorcycleId,
                     clientId: body.clientId,
                 },
@@ -221,6 +229,7 @@ let ContractService = class ContractService {
                     observacao: true,
                     pagamento: true,
                     contractoPdf: true,
+                    signatureToken: true,
                     motorcycle: {
                         select: {
                             id: true,
@@ -248,6 +257,12 @@ let ContractService = class ContractService {
                 where: { id: body.motorcycleId },
                 data: { status: 'andamento' },
             });
+            try {
+                await this.emailService.sendSignatureLink(findClient.email, findClient.fullName, newContract.id, signatureToken);
+            }
+            catch (emailError) {
+                console.error('Erro ao enviar email de assinatura:', emailError);
+            }
             return newContract;
         }
         catch (error) {
@@ -285,10 +300,107 @@ let ContractService = class ContractService {
                 : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    async resendSignatureEmail(contractId) {
+        try {
+            const contract = await this.prismaService.contracts.findFirst({
+                where: { id: contractId },
+                include: {
+                    client: true,
+                    motorcycle: true,
+                },
+            });
+            if (!contract) {
+                throw new common_1.HttpException('Contract not found', common_1.HttpStatus.NOT_FOUND);
+            }
+            if (!contract.signatureToken || !contract.signatureTokenExpiry) {
+                throw new common_1.HttpException('Token de assinatura não encontrado para este contrato', common_1.HttpStatus.BAD_REQUEST);
+            }
+            if (contract.signatureTokenExpiry < new Date()) {
+                const newToken = crypto.randomUUID();
+                const tokenExpiry = new Date();
+                tokenExpiry.setHours(tokenExpiry.getHours() + 48);
+                await this.prismaService.contracts.update({
+                    where: { id: contractId },
+                    data: {
+                        signatureToken: newToken,
+                        signatureTokenExpiry: tokenExpiry,
+                    },
+                });
+                await this.emailService.sendSignatureLink(contract.client.email, contract.client.fullName, contractId, newToken);
+            }
+            else {
+                await this.emailService.sendSignatureLink(contract.client.email, contract.client.fullName, contractId, contract.signatureToken);
+            }
+            return { message: 'Email de assinatura reenviado com sucesso!' };
+        }
+        catch (error) {
+            throw new common_1.HttpException('Erro ao reenviar email de assinatura', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async getContractForSignature(contractId, token) {
+        try {
+            const contract = await this.prismaService.contracts.findFirst({
+                where: {
+                    id: contractId,
+                    signatureToken: token,
+                    signatureTokenExpiry: {
+                        gt: new Date(),
+                    },
+                },
+                include: {
+                    client: true,
+                    motorcycle: true,
+                },
+            });
+            if (!contract) {
+                throw new common_1.HttpException('Contrato não encontrado ou token inválido/expirado', common_1.HttpStatus.NOT_FOUND);
+            }
+            return contract;
+        }
+        catch (error) {
+            throw new common_1.HttpException('Erro ao buscar contrato', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async signContract(contractId, token, signatureData) {
+        try {
+            const updatedContract = await this.prismaService.contracts.update({
+                where: { id: contractId },
+                data: {
+                    signatures: signatureData,
+                    signatureToken: null,
+                    signatureTokenExpiry: null,
+                    status: 'finalizado',
+                },
+                select: {
+                    id: true,
+                    motorcycleId: true,
+                    valor: true,
+                },
+            });
+            await this.prismaService.motorCycle.update({
+                where: { id: updatedContract.motorcycleId },
+                data: { status: 'vendido' },
+            });
+            return {
+                message: 'Contrato assinado com sucesso!',
+                contract: updatedContract,
+            };
+        }
+        catch (error) {
+            throw new common_1.HttpException('Erro ao assinar contrato', error instanceof common_1.HttpException
+                ? error.getStatus()
+                : common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 };
 exports.ContractService = ContractService;
 exports.ContractService = ContractService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        mail_service_1.EmailService])
 ], ContractService);
 //# sourceMappingURL=contract.service.js.map

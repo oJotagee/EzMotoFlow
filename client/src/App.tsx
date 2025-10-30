@@ -23,6 +23,10 @@ import NotFound from "./pages/NotFound";
 import CreateClientPage from "./pages/clients/cadastrar/index";
 import EditClientPage from "./pages/clients/[id]/index";
 
+// Páginas públicas (layout simples)
+import SignContractPage from '@/pages/signature';
+import PublicLayout from "./components/layout/Public";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -51,6 +55,10 @@ const AppRoutes = () => {
 
   return (
     <Routes>
+      <Route path="/signature/:id" element={<PublicLayout />}>
+        <Route index element={<SignContractPage />} />
+      </Route>
+
       <Route 
         path="/" 
         element={

@@ -119,4 +119,31 @@ export class ContractController {
 	deleteContract(@Param('id') id: string) {
 		return this.contractsService.deleteOne(id);
 	}
+
+	@Post(':id/resend-signature')
+	@ApiBearerAuth()
+	@UseGuards(AuthTokenGuard)
+	@ApiOperation({ summary: 'Resend signature email for contract' })
+	resendSignatureEmail(@Param('id') id: string) {
+		return this.contractsService.resendSignatureEmail(id);
+	}
+
+	@Get('sign/:id')
+	@ApiOperation({ summary: 'Get contract for signature (public route)' })
+	getContractForSignature(
+		@Param('id') id: string,
+		@Query('token') token: string,
+	) {
+		return this.contractsService.getContractForSignature(id, token);
+	}
+
+	@Post('sign/:id')
+	@ApiOperation({ summary: 'Sign contract (public route)' })
+	signContract(
+		@Param('id') id: string,
+		@Query('token') token: string,
+		@Body() signatureData: any,
+	) {
+		return this.contractsService.signContract(id, token, signatureData);
+	}
 }

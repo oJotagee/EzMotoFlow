@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { EmailService } from 'src/mail/mail.service';
 import { FilterDto } from './dto/filter.dto';
 import {
 	ResponseAllContractsDto,
@@ -10,7 +11,10 @@ import {
 
 @Injectable()
 export class ContractService {
-	constructor(private prismaService: PrismaService) {}
+	constructor(
+		private prismaService: PrismaService,
+		private emailService: EmailService,
+	) {}
 
 	async getAll(filter: FilterDto): Promise<PaginatedContractsResponseDto> {
 		try {
@@ -239,12 +243,18 @@ export class ContractService {
 				);
 			}
 
+			const signatureToken = crypto.randomUUID();
+			const tokenExpiry = new Date();
+			tokenExpiry.setHours(tokenExpiry.getHours() + 48);
+
 			const newContract = await this.prismaService.contracts.create({
 				data: {
 					valor: findMotorcycle.valor_venda,
 					observacao: body.observacao,
 					pagamento: body.pagamento,
 					contractoPdf: '',
+					signatureToken,
+					signatureTokenExpiry: tokenExpiry,
 					motorcycleId: body.motorcycleId,
 					clientId: body.clientId,
 				},
@@ -256,6 +266,7 @@ export class ContractService {
 					observacao: true,
 					pagamento: true,
 					contractoPdf: true,
+					signatureToken: true,
 					motorcycle: {
 						select: {
 							id: true,
@@ -284,6 +295,17 @@ export class ContractService {
 				where: { id: body.motorcycleId },
 				data: { status: 'andamento' },
 			});
+
+			try {
+				await this.emailService.sendSignatureLink(
+					findClient.email,
+					findClient.fullName,
+					newContract.id,
+					signatureToken,
+				);
+			} catch (emailError) {
+				console.error('Erro ao enviar email de assinatura:', emailError);
+			}
 
 			return newContract;
 		} catch (error) {
@@ -326,6 +348,136 @@ export class ContractService {
 		} catch (error) {
 			throw new HttpException(
 				'Failed to delete the contract',
+				error instanceof HttpException
+					? error.getStatus()
+					: HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	async resendSignatureEmail(contractId: string) {
+		try {
+			const contract = await this.prismaService.contracts.findFirst({
+				where: { id: contractId },
+				include: {
+					client: true,
+					motorcycle: true,
+				},
+			});
+
+			if (!contract) {
+				throw new HttpException('Contract not found', HttpStatus.NOT_FOUND);
+			}
+
+			if (!contract.signatureToken || !contract.signatureTokenExpiry) {
+				throw new HttpException(
+					'Token de assinatura não encontrado para este contrato',
+					HttpStatus.BAD_REQUEST,
+				);
+			}
+
+			if (contract.signatureTokenExpiry < new Date()) {
+				const newToken = crypto.randomUUID();
+				const tokenExpiry = new Date();
+				tokenExpiry.setHours(tokenExpiry.getHours() + 48);
+
+				await this.prismaService.contracts.update({
+					where: { id: contractId },
+					data: {
+						signatureToken: newToken,
+						signatureTokenExpiry: tokenExpiry,
+					},
+				});
+
+				await this.emailService.sendSignatureLink(
+					contract.client.email,
+					contract.client.fullName,
+					contractId,
+					newToken,
+				);
+			} else {
+				await this.emailService.sendSignatureLink(
+					contract.client.email,
+					contract.client.fullName,
+					contractId,
+					contract.signatureToken,
+				);
+			}
+
+			return { message: 'Email de assinatura reenviado com sucesso!' };
+		} catch (error) {
+			throw new HttpException(
+				'Erro ao reenviar email de assinatura',
+				error instanceof HttpException
+					? error.getStatus()
+					: HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	async getContractForSignature(contractId: string, token: string) {
+		try {
+			const contract = await this.prismaService.contracts.findFirst({
+				where: {
+					id: contractId,
+					signatureToken: token,
+					signatureTokenExpiry: {
+						gt: new Date(),
+					},
+				},
+				include: {
+					client: true,
+					motorcycle: true,
+				},
+			});
+
+			if (!contract) {
+				throw new HttpException(
+					'Contrato não encontrado ou token inválido/expirado',
+					HttpStatus.NOT_FOUND,
+				);
+			}
+
+			return contract;
+		} catch (error) {
+			throw new HttpException(
+				'Erro ao buscar contrato',
+				error instanceof HttpException
+					? error.getStatus()
+					: HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	async signContract(contractId: string, token: string, signatureData: any) {
+		try {
+			const updatedContract = await this.prismaService.contracts.update({
+				where: { id: contractId },
+				data: {
+					signatures: signatureData,
+					signatureToken: null,
+					signatureTokenExpiry: null,
+					status: 'finalizado',
+				},
+				select: {
+					id: true,
+					motorcycleId: true,
+					valor: true,
+				},
+			});
+
+			await this.prismaService.motorCycle.update({
+				where: { id: updatedContract.motorcycleId },
+				data: { status: 'vendido' },
+			});
+
+			return {
+				message: 'Contrato assinado com sucesso!',
+				contract: updatedContract,
+			};
+		} catch (error) {
+			throw new HttpException(
+				'Erro ao assinar contrato',
 				error instanceof HttpException
 					? error.getStatus()
 					: HttpStatus.INTERNAL_SERVER_ERROR,
