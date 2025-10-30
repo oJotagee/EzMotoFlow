@@ -364,13 +364,16 @@ export default function ContractsList() {
                                 </a>
                               )}
 
-                              <button
-                                onClick={() => handleDeleteClick(contract)}
-                                className="flex items-center gap-2 w-full p-2 text-left hover:bg-destructive/10 hover:text-destructive rounded transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                                <span className="text-sm">Cancelar</span>
-                              </button>
+                              {contract.status === ContractStatus.ATIVO && (
+                                <button
+                                  onClick={() => handleDeleteClick(contract)}
+                                  className="flex items-center gap-2 w-full p-2 text-left hover:bg-destructive/10 hover:text-destructive rounded transition-colors"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                  <span className="text-sm">Cancelar</span>
+                                </button>
+                              )}
+
                             </Popover.Content>
                           </Popover.Portal>
                         </Popover.Root>

@@ -134,17 +134,6 @@ export function Sidebar() {
             );
           })}
         </nav>
-
-        <div className="p-4 border-t border-sidebar-border">
-          <div className="text-center">
-            <p className="text-xs text-sidebar-foreground/60">
-              EzMotoFlow v1.0
-            </p>
-            <p className="text-xs text-sidebar-foreground/40 mt-1">
-              © 2025 Todos os direitos reservados
-            </p>
-          </div>
-        </div>
       </div>
     </motion.div>
   );
