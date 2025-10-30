@@ -73,7 +73,29 @@ export declare class ContractController {
         contract: {
             id: string;
             valor: number;
+            data: Date;
+            status: import(".prisma/client").$Enums.StatusContrato;
+            observacao: string | null;
+            pagamento: import(".prisma/client").$Enums.Pagamento;
+            contractoPdf: string | null;
             motorcycleId: string;
+            motorcycle: {
+                id: string;
+                nome: string;
+                placa: string;
+                ano: Date;
+                chassi: string;
+                renavam: string;
+            };
+            client: {
+                id: string;
+                fullName: string;
+                documento: string;
+                telefone: string | null;
+                email: string;
+                dataNascimento: Date | null;
+                companyName: string | null;
+            };
         };
     }>;
 }

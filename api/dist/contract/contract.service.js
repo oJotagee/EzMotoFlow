@@ -150,6 +150,7 @@ let ContractService = class ContractService {
                     pagamento: true,
                     contractoPdf: true,
                     motorcycleId: true,
+                    signatures: true,
                     motorcycle: {
                         select: {
                             id: true,
@@ -377,8 +378,34 @@ let ContractService = class ContractService {
                 },
                 select: {
                     id: true,
-                    motorcycleId: true,
                     valor: true,
+                    data: true,
+                    status: true,
+                    observacao: true,
+                    pagamento: true,
+                    contractoPdf: true,
+                    motorcycleId: true,
+                    motorcycle: {
+                        select: {
+                            id: true,
+                            nome: true,
+                            placa: true,
+                            renavam: true,
+                            chassi: true,
+                            ano: true,
+                        },
+                    },
+                    client: {
+                        select: {
+                            id: true,
+                            fullName: true,
+                            documento: true,
+                            telefone: true,
+                            email: true,
+                            dataNascimento: true,
+                            companyName: true,
+                        },
+                    },
                 },
             });
             await this.prismaService.motorCycle.update({

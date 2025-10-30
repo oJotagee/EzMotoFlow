@@ -6,6 +6,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/Button';
 import { Title } from '@/components/ui/Title';
+import Assinatura from "/assinatura.png"
 import { motion } from 'framer-motion';
 import { Contract } from '@/types';
 import api from '@/lib/api';
@@ -211,14 +212,41 @@ export default function ViewContractPage() {
           <div className="mt-12 pt-6">
             <div className="grid grid-cols-2 gap-8">
               <div className="text-center">
-                <div className="border-t border-gray-400 pt-2 mt-16">
-                  <p className="text-xs font-semibold text-black">CLIENTE</p>
-                  <p className="text-xs text-black">{contract.client?.fullName}</p>
-                  <p className="text-xs text-black">CPF: {contract.client?.documento}</p>
+                <div className="pt-2 mt-16">
+                  {contract.signatures?.signature ? (
+                    <div className="mb-4">
+                      <img
+                        src={contract.signatures.signature} 
+                        alt="Assinatura do Cliente" 
+                        className="max-w-full h-20 mx-auto object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-20 mb-4"></div>
+                  )}
+                  <div className="border-t border-gray-400 pt-2">
+                    <p className="text-xs font-semibold text-black">CLIENTE</p>
+                    <p className="text-xs text-black">{contract.client?.fullName}</p>
+                    <p className="text-xs text-black">CPF: {contract.client?.documento}</p>
+                    {contract.signatures?.signedAt && (
+                      <p className="text-xs text-gray-600 mt-1">
+                        Assinado em: {new Date(contract.signatures.signedAt).toLocaleString('pt-BR')}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="text-center">
-                <div className="border-t border-gray-400 pt-2 mt-16">
+                <div className="pt-2 mt-16">
+                  <div className="mb-4">
+                    <img
+                      src={Assinatura} 
+                      alt="Assinatura do Representante Legal" 
+                      className="max-w-full h-20 mx-auto object-contain"
+                    />
+                  </div>
+                </div>
+                <div className="border-t border-gray-400 pt-2">
                   <p className="text-xs font-semibold text-black">EZMOTOFLOW VEÍCULOS MOTORES</p>
                   <p className="text-xs text-black">Representante Legal</p>
                   <p className="text-xs text-black">CNPJ: 12.345.678/0001-90</p>

@@ -20,7 +20,8 @@ import {
   Eye,
   MoreVertical,
   Filter,
-  Download
+  Download,
+  Mail
 } from 'lucide-react';
 
 export default function ContractsList() {
@@ -105,6 +106,16 @@ export default function ContractsList() {
   const handleCancelDelete = () => {
     setShowDeleteModal(false);
     setContractToDelete(null);
+  };
+
+  const handleResendSignature = async (contractId: string) => {
+    try {
+      await api.post(`/contract/${contractId}/resend-signature`);
+      toast.success('Email de assinatura reenviado com sucesso!');
+    } catch (error) {
+      console.log(error)
+      toast.error('Erro ao reenviar email de assinatura');
+    }
   };
 
   const getStatusColor = (status: ContractStatus) => {
@@ -331,53 +342,65 @@ export default function ContractsList() {
                       </span>
                     </td>
                     <td className="p-4">
-                      <div className="flex items-center justify-end">
-                        <Popover.Root>
-                          <Popover.Trigger asChild>
-                            <button className="p-2 hover:bg-muted rounded-lg transition-colors">
-                              <MoreVertical className="w-4 h-4 text-muted-foreground" />
-                            </button>
-                          </Popover.Trigger>
+                      {contract.status !== ContractStatus.CANCELADO && (
+                        <div className="flex items-center justify-end">
+                          <Popover.Root>
+                            <Popover.Trigger asChild>
+                              <button className="p-2 hover:bg-muted rounded-lg transition-colors">
+                                <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                              </button>
+                            </Popover.Trigger>
 
-                          <Popover.Portal>
-                            <Popover.Content
-                              className="bg-background border border-border rounded-lg shadow-lg p-2 w-48 z-50"
-                              sideOffset={5}
-                              align="end"
-                            >
-                              <Link to={`/contracts/${contract.id}`}>
-                                <button className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors">
-                                  <Eye className="w-4 h-4" />
-                                  <span className="text-sm">Visualizar</span>
-                                </button>
-                              </Link>
+                            <Popover.Portal>
+                              <Popover.Content
+                                className="bg-background border border-border rounded-lg shadow-lg p-2 w-48 z-50"
+                                sideOffset={5}
+                                align="end"
+                              >
+                                <Link to={`/contracts/${contract.id}`}>
+                                  <button className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors">
+                                    <Eye className="w-4 h-4" />
+                                    <span className="text-sm">Visualizar</span>
+                                  </button>
+                                </Link>
 
-                              {contract.contractoPdf && (
-                                <a
-                                  href={contract.contractoPdf}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors"
-                                >
-                                  <Download className="w-4 h-4" />
-                                  <span className="text-sm">Baixar PDF</span>
-                                </a>
-                              )}
+                                {contract.status === ContractStatus.ATIVO && (
+                                  <button
+                                    onClick={() => handleResendSignature(contract.id)}
+                                    className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors"
+                                  >
+                                    <Mail className="w-4 h-4" />
+                                    <span className="text-sm">Reenviar Email</span>
+                                  </button>
+                                )}
 
-                              {contract.status === ContractStatus.ATIVO && (
-                                <button
-                                  onClick={() => handleDeleteClick(contract)}
-                                  className="flex items-center gap-2 w-full p-2 text-left hover:bg-destructive/10 hover:text-destructive rounded transition-colors"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                  <span className="text-sm">Cancelar</span>
-                                </button>
-                              )}
+                                {contract.contractoPdf && (
+                                  <a
+                                    href={contract.contractoPdf}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors"
+                                  >
+                                    <Download className="w-4 h-4" />
+                                    <span className="text-sm">Baixar PDF</span>
+                                  </a>
+                                )}
 
-                            </Popover.Content>
-                          </Popover.Portal>
-                        </Popover.Root>
-                      </div>
+                                {contract.status === ContractStatus.ATIVO && (
+                                  <button
+                                    onClick={() => handleDeleteClick(contract)}
+                                    className="flex items-center gap-2 w-full p-2 text-left hover:bg-destructive/10 hover:text-destructive rounded transition-colors"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                    <span className="text-sm">Cancelar</span>
+                                  </button>
+                                )}
+
+                              </Popover.Content>
+                            </Popover.Portal>
+                          </Popover.Root>
+                        </div>
+                      )}
                     </td>
                   </motion.tr>
                 ))
