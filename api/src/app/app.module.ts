@@ -17,7 +17,6 @@ import { join } from 'path';
 	imports: [
 		UsersModule,
 		AuthModule,
-		UsersModule,
 		MotorcycleModule,
 		AwsS3Module,
 		ClientsModule,

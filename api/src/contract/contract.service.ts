@@ -2,18 +2,21 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EmailService } from 'src/mail/mail.service';
+import { AwsS3Service } from 'src/aws/aws-s3.service';
 import { FilterDto } from './dto/filter.dto';
 import {
 	ResponseAllContractsDto,
 	ResponseContractsDto,
 	PaginatedContractsResponseDto,
 } from './dto/response.dto';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class ContractService {
 	constructor(
 		private prismaService: PrismaService,
 		private emailService: EmailService,
+		private awsS3Service: AwsS3Service,
 	) {}
 
 	async getAll(filter: FilterDto): Promise<PaginatedContractsResponseDto> {
@@ -450,16 +453,36 @@ export class ContractService {
 		}
 	}
 
-	async signContract(contractId: string, token: string, signatureData: any) {
+	async signContract(
+		contractId: string,
+		token: string,
+		signatureData: any,
+		contractPdf?: string,
+	) {
 		try {
+			let contractPdfUrl = '';
+			if (contractPdf) {
+				try {
+					contractPdfUrl = await this.awsS3Service.uploadBase64Pdf(contractPdf);
+				} catch (error) {
+					console.error('Erro ao fazer upload do PDF:', error);
+				}
+			}
+
+			const updateData: any = {
+				signatures: signatureData,
+				signatureToken: null,
+				signatureTokenExpiry: null,
+				status: 'finalizado',
+			};
+
+			if (contractPdfUrl) {
+				updateData.contractoPdf = contractPdfUrl;
+			}
+
 			const updatedContract = await this.prismaService.contracts.update({
 				where: { id: contractId },
-				data: {
-					signatures: signatureData,
-					signatureToken: null,
-					signatureTokenExpiry: null,
-					status: 'finalizado',
-				},
+				data: updateData,
 				select: {
 					id: true,
 					valor: true,

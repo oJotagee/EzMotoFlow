@@ -22,4 +22,11 @@ export class CreateContractDto {
 	@IsString()
 	@IsNotEmpty()
 	readonly clientId: string;
+
+	@IsString()
+	@IsOptional()
+	readonly contractoPdf?: string;
+
+	@IsOptional()
+	readonly signatures?: any[];
 }

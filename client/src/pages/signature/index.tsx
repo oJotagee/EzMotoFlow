@@ -3,8 +3,10 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import SignatureCanvas from 'react-signature-canvas';
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import html2canvas from 'html2canvas';
 import { toast } from 'sonner';
 import api from '@/lib/api';
+import jsPDF from 'jspdf';
 
 export default function SignContractPage() {
   const { id } = useParams();
@@ -23,8 +25,15 @@ export default function SignContractPage() {
   });
 
   const { mutate: signContract, isPending } = useMutation({
-    mutationFn: async (signatureData: any) => {
-      await api.post(`/contract/sign/${id}?token=${token}`, signatureData);
+    mutationFn: async (requestData: any) => {
+      await api.post(`/contract/sign/${id}?token=${token}`, {
+        signatureData: {
+          signature: requestData.signature,
+          signedAt: requestData.signedAt,
+          signerName: requestData.signerName,
+        },
+        contractPdf: requestData.contractPdf,
+      });
     },
     onSuccess: () => {
       toast.success('Contrato assinado com sucesso!');
@@ -35,18 +44,190 @@ export default function SignContractPage() {
     },
   });
 
-  const handleSign = () => {
+  const generateContractPDF = async (signatureDataURL: string) => {
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.width = '210mm';
+    tempDiv.style.backgroundColor = 'white';
+    tempDiv.style.fontFamily = 'Arial, sans-serif';
+    tempDiv.style.fontSize = '14px';
+    tempDiv.style.lineHeight = '1.5';
+    tempDiv.style.color = 'black';
+
+    // Conteúdo do contrato com a assinatura
+    tempDiv.innerHTML = `
+      <div style="padding: 32px;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+          <div>
+            <h1 style="font-size: 28px; font-weight: bold; color: #2563eb; margin-bottom: 8px;">EzMotoFlow</h1>
+          </div>
+        </div>
+
+        <!-- Título -->
+        <div style="text-align: center; padding: 24px 0; border-bottom: 2px solid black; margin-bottom: 24px;">
+          <h2 style="font-size: 20px; font-weight: bold; color: black;">
+            Realizando sonhos sobre duas rodas!
+          </h2>
+        </div>
+
+        <!-- Conteúdo -->
+        <div style="space-y: 24px; font-size: 14px; line-height: 1.6;">
+          <p style="text-align: justify; margin-bottom: 16px;">
+            Na EzMotoFlow Veículos Motores, acreditamos que cada moto entregue representa muito mais que uma venda, é a 
+            conquista de um sonho, o início de uma nova jornada e a confiança depositada em nosso trabalho.
+          </p>
+
+          <div style="margin: 32px 0;">
+            <p><strong>Cliente:</strong> ${contract.client?.fullName || 'N/A'}</p>
+            <p><strong>CPF:</strong> ${contract.client?.documento || 'N/A'}</p>
+            <p><strong>Telefone:</strong> ${contract.client?.telefone || 'N/A'}</p>
+            <p><strong>E-mail:</strong> ${contract.client?.email || 'N/A'}</p>
+            
+            <div style="margin: 24px 0; border-top: 1px solid #ccc; padding-top: 16px;">
+              <p><strong>Modelo da Moto:</strong> ${contract.motorcycle?.nome || 'N/A'}</p>
+              <p><strong>Placa:</strong> ${contract.motorcycle?.placa || 'N/A'}</p>
+              <p><strong>Ano:</strong> ${contract.motorcycle?.ano || 'N/A'}</p>
+              <p><strong>Chassi:</strong> ${contract.motorcycle?.chassi || 'N/A'}</p>
+              <p><strong>RENAVAM:</strong> ${contract.motorcycle?.renavam || 'N/A'}</p>
+            </div>
+
+            <div style="margin: 24px 0; border-top: 1px solid #ccc; padding-top: 16px;">
+              <p><strong>Valor do Contrato:</strong> R$ ${(contract.valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              <p><strong>Forma de Pagamento:</strong> ${contract.pagamento}</p>
+              <p><strong>Data do Contrato:</strong> ${new Date(contract.data).toLocaleDateString('pt-BR')}</p>
+              <p><strong>Status:</strong> ${contract.status}</p>
+            </div>
+          </div>
+
+          <div style="text-align: center; margin: 32px 0;">
+            <p style="font-size: 18px; font-weight: bold;">🎉 Parabéns pela sua conquista!</p>
+          </div>
+
+          <p style="text-align: justify; margin-bottom: 16px;">
+            Hoje celebramos com você esse momento especial! Sua nova motocicleta simboliza esforço, determinação e a 
+            busca por novos caminhos.
+          </p>
+
+          <p style="text-align: justify; margin-bottom: 16px;">
+            Nos sentimos honrados e gratos por fazer parte dessa realização. Obrigado por escolher a EzMotoFlow Motores e 
+            por acreditar em nossa equipe.
+          </p>
+
+          <div style="margin: 24px 0;">
+            <p style="font-weight: bold;">Nossa parceria segue acelerando juntos!</p>
+            <p style="text-align: justify;">
+              Desejamos que cada quilômetro seja cheio de boas histórias, alegria, liberdade e segurança.
+            </p>
+          </div>
+
+          <p style="text-align: justify; margin-bottom: 16px;">
+            Agora você faz parte da família EzMotoFlow Motores e estaremos sempre prontos para te atender com a mesma 
+            dedicação e carinho.
+          </p>
+
+          <p style="font-style: italic; margin-bottom: 32px;">
+            Com gratidão, respeito e reconhecimento.
+          </p>
+
+          ${contract.observacao ? `
+            <div style="margin: 32px 0; padding: 16px; background-color: #f9f9f9; border-left: 4px solid #2563eb;">
+              <p style="font-weight: bold;">Observações:</p>
+              <p style="font-size: 12px;">${contract.observacao}</p>
+            </div>
+          ` : ''}
+
+          <!-- Termos e Condições -->
+          <div style="margin: 48px 0; border-top: 1px solid #ccc; padding-top: 24px;">
+            <h3 style="font-weight: bold; margin-bottom: 16px;">TERMOS E CONDIÇÕES:</h3>
+            <div style="font-size: 12px; line-height: 1.4;">
+              <p>1. Este contrato é válido mediante o pagamento integral do valor acordado.</p>
+              <p>2. A entrega do veículo será realizada após a compensação do pagamento.</p>
+              <p>3. O cliente se responsabiliza pela documentação e transferência do veículo.</p>
+              <p>4. Garantia conforme especificações do fabricante.</p>
+              <p>5. Foro competente: comarca de São Paulo/SP.</p>
+            </div>
+          </div>
+
+          <!-- Assinaturas -->
+          <div style="margin: 48px 0;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+              <div style="text-align: center;">
+                <div style="height: 80px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center;">
+                  <img src="${signatureDataURL}" alt="Assinatura do Cliente" style="max-width: 100%; max-height: 80px;" />
+                </div>
+                <div style="border-top: 1px solid #999; padding-top: 8px;">
+                  <p style="font-size: 12px; font-weight: bold;">CLIENTE</p>
+                  <p style="font-size: 12px;">${contract.client?.fullName}</p>
+                  <p style="font-size: 12px;">CPF: ${contract.client?.documento}</p>
+                  <p style="font-size: 10px; color: #666; margin-top: 4px;">
+                    Assinado em: ${new Date().toLocaleString('pt-BR')}
+                  </p>
+                </div>
+              </div>
+              <div style="text-align: center;">
+                <div style="border-top: 1px solid #999; padding-top: 8px; margin-top: 96px;">
+                  <p style="font-size: 12px; font-weight: bold;">EZMOTOFLOW VEÍCULOS MOTORES</p>
+                  <p style="font-size: 12px;">Representante Legal</p>
+                  <p style="font-size: 12px;">CNPJ: 12.345.678/0001-90</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(tempDiv);
+
+    try {
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      });
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png');
+      
+      const pdfWidth = 210;
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+
+      const pdfBase64 = pdf.output('datauristring');
+      
+      return pdfBase64;
+    } finally {
+      document.body.removeChild(tempDiv);
+    }
+  };
+
+  const handleSign = async () => {
     if (sigPad.current?.isEmpty()) {
       toast.error('Por favor, faça sua assinatura');
       return;
     }
 
-    const signatureDataURL = sigPad.current?.toDataURL();
-    signContract({
-      signature: signatureDataURL,
-      signedAt: new Date().toISOString(),
-      signerName: contract?.client?.fullName,
-    });
+    try {
+      const signatureDataURL = sigPad.current?.toDataURL();
+      
+      // Gerar PDF do contrato assinado
+      const contractPdfBase64 = await generateContractPDF(signatureDataURL);
+
+      signContract({
+        signature: signatureDataURL,
+        signedAt: new Date().toISOString(),
+        signerName: contract?.client?.fullName,
+        contractPdf: contractPdfBase64
+      });
+    } catch (error) {
+      toast.error('Erro ao gerar PDF do contrato');
+      console.error('Erro ao gerar PDF:', error);
+    }
   };
 
   const clearSignature = () => {

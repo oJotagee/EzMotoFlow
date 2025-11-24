@@ -142,8 +142,13 @@ export class ContractController {
 	signContract(
 		@Param('id') id: string,
 		@Query('token') token: string,
-		@Body() signatureData: any,
+		@Body() body: { signatureData: any; contractPdf?: string },
 	) {
-		return this.contractsService.signContract(id, token, signatureData);
+		return this.contractsService.signContract(
+			id,
+			token,
+			body.signatureData,
+			body.contractPdf,
+		);
 	}
 }

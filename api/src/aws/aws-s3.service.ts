@@ -68,6 +68,34 @@ export class AwsS3Service {
 		}
 	}
 
+	async uploadBase64Pdf(base64: string): Promise<string> {
+		try {
+			const matches = base64.match(/^data:(application\/pdf);base64,(.+)$/);
+			if (!matches) throw new Error('Base64 inválido ou não é um PDF');
+
+			const mimeType = matches[1];
+			const base64Data = matches[2];
+
+			const buffer = Buffer.from(base64Data, 'base64');
+
+			const fileName = `contracts/contract-${Date.now()}-${Math.random().toString(36).substring(2)}.pdf`;
+
+			const command = new PutObjectCommand({
+				Bucket: this.bucket,
+				Key: fileName,
+				Body: buffer,
+				ContentType: mimeType,
+			});
+
+			await this.s3.send(command);
+
+			return `https://${this.bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+		} catch (error) {
+			console.error('Erro ao fazer upload do PDF:', error);
+			throw new Error('Falha no upload do PDF');
+		}
+	}
+
 	async deleteImage(fileUrl: string): Promise<void> {
 		try {
 			const fileName = fileUrl.split('/').pop();
