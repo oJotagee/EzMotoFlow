@@ -3,6 +3,8 @@
 import { User, Save, ArrowLeft, Mail, Lock } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Input, PasswordInput } from '@/components/ui/Input';
+import { PermissionsSelector } from '@/components/ui/PermissionsSelector';
+import { PermissionResource, PermissionAction } from '@/types/permissions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { Subtitle } from '@/components/ui/Subtitle';
@@ -10,9 +12,11 @@ import { Button } from '@/components/ui/Button';
 import { Title } from '@/components/ui/Title';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { z } from 'zod';
+import { getErrorMessage } from '@/lib/error-messages';
 
 const userSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -22,9 +26,15 @@ const userSchema = z.object({
 
 type UserForm = z.infer<typeof userSchema>;
 
+interface Permission {
+  resource: PermissionResource;
+  action: PermissionAction;
+}
+
 export default function CreateUserPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>([]);
 
   const {
     register,
@@ -38,19 +48,32 @@ export default function CreateUserPage() {
 
   const { mutate: save, isPending: sending } = useMutation({
     mutationFn: async (values: UserForm) => {
-      await api.post('/users', {
+      // Primeiro cria o usuário
+      const response = await api.post('/users', {
         name: values.name,
         email: values.email,
         password: values.password,
       });
+
+      const userId = response.data.user.id;
+
+      // Depois atualiza as permissões
+      if (selectedPermissions.length > 0) {
+        await api.post(`/users/${userId}/permissions`, {
+          userId,
+          permissions: selectedPermissions
+        });
+      }
+
+      return response.data;
     },
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: ['get-users'] });
       toast.success('Usuário criado com sucesso!');
       navigate('/users');
     },
-    onError() {
-      toast.error('Erro ao criar usuário!');
+    onError(error: any) {
+      toast.error(getErrorMessage(error));
     }
   });
 
@@ -66,7 +89,7 @@ export default function CreateUserPage() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
         </Link>
-        
+
         <div>
           <Title size="2xl" className="text-foreground flex items-center gap-3">
             <User className="w-8 h-8 text-primary" />
@@ -141,10 +164,19 @@ export default function CreateUserPage() {
             </div>
           </div>
 
+          <div>
+            <PermissionsSelector
+              selectedPermissions={selectedPermissions}
+              onChange={setSelectedPermissions}
+              disabled={sending}
+            />
+          </div>
+
           <div className="flex items-center gap-4 pt-4 border-t border-border">
             <Button
               testID="save-button"
               type="primary"
+              htmlType="submit"
               loading={sending}
               disabled={sending}
               className="shadow-primary"

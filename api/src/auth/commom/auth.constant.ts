@@ -1,1 +1,1 @@
-export const TOKEN_PAYLOAD = "token";
+export const TOKEN_PAYLOAD = 'token';

@@ -20,23 +20,23 @@ export class ResponseClientDto {
   dataNascimento: Date | null;
   companyName: string | null;
   status: string;
-  cep: string
-  rua: string
-  numero: string
-  bairro: string
-  cidade: string
-  estado: string
+  cep: string;
+  rua: string;
+  numero: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
   complementos: string | null;
 }
 
 export class ResponseClientsDto {
-	message: string;
+  message: string;
 }
 
 export class PaginatedClientsResponseDto {
-	data: ResponseAllClientsDto[];
-	total: number;
-	page: number;
-	limit: number;
-	pages: number;
+  data: ResponseAllClientsDto[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
 }

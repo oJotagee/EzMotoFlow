@@ -2,7 +2,9 @@
 
 import { PaymentMethod, Client, Motorcycle, PaginatedResponse } from '@/types';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { FileText, Save, ArrowLeft } from 'lucide-react';
+import { FileText, Save, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { PermissionGuard } from '@/components/auth/PermissionGuard';
+import { PermissionResource, PermissionAction } from '@/types/permissions';
 import { Selectize } from '@/components/ui/Selectize';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
@@ -15,6 +17,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { z } from 'zod';
+import { getErrorMessage } from '@/lib/error-messages';
 
 const contractSchema = z.object({
   observacao: z.string().optional(),
@@ -65,8 +68,8 @@ export default function CreateContractPage() {
       toast.success('Contrato criado com sucesso!');
       navigate('/contracts');
     },
-    onError() {
-      toast.error('Erro ao criar contrato!');
+    onError(error: any) {
+      toast.error(getErrorMessage(error));
     }
   });
 
@@ -91,177 +94,201 @@ export default function CreateContractPage() {
   });
 
   return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-4"
-      >
-        <Link to="/contracts">
-          <Button testID="back-button" type="secondary" justIcon>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        </Link>
-        
-        <div>
-          <Title size="2xl" className="text-foreground flex items-center gap-3">
-            <FileText className="w-8 h-8 text-primary" />
-            Novo Contrato
-          </Title>
-          <Subtitle className="text-muted-foreground">
-            Preencha os dados para criar um novo contrato
-          </Subtitle>
+    <PermissionGuard
+      resource={PermissionResource.CONTRACTS}
+      action={PermissionAction.CREATE}
+      fallback={
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center">
+            <AlertTriangle className="w-8 h-8 text-destructive" />
+          </div>
+          <div className="text-center">
+            <Title size="xl" className="text-foreground mb-2">
+              Acesso Negado
+            </Title>
+            <Subtitle className="text-muted-foreground">
+              Você não tem permissão para criar contratos
+            </Subtitle>
+          </div>
+          <Link to="/contracts">
+            <Button testID="back-to-contracts" type="secondary">Voltar para Contratos</Button>
+          </Link>
         </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-card border border-border rounded-xl p-6 shadow-elegant"
-      >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          <div>
-            <Title size="lg" className="text-card-foreground mb-4">
-              Partes do Contrato
-            </Title>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Selectize
-                label="Cliente"
-                allOptions={[
-                  { text: 'Selecione um cliente', value: '' },
-                  ...(clientsData?.map((client) => ({
-                    text: `${client.fullName} - ${client.documento}`,
-                    value: client.id
-                  })) || [])
-                ]}
-                selectedOptions={watchedClientId ? [
-                  { 
-                    text: clientsData?.find(c => c.id === watchedClientId)?.fullName || '',
-                    value: watchedClientId 
-                  }
-                ] : []}
-                setSelectedOptions={(options) => {
-                  if (options.length > 0 && options[0].value) {
-                    setValue('clientId', options[0].value)
-                  } else {
-                    setValue('clientId', '')
-                  }
-                }}
-                multiple={false}
-                search={true}
-                error={!!errors.clientId}
-                errorMessage={errors.clientId?.message}
-                placeholder="Selecione um cliente"
-              />
-
-              <Selectize
-                label="Motocicleta"
-                allOptions={[
-                  { text: 'Selecione uma motocicleta', value: '' },
-                  ...(motorcyclesData?.map((motorcycle) => ({
-                    text: `${motorcycle.nome} - ${motorcycle.placa} - R$ ${(motorcycle.valor_venda / 100).toFixed(2)}`,
-                    value: motorcycle.id
-                  })) || [])
-                ]}
-                selectedOptions={watchedMotorcycleId ? [
-                  { 
-                    text: motorcyclesData?.find(m => m.id === watchedMotorcycleId)?.nome || '',
-                    value: watchedMotorcycleId 
-                  }
-                ] : []}
-                setSelectedOptions={(options) => {
-                  if (options.length > 0 && options[0].value) {
-                    setValue('motorcycleId', options[0].value)
-                  } else {
-                    setValue('motorcycleId', '')
-                  }
-                }}
-                multiple={false}
-                search={true}
-                error={!!errors.motorcycleId}
-                errorMessage={errors.motorcycleId?.message}
-                placeholder="Selecione uma motocicleta"
-              />
-            </div>
-          </div>
-
-          <div>
-            <Title size="lg" className="text-card-foreground mb-4">
-              Detalhes do Contrato
-            </Title>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Selectize
-                label="Forma de Pagamento"
-                allOptions={[
-                  { text: 'Selecione...', value: '' },
-                  { text: 'PIX', value: PaymentMethod.PIX },
-                  { text: 'Cartão', value: PaymentMethod.CARTAO },
-                  { text: 'Boleto', value: PaymentMethod.BOLETO }
-                ]}
-                selectedOptions={watchedPagamento ? [
-                  { 
-                    text: watchedPagamento === PaymentMethod.PIX ? 'PIX' : 
-                    watchedPagamento === PaymentMethod.CARTAO ? 'Cartão' : 'Boleto',
-                    value: watchedPagamento 
-                  }
-                ] : []}
-                setSelectedOptions={(options) => {
-                  if (options.length > 0 && options[0].value) {
-                    setValue('pagamento', options[0].value as PaymentMethod)
-                  } else {
-                    setValue('pagamento', '' as any)
-                  }
-                }}
-                multiple={false}
-                search={false}
-                error={!!errors.pagamento}
-                errorMessage={errors.pagamento?.message}
-                placeholder="Selecione a forma de pagamento"
-              />
-            </div>
-          </div>
-
-          <div>
-            <Title size="lg" className="text-card-foreground mb-4">
-              Observações
-            </Title>
-            <div className="grid grid-cols-1 gap-6">
-              <Textarea
-                textareaFieldProps={{
-                  testID: 'observacao-textarea',
-                  label: 'Observações',
-                  textarea: {
-                    ...register('observacao'),
-                    placeholder: 'Observações adicionais sobre o contrato...',
-                    rows: 3
-                  }
-                }}
-                errorMessage={errors.observacao?.message}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 pt-4 border-t border-border">
-            <Button
-              testID="save-button"
-              type="primary"
-              loading={sending}
-              disabled={sending}
-              className="shadow-primary"
-            >
-              <Save className="w-5 h-5 mr-2" />
-              Criar Contrato
+      }
+    >
+      <div className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-4"
+        >
+          <Link to="/contracts">
+            <Button testID="back-button" type="secondary" justIcon>
+              <ArrowLeft className="w-5 h-5" />
             </Button>
+          </Link>
 
-            <Link to="/contracts">
-              <Button testID="cancel-button" type="secondary">
-                Cancelar
-              </Button>
-            </Link>
+          <div>
+            <Title size="2xl" className="text-foreground flex items-center gap-3">
+              <FileText className="w-8 h-8 text-primary" />
+              Novo Contrato
+            </Title>
+            <Subtitle className="text-muted-foreground">
+              Preencha os dados para criar um novo contrato
+            </Subtitle>
           </div>
-        </form>
-      </motion.div>
-    </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-card border border-border rounded-xl p-6 shadow-elegant"
+        >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            <div>
+              <Title size="lg" className="text-card-foreground mb-4">
+                Partes do Contrato
+              </Title>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Selectize
+                  label="Cliente"
+                  allOptions={[
+                    { text: 'Selecione um cliente', value: '' },
+                    ...(clientsData?.map((client) => ({
+                      text: `${client.fullName} - ${client.documento}`,
+                      value: client.id
+                    })) || [])
+                  ]}
+                  selectedOptions={watchedClientId ? [
+                    {
+                      text: clientsData?.find(c => c.id === watchedClientId)?.fullName || '',
+                      value: watchedClientId
+                    }
+                  ] : []}
+                  setSelectedOptions={(options) => {
+                    if (options.length > 0 && options[0].value) {
+                      setValue('clientId', options[0].value)
+                    } else {
+                      setValue('clientId', '')
+                    }
+                  }}
+                  multiple={false}
+                  search={true}
+                  error={!!errors.clientId}
+                  errorMessage={errors.clientId?.message}
+                  placeholder="Selecione um cliente"
+                />
+
+                <Selectize
+                  label="Motocicleta"
+                  allOptions={[
+                    { text: 'Selecione uma motocicleta', value: '' },
+                    ...(motorcyclesData?.map((motorcycle) => ({
+                      text: `${motorcycle.nome} - ${motorcycle.placa} - R$ ${(motorcycle.valor_venda / 100).toFixed(2)}`,
+                      value: motorcycle.id
+                    })) || [])
+                  ]}
+                  selectedOptions={watchedMotorcycleId ? [
+                    {
+                      text: motorcyclesData?.find(m => m.id === watchedMotorcycleId)?.nome || '',
+                      value: watchedMotorcycleId
+                    }
+                  ] : []}
+                  setSelectedOptions={(options) => {
+                    if (options.length > 0 && options[0].value) {
+                      setValue('motorcycleId', options[0].value)
+                    } else {
+                      setValue('motorcycleId', '')
+                    }
+                  }}
+                  multiple={false}
+                  search={true}
+                  error={!!errors.motorcycleId}
+                  errorMessage={errors.motorcycleId?.message}
+                  placeholder="Selecione uma motocicleta"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Title size="lg" className="text-card-foreground mb-4">
+                Detalhes do Contrato
+              </Title>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Selectize
+                  label="Forma de Pagamento"
+                  allOptions={[
+                    { text: 'Selecione...', value: '' },
+                    { text: 'PIX', value: PaymentMethod.PIX },
+                    { text: 'Cartão', value: PaymentMethod.CARTAO },
+                    { text: 'Boleto', value: PaymentMethod.BOLETO }
+                  ]}
+                  selectedOptions={watchedPagamento ? [
+                    {
+                      text: watchedPagamento === PaymentMethod.PIX ? 'PIX' :
+                        watchedPagamento === PaymentMethod.CARTAO ? 'Cartão' : 'Boleto',
+                      value: watchedPagamento
+                    }
+                  ] : []}
+                  setSelectedOptions={(options) => {
+                    if (options.length > 0 && options[0].value) {
+                      setValue('pagamento', options[0].value as PaymentMethod)
+                    } else {
+                      setValue('pagamento', '' as any)
+                    }
+                  }}
+                  multiple={false}
+                  search={false}
+                  error={!!errors.pagamento}
+                  errorMessage={errors.pagamento?.message}
+                  placeholder="Selecione a forma de pagamento"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Title size="lg" className="text-card-foreground mb-4">
+                Observações
+              </Title>
+              <div className="grid grid-cols-1 gap-6">
+                <Textarea
+                  textareaFieldProps={{
+                    testID: 'observacao-textarea',
+                    label: 'Observações',
+                    textarea: {
+                      ...register('observacao'),
+                      placeholder: 'Observações adicionais sobre o contrato...',
+                      rows: 3
+                    }
+                  }}
+                  errorMessage={errors.observacao?.message}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 pt-4 border-t border-border">
+              <Button
+                testID="save-button"
+                type="primary"
+                htmlType="submit"
+                loading={sending}
+                disabled={sending}
+                className="shadow-primary"
+              >
+                <Save className="w-5 h-5 mr-2" />
+                Criar Contrato
+              </Button>
+
+              <Link to="/contracts">
+                <Button testID="cancel-button" type="secondary">
+                  Cancelar
+                </Button>
+              </Link>
+            </div>
+          </form>
+        </motion.div>
+      </div>
+    </PermissionGuard>
   );
 }

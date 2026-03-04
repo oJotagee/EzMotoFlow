@@ -8,6 +8,7 @@ export interface ButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   type?: 'primary' | 'secondary' | 'error' | 'success' | 'off' | 'accent' | 'warning' | '';
+  htmlType?: 'button' | 'submit' | 'reset';
   loading?: boolean;
   justIcon?: boolean;
   color?: string;
@@ -16,6 +17,7 @@ export interface ButtonProps {
 export function Button(props: ButtonProps) {
   return (
     <button
+      type={props.htmlType || 'button'}
       style={{ backgroundColor: props.color || '' }}
       data-test-id={props.testID}
       disabled={props.disabled}
@@ -27,36 +29,36 @@ export function Button(props: ButtonProps) {
         props.className || '',
         {
           // Primary - EzMotoFlow Blue
-          "bg-primary text-primary-foreground hover:bg-primary-dark shadow-primary border-0 hover:shadow-glow": 
+          "bg-primary text-primary-foreground hover:bg-primary-dark shadow-primary border-0 hover:shadow-glow":
             props.type === 'primary' || !props.type,
-          
+
           // Secondary - Speed Orange
-          "bg-secondary text-secondary-foreground hover:bg-secondary-glow shadow-secondary border-0": 
+          "bg-secondary text-secondary-foreground hover:bg-secondary-glow shadow-secondary border-0":
             props.type === 'secondary',
-          
+
           // Accent - Electric Cyan
-          "bg-accent text-accent-foreground hover:bg-accent-glow shadow-accent border-0": 
+          "bg-accent text-accent-foreground hover:bg-accent-glow shadow-accent border-0":
             props.type === 'accent',
-          
+
           // Success - Racing Green
-          "bg-success text-success-foreground hover:opacity-90 border-0": 
+          "bg-success text-success-foreground hover:opacity-90 border-0":
             props.type === 'success',
-          
+
           // Warning - Caution Yellow
-          "bg-warning text-warning-foreground hover:opacity-90 border-0": 
+          "bg-warning text-warning-foreground hover:opacity-90 border-0":
             props.type === 'warning',
-          
+
           // Error - Alert Red
-          "bg-destructive text-destructive-foreground hover:opacity-90 shadow-destructive border-0": 
+          "bg-destructive text-destructive-foreground hover:opacity-90 shadow-destructive border-0":
             props.type === 'error',
-          
+
           // Off - Muted gray
-          "bg-muted text-muted-foreground hover:bg-muted/80 border border-border": 
+          "bg-muted text-muted-foreground hover:bg-muted/80 border border-border":
             props.type === 'off',
-          
+
           // Custom color
           [`bg-[${props.color}]`]: !props.type && props.color,
-          
+
           // Loading state
           "cursor-not-allowed opacity-75": props.loading
         }

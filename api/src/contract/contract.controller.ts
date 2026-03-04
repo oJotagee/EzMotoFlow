@@ -1,154 +1,164 @@
 import {
-	ApiBearerAuth,
-	ApiOperation,
-	ApiParam,
-	ApiQuery,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
+import { PermissionsGuard } from 'src/auth/guard/permissions.guard';
+import {
+  CanReadContracts,
+  CanCreateContracts,
+  CanDeleteContracts,
+} from 'src/auth/commom/permissions.decorator';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { ContractService } from './contract.service';
 import { FilterDto } from './dto/filter.dto';
 import {
-	Body,
-	Controller,
-	Delete,
-	Get,
-	Param,
-	Post,
-	Query,
-	UseGuards,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 
 @Controller('contract')
 export class ContractController {
-	constructor(private readonly contractsService: ContractService) {}
+  constructor(private readonly contractsService: ContractService) {}
 
-	@Get()
-	@ApiBearerAuth()
-	@UseGuards(AuthTokenGuard)
-	@ApiOperation({ summary: 'Get all contracts with pagination' })
-	@ApiQuery({
-		name: 'limit',
-		required: false,
-		example: 10,
-		description: 'Limit of contracts to fetch (max 10)',
-	})
-	@ApiQuery({
-		name: 'offset',
-		required: false,
-		example: 0,
-		description: 'Number of contracts to skip',
-	})
-	@ApiQuery({
-		name: 'status',
-		required: false,
-		example: '',
-		description:
-			'Filter by contract status: "ativo", "cancelado" or "finalizado"',
-	})
-	@ApiQuery({
-		name: 'nomeCliente',
-		required: false,
-		example: '',
-		description: 'Filter by client name',
-	})
-	@ApiQuery({
-		name: 'documentoCliente',
-		required: false,
-		example: '',
-		description: 'Filter by client document',
-	})
-	@ApiQuery({
-		name: 'placa',
-		required: false,
-		example: '',
-		description: 'Filter by motorcycle plate',
-	})
-	@ApiQuery({
-		name: 'renavam',
-		required: false,
-		example: '',
-		description: 'Filter by motorcycle renavam',
-	})
-	@ApiQuery({
-		name: 'dataInicio',
-		required: false,
-		example: 2017,
-		description: 'Filter by start year (inclusive)',
-	})
-	@ApiQuery({
-		name: 'dataFim',
-		required: false,
-		example: 2025,
-		description: 'Filter by end year (inclusive)',
-	})
-	findAllContracts(@Query() filter: FilterDto) {
-		return this.contractsService.getAll(filter);
-	}
+  @Get()
+  @ApiBearerAuth()
+  @UseGuards(AuthTokenGuard, PermissionsGuard)
+  @CanReadContracts()
+  @ApiOperation({ summary: 'Get all contracts with pagination' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    example: 10,
+    description: 'Limit of contracts to fetch (max 10)',
+  })
+  @ApiQuery({
+    name: 'offset',
+    required: false,
+    example: 0,
+    description: 'Number of contracts to skip',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    example: '',
+    description:
+      'Filter by contract status: "ativo", "cancelado" or "finalizado"',
+  })
+  @ApiQuery({
+    name: 'nomeCliente',
+    required: false,
+    example: '',
+    description: 'Filter by client name',
+  })
+  @ApiQuery({
+    name: 'documentoCliente',
+    required: false,
+    example: '',
+    description: 'Filter by client document',
+  })
+  @ApiQuery({
+    name: 'placa',
+    required: false,
+    example: '',
+    description: 'Filter by motorcycle plate',
+  })
+  @ApiQuery({
+    name: 'renavam',
+    required: false,
+    example: '',
+    description: 'Filter by motorcycle renavam',
+  })
+  @ApiQuery({
+    name: 'dataInicio',
+    required: false,
+    example: 2017,
+    description: 'Filter by start year (inclusive)',
+  })
+  @ApiQuery({
+    name: 'dataFim',
+    required: false,
+    example: 2025,
+    description: 'Filter by end year (inclusive)',
+  })
+  findAllContracts(@Query() filter: FilterDto) {
+    return this.contractsService.getAll(filter);
+  }
 
-	@Get(':id')
-	@ApiBearerAuth()
-	@UseGuards(AuthTokenGuard)
-	@ApiOperation({ summary: 'Find a contract by ID' })
-	@ApiQuery({
-		name: 'id',
-		example: 'dtpysooc8k9p2mk6f09rv5ro',
-		description: 'Contract identifier',
-	})
-	findContractById(@Query('id') id: string) {
-		return this.contractsService.getOne(id);
-	}
+  @Get(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthTokenGuard, PermissionsGuard)
+  @CanReadContracts()
+  @ApiOperation({ summary: 'Find a contract by ID' })
+  @ApiParam({
+    name: 'id',
+    example: 'dtpysooc8k9p2mk6f09rv5ro',
+    description: 'Contract identifier',
+  })
+  findContractById(@Param('id') id: string) {
+    return this.contractsService.getOne(id);
+  }
 
-	@Post()
-	@ApiBearerAuth()
-	@UseGuards(AuthTokenGuard)
-	@ApiOperation({ summary: 'Create a new contract' })
-	createContract(@Body() body: CreateContractDto) {
-		return this.contractsService.createOne(body);
-	}
+  @Post()
+  @ApiBearerAuth()
+  @UseGuards(AuthTokenGuard, PermissionsGuard)
+  @CanCreateContracts()
+  @ApiOperation({ summary: 'Create a new contract' })
+  createContract(@Body() body: CreateContractDto) {
+    return this.contractsService.createOne(body);
+  }
 
-	@Delete(':id')
-	@ApiBearerAuth()
-	@UseGuards(AuthTokenGuard)
-	@ApiOperation({ summary: 'Delete a contract' })
-	@ApiParam({
-		name: 'id',
-		example: 'dtpysooc8k9p2mk6f09rv5ro',
-		description: 'Contract identifier',
-	})
-	deleteContract(@Param('id') id: string) {
-		return this.contractsService.deleteOne(id);
-	}
+  @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthTokenGuard, PermissionsGuard)
+  @CanDeleteContracts()
+  @ApiOperation({ summary: 'Delete a contract' })
+  @ApiParam({
+    name: 'id',
+    example: 'dtpysooc8k9p2mk6f09rv5ro',
+    description: 'Contract identifier',
+  })
+  deleteContract(@Param('id') id: string) {
+    return this.contractsService.deleteOne(id);
+  }
 
-	@Post(':id/resend-signature')
-	@ApiBearerAuth()
-	@UseGuards(AuthTokenGuard)
-	@ApiOperation({ summary: 'Resend signature email for contract' })
-	resendSignatureEmail(@Param('id') id: string) {
-		return this.contractsService.resendSignatureEmail(id);
-	}
+  @Post(':id/resend-signature')
+  @ApiBearerAuth()
+  @UseGuards(AuthTokenGuard)
+  @ApiOperation({ summary: 'Resend signature email for contract' })
+  resendSignatureEmail(@Param('id') id: string) {
+    return this.contractsService.resendSignatureEmail(id);
+  }
 
-	@Get('sign/:id')
-	@ApiOperation({ summary: 'Get contract for signature (public route)' })
-	getContractForSignature(
-		@Param('id') id: string,
-		@Query('token') token: string,
-	) {
-		return this.contractsService.getContractForSignature(id, token);
-	}
+  @Get('sign/:id')
+  @ApiOperation({ summary: 'Get contract for signature (public route)' })
+  getContractForSignature(
+    @Param('id') id: string,
+    @Query('token') token: string,
+  ) {
+    return this.contractsService.getContractForSignature(id, token);
+  }
 
-	@Post('sign/:id')
-	@ApiOperation({ summary: 'Sign contract (public route)' })
-	signContract(
-		@Param('id') id: string,
-		@Query('token') token: string,
-		@Body() body: { signatureData: any; contractPdf?: string },
-	) {
-		return this.contractsService.signContract(
-			id,
-			token,
-			body.signatureData,
-			body.contractPdf,
-		);
-	}
+  @Post('sign/:id')
+  @ApiOperation({ summary: 'Sign contract (public route)' })
+  signContract(
+    @Param('id') id: string,
+    @Query('token') token: string,
+    @Body() body: { signatureData: any; contractPdf?: string },
+  ) {
+    return this.contractsService.signContract(
+      id,
+      token,
+      body.signatureData,
+      body.contractPdf,
+    );
+  }
 }

@@ -8,8 +8,8 @@ import { Module } from '@nestjs/common';
 import { AwsS3Module } from 'src/aws/aws-s3.module';
 
 @Module({
-	imports: [PrismaModule, AuthModule, HttpModule, EmailModule, AwsS3Module],
-	controllers: [ContractController],
-	providers: [ContractService],
+  imports: [PrismaModule, AuthModule, HttpModule, EmailModule, AwsS3Module],
+  controllers: [ContractController],
+  providers: [ContractService],
 })
 export class ContractModule {}

@@ -2,34 +2,34 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app/app.module';
 import { NestFactory } from '@nestjs/core';
-import * as bodyParser from 'body-parser';
+import { json, urlencoded } from 'express';
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule);
 
-	app.useGlobalPipes(
-		new ValidationPipe({
-			transform: true,
-			whitelist: true,
-			forbidNonWhitelisted: true,
-		}),
-	);
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ limit: '50mb', extended: true }));
 
-	app.enableCors();
+  app.enableCors();
 
-	const config = new DocumentBuilder()
-		.setTitle('EzMotoFlow')
-		.setDescription('EzMotoFlow description')
-		.addBearerAuth()
-		.setVersion('1.0')
-		.build();
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
 
-	const documentFactory = () => SwaggerModule.createDocument(app, config);
-	SwaggerModule.setup('docs', app, documentFactory);
+  const config = new DocumentBuilder()
+    .setTitle('EzMotoFlow')
+    .setDescription('EzMotoFlow description')
+    .addBearerAuth()
+    .setVersion('1.0')
+    .build();
 
-	app.use(bodyParser.json({ limit: '18mb' }));
-	app.use(bodyParser.urlencoded({ limit: '18mb', extended: true }));
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, documentFactory);
 
-	await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

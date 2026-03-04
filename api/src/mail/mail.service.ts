@@ -3,32 +3,32 @@ import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
-	private transporter: nodemailer.Transporter;
+  private transporter: nodemailer.Transporter;
 
-	constructor() {
-		this.transporter = nodemailer.createTransport({
-			host: process.env.SMTP_HOST,
-			port: Number(process.env.SMTP_PORT),
-			auth: {
-				user: process.env.SMTP_USER,
-				pass: process.env.SMTP_PASS,
-			},
-		});
-	}
+  constructor() {
+    this.transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT),
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+  }
 
-	async sendSignatureLink(
-		clientEmail: string,
-		clientName: string,
-		contractId: string,
-		signatureToken: string,
-	) {
-		const signatureUrl = `${process.env.FRONTEND_URL}/signature/${contractId}?token=${signatureToken}`;
+  async sendSignatureLink(
+    clientEmail: string,
+    clientName: string,
+    contractId: string,
+    signatureToken: string,
+  ) {
+    const signatureUrl = `${process.env.FRONTEND_URL}/signature/${contractId}?token=${signatureToken}`;
 
-		const mailOptions = {
-			from: process.env.FROM_EMAIL,
-			to: clientEmail,
-			subject: 'Assinatura de Contrato - EzMotoFlow',
-			html: `
+    const mailOptions = {
+      from: process.env.FROM_EMAIL,
+      to: clientEmail,
+      subject: 'Assinatura de Contrato - EzMotoFlow',
+      html: `
         <h2>Olá, ${clientName}!</h2>
         <p>Você foi convidado para assinar um contrato.</p>
         <p>Clique no link abaixo para visualizar e assinar o contrato:</p>
@@ -38,8 +38,8 @@ export class EmailService {
         <p>Este link é válido por 48 horas.</p>
         <p>Atenciosamente,<br>Equipe EzMotoFlow</p>
       `,
-		};
+    };
 
-		await this.transporter.sendMail(mailOptions);
-	}
+    await this.transporter.sendMail(mailOptions);
+  }
 }

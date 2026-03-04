@@ -1,7 +1,9 @@
 "use client"
 
-import { Bike, Save, ArrowLeft, FileText, Palette, Calendar } from 'lucide-react';
+import { Bike, Save, ArrowLeft, FileText, Palette, Calendar, AlertTriangle } from 'lucide-react';
 import { Input, Textarea, MaskInput, NumberInput } from '@/components/ui/Input';
+import { PermissionGuard } from '@/components/auth/PermissionGuard';
+import { PermissionResource, PermissionAction } from '@/types/permissions';
 import { ImageUpload } from '@/components/ui/ImageUpload';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Selectize } from '@/components/ui/Selectize';
@@ -16,6 +18,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { z } from 'zod';
+import { getErrorMessage } from '@/lib/error-messages';
 
 const motorcycleSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório'),
@@ -91,281 +94,304 @@ export default function CreateMotorcyclePage() {
     },
     onError(error: any) {
       console.error('Erro na mutação:', error);
-      
-      toast.error('Erro ao criar motocicleta!');
+      toast.error(getErrorMessage(error));
     }
   });
 
   return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-4"
-      >
-        <Link to="/motorcycles">
-          <Button testID="back-button" type="secondary" justIcon>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        </Link>
-        
-        <div>
-          <Title size="2xl" className="text-foreground flex items-center gap-3">
-            <Bike className="w-8 h-8 text-primary" />
-            Nova Motocicleta
-          </Title>
-          <Subtitle className="text-muted-foreground">
-            Preencha os dados para cadastrar uma nova motocicleta
-          </Subtitle>
+    <PermissionGuard
+      resource={PermissionResource.MOTORCYCLES}
+      action={PermissionAction.CREATE}
+      fallback={
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center">
+            <AlertTriangle className="w-8 h-8 text-destructive" />
+          </div>
+          <div className="text-center">
+            <Title size="xl" className="text-foreground mb-2">
+              Acesso Negado
+            </Title>
+            <Subtitle className="text-muted-foreground">
+              Você não tem permissão para criar motocicletas
+            </Subtitle>
+          </div>
+          <Link to="/motorcycles">
+            <Button testID="back-to-motorcycles" type="secondary">Voltar para Motocicletas</Button>
+          </Link>
         </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-card border border-border rounded-xl p-6 shadow-elegant"
-      >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          <div>
-            <Title size="lg" className="text-card-foreground mb-4">
-              Informações Básicas
-            </Title>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Input
-                inputFieldProps={{
-                  testID: 'nome-input',
-                  label: 'Nome/Modelo',
-                  input: {
-                    ...register('nome'),
-                    placeholder: 'Ex: Honda CB 600F Hornet'
-                  }
-                }}
-                leftIcon={<Bike className="w-5 h-5 text-muted-foreground" />}
-                errorMessage={errors.nome?.message}
-                required
-              />
-
-              <Input
-                inputFieldProps={{
-                  testID: 'cor-input',
-                  label: 'Cor',
-                  input: {
-                    ...register('cor'),
-                    placeholder: 'Ex: Vermelho'
-                  }
-                }}
-                leftIcon={<Palette className="w-5 h-5 text-muted-foreground" />}
-                errorMessage={errors.cor?.message}
-                required
-              />
-
-              <MaskInput
-                inputFieldProps={{
-                  testID: 'placa-input',
-                  label: 'Placa',
-                  mask: 'aaa-9999',
-                  input: {
-                    ...register('placa'),
-                    placeholder: 'ABC-1234'
-                  }
-                }}
-                leftIcon={<FileText className="w-5 h-5 text-muted-foreground" />}
-                errorMessage={errors.placa?.message}
-                required
-              />
-
-              <MaskInput
-                inputFieldProps={{
-                  testID: 'ano-input',
-                  label: 'Ano',
-                  mask: '9999',
-                  input: {
-                    ...register('ano'),
-                    placeholder: '2020'
-                  }
-                }}
-                leftIcon={<Calendar className="w-5 h-5 text-muted-foreground" />}
-                errorMessage={errors.ano?.message}
-                required
-              />
-
-              <Input
-                inputFieldProps={{
-                  testID: 'chassi-input',
-                  label: 'Chassi',
-                  input: {
-                    ...register('chassi'),
-                    placeholder: 'Digite o chassi (17 caracteres)',
-                    maxLength: 17,
-                    minLength: 17
-                  }
-                }}
-                errorMessage={errors.chassi?.message}
-                required
-              />
-
-              <MaskInput
-                inputFieldProps={{
-                  testID: 'renavam-input',
-                  label: 'Renavam',
-                  mask: '99999999999',
-                  input: {
-                    ...register('renavam'),
-                    placeholder: 'Digite o renavam (11 dígitos)'
-                  }
-                }}
-                errorMessage={errors.renavam?.message}
-                required
-              />
-
-              <Input
-                inputFieldProps={{
-                  testID: 'km-input',
-                  label: 'Quilometragem',
-                  input: {
-                    ...register('km'),
-                    placeholder: '0'
-                  }
-                }}
-                errorMessage={errors.km?.message}
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <Title size="lg" className="text-card-foreground mb-4">
-              Informações Financeiras
-            </Title>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <NumberInput
-                inputFieldProps={{
-                  testID: 'valor_compra-input',
-                  label: 'Valor de Compra',
-                  input: {
-                    ...register('valor_compra'),
-                    prefix: "R$",
-                    decimalScale: 2,
-                    decimalSeparator: ",",
-                    thousandSeparator: ".",
-                    placeholder: "Insira o valor de compra",
-                    onChange: (e) => {
-                      const format = e.target.value.replace(/\D/g, '');
-                      setValue("valor_compra", Number(format))
-                    },
-                  },
-                }}
-                errorMessage={errors.valor_compra?.message}
-              />
-
-              <NumberInput
-                inputFieldProps={{
-                  testID: 'valor_venda-input',
-                  label: 'Valor de Venda',
-                  input: {
-                    ...register('valor_venda'),
-                    prefix: "R$",
-                    decimalScale: 2,
-                    decimalSeparator: ",",
-                    thousandSeparator: ".",
-                    placeholder: "Insira o valor de venda",
-                    onChange: (e) => {
-                      const format = e.target.value.replace(/\D/g, '');
-                      setValue("valor_venda", Number(format))
-                    },
-                  },
-                }}
-                errorMessage={errors.valor_venda?.message}
-              />
-
-              <NumberInput
-                inputFieldProps={{
-                  testID: 'valor_fipe-input',
-                  label: 'Valor FIPE',
-                  input: {
-                    ...register('valor_fipe'),
-                    prefix: "R$",
-                    decimalScale: 2,
-                    decimalSeparator: ",",
-                    thousandSeparator: ".",
-                    placeholder: "Insira o valor FIPE",
-                    onChange: (e) => {
-                      const format = e.target.value.replace(/\D/g, '');
-                      setValue("valor_fipe", Number(format))
-                    },
-                  },
-                }}
-                errorMessage={errors.valor_fipe?.message}
-              />
-            </div>
-          </div>
-
-          <div>
-            <Title size="lg" className="text-card-foreground mb-4">
-              Observações
-            </Title>
-            <div className="grid grid-cols-1 gap-6">
-              <Textarea
-                textareaFieldProps={{
-                  testID: 'observacao-textarea',
-                  label: 'Observações',
-                  textarea: {
-                    ...register('observacao'),
-                    placeholder: 'Observações adicionais sobre a motocicleta...',
-                    rows: 3
-                  }
-                }}
-                errorMessage={errors.observacao?.message}
-              />
-            </div>
-          </div>
-
-          <div>
-            <Title size="lg" className="text-card-foreground mb-4">
-              Fotos da Motocicleta
-            </Title>
-            <div className="grid grid-cols-1 gap-6">
-              <ImageUpload
-                label="Upload de Imagens"
-                maxFiles={3}
-                acceptedFileTypes={['image/jpeg', 'image/jpg', 'image/png', 'image/webp']}
-                maxFileSize={5 * 1024 * 1024}
-                convertToBase64={true}
-                onImagesChange={(images) => {
-                  const foto1 = images[0]?.base64 || images[0]?.url || '';
-                  const foto2 = images[1]?.base64 || images[1]?.url || '';
-                  const foto3 = images[2]?.base64 || images[2]?.url || '';
-                  
-                  setValue('foto1', foto1);
-                  setValue('foto2', foto2);
-                  setValue('foto3', foto3);
-                }}
-                className="w-full"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 pt-4 border-t border-border">
-            <Button
-              testID="save-button"
-              type="primary"
-              loading={sending}
-              disabled={sending}
-              className="shadow-primary"
-            >
-              <Save className="w-5 h-5 mr-2" />
-              Criar Motocicleta
+      }
+    >
+      <div className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-4"
+        >
+          <Link to="/motorcycles">
+            <Button testID="back-button" type="secondary" justIcon>
+              <ArrowLeft className="w-5 h-5" />
             </Button>
+          </Link>
 
-            <Link to="/motorcycles">
-              <Button testID="cancel-button" type="secondary">
-                Cancelar
-              </Button>
-            </Link>
+          <div>
+            <Title size="2xl" className="text-foreground flex items-center gap-3">
+              <Bike className="w-8 h-8 text-primary" />
+              Nova Motocicleta
+            </Title>
+            <Subtitle className="text-muted-foreground">
+              Preencha os dados para cadastrar uma nova motocicleta
+            </Subtitle>
           </div>
-        </form>
-      </motion.div>
-    </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-card border border-border rounded-xl p-6 shadow-elegant"
+        >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            <div>
+              <Title size="lg" className="text-card-foreground mb-4">
+                Informações Básicas
+              </Title>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Input
+                  inputFieldProps={{
+                    testID: 'nome-input',
+                    label: 'Nome/Modelo',
+                    input: {
+                      ...register('nome'),
+                      placeholder: 'Ex: Honda CB 600F Hornet'
+                    }
+                  }}
+                  leftIcon={<Bike className="w-5 h-5 text-muted-foreground" />}
+                  errorMessage={errors.nome?.message}
+                  required
+                />
+
+                <Input
+                  inputFieldProps={{
+                    testID: 'cor-input',
+                    label: 'Cor',
+                    input: {
+                      ...register('cor'),
+                      placeholder: 'Ex: Vermelho'
+                    }
+                  }}
+                  leftIcon={<Palette className="w-5 h-5 text-muted-foreground" />}
+                  errorMessage={errors.cor?.message}
+                  required
+                />
+
+                <MaskInput
+                  inputFieldProps={{
+                    testID: 'placa-input',
+                    label: 'Placa',
+                    mask: 'aaa-9999',
+                    input: {
+                      ...register('placa'),
+                      placeholder: 'ABC-1234'
+                    }
+                  }}
+                  leftIcon={<FileText className="w-5 h-5 text-muted-foreground" />}
+                  errorMessage={errors.placa?.message}
+                  required
+                />
+
+                <MaskInput
+                  inputFieldProps={{
+                    testID: 'ano-input',
+                    label: 'Ano',
+                    mask: '9999',
+                    input: {
+                      ...register('ano'),
+                      placeholder: '2020'
+                    }
+                  }}
+                  leftIcon={<Calendar className="w-5 h-5 text-muted-foreground" />}
+                  errorMessage={errors.ano?.message}
+                  required
+                />
+
+                <Input
+                  inputFieldProps={{
+                    testID: 'chassi-input',
+                    label: 'Chassi',
+                    input: {
+                      ...register('chassi'),
+                      placeholder: 'Digite o chassi (17 caracteres)',
+                      maxLength: 17,
+                      minLength: 17
+                    }
+                  }}
+                  errorMessage={errors.chassi?.message}
+                  required
+                />
+
+                <MaskInput
+                  inputFieldProps={{
+                    testID: 'renavam-input',
+                    label: 'Renavam',
+                    mask: '99999999999',
+                    input: {
+                      ...register('renavam'),
+                      placeholder: 'Digite o renavam (11 dígitos)'
+                    }
+                  }}
+                  errorMessage={errors.renavam?.message}
+                  required
+                />
+
+                <Input
+                  inputFieldProps={{
+                    testID: 'km-input',
+                    label: 'Quilometragem',
+                    input: {
+                      ...register('km'),
+                      placeholder: '0'
+                    }
+                  }}
+                  errorMessage={errors.km?.message}
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <Title size="lg" className="text-card-foreground mb-4">
+                Informações Financeiras
+              </Title>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <NumberInput
+                  inputFieldProps={{
+                    testID: 'valor_compra-input',
+                    label: 'Valor de Compra',
+                    input: {
+                      ...register('valor_compra'),
+                      prefix: "R$",
+                      decimalScale: 2,
+                      decimalSeparator: ",",
+                      thousandSeparator: ".",
+                      placeholder: "Insira o valor de compra",
+                      onChange: (e) => {
+                        const format = e.target.value.replace(/\D/g, '');
+                        setValue("valor_compra", Number(format))
+                      },
+                    },
+                  }}
+                  errorMessage={errors.valor_compra?.message}
+                />
+
+                <NumberInput
+                  inputFieldProps={{
+                    testID: 'valor_venda-input',
+                    label: 'Valor de Venda',
+                    input: {
+                      ...register('valor_venda'),
+                      prefix: "R$",
+                      decimalScale: 2,
+                      decimalSeparator: ",",
+                      thousandSeparator: ".",
+                      placeholder: "Insira o valor de venda",
+                      onChange: (e) => {
+                        const format = e.target.value.replace(/\D/g, '');
+                        setValue("valor_venda", Number(format))
+                      },
+                    },
+                  }}
+                  errorMessage={errors.valor_venda?.message}
+                />
+
+                <NumberInput
+                  inputFieldProps={{
+                    testID: 'valor_fipe-input',
+                    label: 'Valor FIPE',
+                    input: {
+                      ...register('valor_fipe'),
+                      prefix: "R$",
+                      decimalScale: 2,
+                      decimalSeparator: ",",
+                      thousandSeparator: ".",
+                      placeholder: "Insira o valor FIPE",
+                      onChange: (e) => {
+                        const format = e.target.value.replace(/\D/g, '');
+                        setValue("valor_fipe", Number(format))
+                      },
+                    },
+                  }}
+                  errorMessage={errors.valor_fipe?.message}
+                />
+              </div>
+            </div>
+
+            <div>
+              <Title size="lg" className="text-card-foreground mb-4">
+                Observações
+              </Title>
+              <div className="grid grid-cols-1 gap-6">
+                <Textarea
+                  textareaFieldProps={{
+                    testID: 'observacao-textarea',
+                    label: 'Observações',
+                    textarea: {
+                      ...register('observacao'),
+                      placeholder: 'Observações adicionais sobre a motocicleta...',
+                      rows: 3
+                    }
+                  }}
+                  errorMessage={errors.observacao?.message}
+                />
+              </div>
+            </div>
+
+            <div>
+              <Title size="lg" className="text-card-foreground mb-4">
+                Fotos da Motocicleta
+              </Title>
+              <div className="grid grid-cols-1 gap-6">
+                <ImageUpload
+                  label="Upload de Imagens"
+                  maxFiles={3}
+                  acceptedFileTypes={['image/jpeg', 'image/jpg', 'image/png', 'image/webp']}
+                  maxFileSize={5 * 1024 * 1024}
+                  convertToBase64={true}
+                  onImagesChange={(images) => {
+                    const foto1 = images[0]?.base64 || images[0]?.url || '';
+                    const foto2 = images[1]?.base64 || images[1]?.url || '';
+                    const foto3 = images[2]?.base64 || images[2]?.url || '';
+
+                    setValue('foto1', foto1);
+                    setValue('foto2', foto2);
+                    setValue('foto3', foto3);
+                  }}
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 pt-4 border-t border-border">
+              <Button
+                testID="save-button"
+                type="primary"
+                htmlType="submit"
+                loading={sending}
+                disabled={sending}
+                className="shadow-primary"
+              >
+                <Save className="w-5 h-5 mr-2" />
+                Criar Motocicleta
+              </Button>
+
+              <Link to="/motorcycles">
+                <Button testID="cancel-button" type="secondary">
+                  Cancelar
+                </Button>
+              </Link>
+            </div>
+          </form>
+        </motion.div>
+      </div>
+    </PermissionGuard>
   );
 }

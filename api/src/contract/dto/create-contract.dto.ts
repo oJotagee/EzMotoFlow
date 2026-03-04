@@ -1,32 +1,32 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export enum Pagamento {
-	boleto = 'boleto',
-	cartao = 'cartao',
-	pix = 'pix',
+  boleto = 'boleto',
+  cartao = 'cartao',
+  pix = 'pix',
 }
 
 export class CreateContractDto {
-	@IsString()
-	@IsOptional()
-	readonly observacao?: string;
+  @IsString()
+  @IsOptional()
+  readonly observacao?: string;
 
-	@IsEnum(Pagamento)
-	@IsNotEmpty()
-	readonly pagamento: Pagamento;
+  @IsEnum(Pagamento)
+  @IsNotEmpty()
+  readonly pagamento: Pagamento;
 
-	@IsString()
-	@IsNotEmpty()
-	readonly motorcycleId: string;
+  @IsString()
+  @IsNotEmpty()
+  readonly motorcycleId: string;
 
-	@IsString()
-	@IsNotEmpty()
-	readonly clientId: string;
+  @IsString()
+  @IsNotEmpty()
+  readonly clientId: string;
 
-	@IsString()
-	@IsOptional()
-	readonly contractoPdf?: string;
+  @IsString()
+  @IsOptional()
+  readonly contractoPdf?: string;
 
-	@IsOptional()
-	readonly signatures?: any[];
+  @IsOptional()
+  readonly signatures?: any[];
 }

@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { getErrorMessage } from '@/lib/error-messages';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido').min(1, 'Email é obrigatório'),
@@ -21,7 +22,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function Login() {
   const navigate = useNavigate();
   const { mutate: login, isPending } = useLogin();
-  
+
   const {
     register,
     handleSubmit,
@@ -37,7 +38,7 @@ export default function Login() {
         navigate('/dashboard');
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || 'Erro ao fazer login');
+        toast.error(getErrorMessage(error));
       },
     });
   };
@@ -106,6 +107,7 @@ export default function Login() {
             <Button
               testID="login-button"
               type="primary"
+              htmlType="submit"
               loading={isPending}
               disabled={isPending}
               className="w-full h-12 shadow-primary"

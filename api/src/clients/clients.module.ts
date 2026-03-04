@@ -5,8 +5,8 @@ import { AuthModule } from 'src/auth/auth.module';
 import { Module } from '@nestjs/common';
 
 @Module({
-	imports: [PrismaModule, AuthModule],
-	controllers: [ClientsController],
-	providers: [ClientsService],
+  imports: [PrismaModule, AuthModule],
+  controllers: [ClientsController],
+  providers: [ClientsService],
 })
 export class ClientsModule {}

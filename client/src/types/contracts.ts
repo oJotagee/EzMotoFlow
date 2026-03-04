@@ -18,6 +18,12 @@ export interface Contract {
   observacao?: string;
   pagamento: PaymentMethod;
   contractoPdf?: string;
+  signatures?: {
+    signature: string;
+    signedAt: string;
+  };
+  signatureToken?: string;
+  signatureTokenExpiry?: string;
   created_at: string;
   updated_at: string;
   motorcycleId: string;

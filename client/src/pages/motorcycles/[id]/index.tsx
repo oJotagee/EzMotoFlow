@@ -1,11 +1,13 @@
 "use client"
 
-import { Bike, Save, ArrowLeft, FileText, Palette, Calendar } from 'lucide-react';
+import { Bike, Save, ArrowLeft, FileText, Palette, Calendar, AlertTriangle } from 'lucide-react';
+import { PermissionGuard } from '@/components/auth/PermissionGuard';
+import { PermissionResource, PermissionAction } from '@/types/permissions';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Input, Textarea, MaskInput, NumberInput } from '@/components/ui/Input';
 import { ImageUpload } from '@/components/ui/ImageUpload';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Motorcycle } from '@/types';
+import { Motorcycle, MotorcycleStatus } from '@/types';
 import { useForm, Controller } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,6 +18,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { z } from 'zod';
+import { getErrorMessage } from '@/lib/error-messages';
 
 const motorcycleSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório'),
@@ -67,7 +70,7 @@ export default function EditMotorcyclePage() {
 
       setValue('nome', data.nome);
       setValue('cor', data.cor);
-             setValue('placa', data.placa ? data.placa.toUpperCase() : '');
+      setValue('placa', data.placa ? data.placa.toUpperCase() : '');
       setValue('ano', data.ano ? data.ano.substring(0, 4) : '');
       setValue('chassi', data.chassi);
       setValue('renavam', data.renavam);
@@ -122,8 +125,7 @@ export default function EditMotorcyclePage() {
     },
     onError(error: any) {
       console.error('Erro na mutação:', error);
-      
-      toast.error("Erro ao atualizar motocicleta!");
+      toast.error(getErrorMessage(error));
     }
   });
 
@@ -151,319 +153,382 @@ export default function EditMotorcyclePage() {
     );
   }
 
+  const isSold = motorcycle.status === MotorcycleStatus.VENDIDO;
+
   return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-4"
-      >
-        <Link to="/motorcycles">
-          <Button testID="back-button" type="secondary" justIcon>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        </Link>
-        
-        <div>
-          <Title size="2xl" className="text-foreground flex items-center gap-3">
-            <Bike className="w-8 h-8 text-primary" />
-            Editar Motocicleta
-          </Title>
-          <Subtitle className="text-muted-foreground">
-            Atualize as informações da motocicleta
-          </Subtitle>
+    <PermissionGuard
+      resource={PermissionResource.MOTORCYCLES}
+      action={PermissionAction.UPDATE}
+      fallback={
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center">
+            <AlertTriangle className="w-8 h-8 text-destructive" />
+          </div>
+          <div className="text-center">
+            <Title size="xl" className="text-foreground mb-2">
+              Acesso Negado
+            </Title>
+            <Subtitle className="text-muted-foreground">
+              Você não tem permissão para editar motocicletas
+            </Subtitle>
+          </div>
+          <Link to="/motorcycles">
+            <Button testID="back-to-motorcycles" type="secondary">Voltar para Motocicletas</Button>
+          </Link>
         </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-card border border-border rounded-xl p-6 shadow-elegant"
-      >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          <div>
-            <Title size="lg" className="text-card-foreground mb-4">
-              Informações Básicas
-            </Title>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Input
-                inputFieldProps={{
-                  testID: 'nome-input',
-                  label: 'Nome/Modelo',
-                  input: {
-                    ...register('nome'),
-                    placeholder: 'Ex: Honda CB 600F Hornet'
-                  }
-                }}
-                leftIcon={<Bike className="w-5 h-5 text-muted-foreground" />}
-                errorMessage={errors.nome?.message}
-                required
-              />
-
-              <Input
-                inputFieldProps={{
-                  testID: 'cor-input',
-                  label: 'Cor',
-                  input: {
-                    ...register('cor'),
-                    placeholder: 'Ex: Vermelho'
-                  }
-                }}
-                leftIcon={<Palette className="w-5 h-5 text-muted-foreground" />}
-                errorMessage={errors.cor?.message}
-                required
-              />
-
-              <Controller
-                name="placa"
-                control={control}
-                render={({ field }) => (
-                  <MaskInput
-                    inputFieldProps={{
-                      testID: 'placa-input',
-                      label: 'Placa',
-                      mask: 'aaa-9999',
-                      input: {
-                        ...field,
-                        placeholder: 'ABC-1234',
-                        onChange: (e) => {
-                          const value = e.target.value.toUpperCase();
-                          field.onChange(value);
-                        }
-                      }
-                    }}
-                    leftIcon={<FileText className="w-5 h-5 text-muted-foreground" />}
-                    errorMessage={errors.placa?.message}
-                    required
-                  />
-                )}
-              />
-
-              <Controller
-                name="ano"
-                control={control}
-                render={({ field }) => (
-                  <MaskInput
-                    inputFieldProps={{
-                      testID: 'ano-input',
-                      label: 'Ano',
-                      mask: '9999',
-                      input: {
-                        ...field,
-                        placeholder: '2020'
-                      }
-                    }}
-                    leftIcon={<Calendar className="w-5 h-5 text-muted-foreground" />}
-                    errorMessage={errors.ano?.message}
-                    required
-                  />
-                )}
-              />
-
-              <Input
-                inputFieldProps={{
-                  testID: 'chassi-input',
-                  label: 'Chassi',
-                  input: {
-                    ...register('chassi'),
-                    placeholder: 'Digite o chassi (17 caracteres)',
-                    maxLength: 17,
-                    minLength: 17
-                  }
-                }}
-                errorMessage={errors.chassi?.message}
-                required
-              />
-
-              <Controller
-                name="renavam"
-                control={control}
-                render={({ field }) => (
-                  <MaskInput
-                    inputFieldProps={{
-                      testID: 'renavam-input',
-                      label: 'Renavam',
-                      mask: '99999999999',
-                      input: {
-                        ...field,
-                        placeholder: 'Digite o renavam (11 dígitos)'
-                      }
-                    }}
-                    errorMessage={errors.renavam?.message}
-                    required
-                  />
-                )}
-              />
-
-              <Input
-                inputFieldProps={{
-                  testID: 'km-input',
-                  label: 'Quilometragem',
-                  input: {
-                    ...register('km'),
-                    placeholder: '0'
-                  }
-                }}
-                errorMessage={errors.km?.message}
-                required
-              />
-
-
-            </div>
-          </div>
-
-          <div>
-            <Title size="lg" className="text-card-foreground mb-4">
-              Informações Financeiras
-            </Title>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Controller
-                name="valor_compra"
-                control={control}
-                render={({ field }) => (
-                  <NumberInput
-                    inputFieldProps={{
-                      testID: 'valor_compra-input',
-                      label: 'Valor de Compra',
-                      input: {
-                        ...field,
-                        prefix: "R$",
-                        decimalScale: 2,
-                        decimalSeparator: ",",
-                        thousandSeparator: ".",
-                        placeholder: "Insira o valor de compra",
-                        onChange: (e) => {
-                          const format = e.target.value.replace(/\D/g, '');
-                          setValue("valor_compra", Number(format))
-                        },
-                      },
-                    }}
-                    errorMessage={errors.valor_compra?.message}
-                  />
-                )}
-              />
-
-              <Controller
-                name="valor_venda"
-                control={control}
-                render={({ field }) => (
-                  <NumberInput
-                    inputFieldProps={{
-                      testID: 'valor_venda-input',
-                      label: 'Valor de Venda',
-                      input: {
-                        ...field,
-                        prefix: "R$",
-                        decimalScale: 2,
-                        decimalSeparator: ",",
-                        thousandSeparator: ".",
-                        placeholder: "Insira o valor de venda",
-                        onChange: (e) => {
-                          const format = e.target.value.replace(/\D/g, '');
-                          setValue("valor_venda", Number(format))
-                        },
-                      },
-                    }}
-                    errorMessage={errors.valor_venda?.message}
-                  />
-                )}
-              />
-
-              <Controller
-                name="valor_fipe"
-                control={control}
-                render={({ field }) => (
-                  <NumberInput
-                    inputFieldProps={{
-                      testID: 'valor_fipe-input',
-                      label: 'Valor FIPE',
-                      input: {
-                        ...field,
-                        prefix: "R$",
-                        decimalScale: 2,
-                        decimalSeparator: ",",
-                        thousandSeparator: ".",
-                        placeholder: "Insira o valor FIPE",
-                        onChange: (e) => {
-                          const format = e.target.value.replace(/\D/g, '');
-                          setValue("valor_fipe", Number(format))
-                        },
-                      },
-                    }}
-                    errorMessage={errors.valor_fipe?.message}
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          <div>
-            <Title size="lg" className="text-card-foreground mb-4">
-              Observações
-            </Title>
-            <div className="grid grid-cols-1 gap-6">
-              <Textarea
-                textareaFieldProps={{
-                  testID: 'observacao-textarea',
-                  label: 'Observações',
-                  textarea: {
-                    ...register('observacao'),
-                    placeholder: 'Observações adicionais sobre a motocicleta...',
-                    rows: 3
-                  }
-                }}
-                errorMessage={errors.observacao?.message}
-              />
-            </div>
-          </div>
-
-          <div>
-            <Title size="lg" className="text-card-foreground mb-4">
-              Fotos da Motocicleta
-            </Title>
-            <div className="grid grid-cols-1 gap-6">
-              <ImageUpload
-                label="Upload de Imagens"
-                maxFiles={3}
-                acceptedFileTypes={['image/jpeg', 'image/jpg', 'image/png', 'image/webp']}
-                maxFileSize={5 * 1024 * 1024}
-                convertToBase64={true}
-                initialImages={[motorcycle?.foto1, motorcycle?.foto2, motorcycle?.foto3].filter(Boolean)}
-                onImagesChange={(images) => {
-                  const foto1 = images[0]?.base64 || images[0]?.url || '';
-                  const foto2 = images[1]?.base64 || images[1]?.url || '';
-                  const foto3 = images[2]?.base64 || images[2]?.url || '';
-                  
-                  setValue('foto1', foto1);
-                  setValue('foto2', foto2);
-                  setValue('foto3', foto3);
-                }}
-                className="w-full"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 pt-4 border-t border-border">
-            <Button
-              testID="save-button"
-              type="primary"
-              loading={updating}
-              disabled={updating}
-              className="shadow-primary"
-            >
-              <Save className="w-5 h-5 mr-2" />
-              Atualizar Motocicleta
+      }
+    >
+      <div className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-4"
+        >
+          <Link to="/motorcycles">
+            <Button testID="back-button" type="secondary" justIcon>
+              <ArrowLeft className="w-5 h-5" />
             </Button>
+          </Link>
 
-            <Link to="/motorcycles">
-              <Button testID="cancel-button" type="secondary">
-                Cancelar
-              </Button>
-            </Link>
+          <div className="flex-1">
+            <Title size="2xl" className="text-foreground flex items-center gap-3">
+              <Bike className="w-8 h-8 text-primary" />
+              {isSold ? 'Visualizar Motocicleta' : 'Editar Motocicleta'}
+            </Title>
+            <Subtitle className="text-muted-foreground">
+              {isSold ? 'Visualização de motocicleta vendida (edição bloqueada)' : 'Atualize as informações da motocicleta'}
+            </Subtitle>
           </div>
-        </form>
-      </motion.div>
-    </div>
+          {isSold && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-warning/10 border border-warning/20 rounded-lg">
+              <AlertTriangle className="w-5 h-5 text-warning" />
+              <span className="text-sm font-medium text-warning">Motocicleta Vendida</span>
+            </div>
+          )}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-card border border-border rounded-xl p-6 shadow-elegant"
+        >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            <div>
+              <Title size="lg" className="text-card-foreground mb-4">
+                Informações Básicas
+              </Title>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Input
+                  inputFieldProps={{
+                    testID: 'nome-input',
+                    label: 'Nome/Modelo',
+                    input: {
+                      ...register('nome'),
+                      placeholder: 'Ex: Honda CB 600F Hornet',
+                      disabled: isSold
+                    }
+                  }}
+                  leftIcon={<Bike className="w-5 h-5 text-muted-foreground" />}
+                  errorMessage={errors.nome?.message}
+                  required
+                />
+
+                <Input
+                  inputFieldProps={{
+                    testID: 'cor-input',
+                    label: 'Cor',
+                    input: {
+                      ...register('cor'),
+                      placeholder: 'Ex: Vermelho',
+                      disabled: isSold
+                    }
+                  }}
+                  leftIcon={<Palette className="w-5 h-5 text-muted-foreground" />}
+                  errorMessage={errors.cor?.message}
+                  required
+                />
+
+                <Controller
+                  name="placa"
+                  control={control}
+                  render={({ field }) => (
+                    <MaskInput
+                      inputFieldProps={{
+                        testID: 'placa-input',
+                        label: 'Placa',
+                        mask: 'aaa-9999',
+                        input: {
+                          ...field,
+                          placeholder: 'ABC-1234',
+                          onChange: (e) => {
+                            const value = e.target.value.toUpperCase();
+                            field.onChange(value);
+                          },
+                          disabled: isSold
+                        }
+                      }}
+                      leftIcon={<FileText className="w-5 h-5 text-muted-foreground" />}
+                      errorMessage={errors.placa?.message}
+                      required
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="ano"
+                  control={control}
+                  render={({ field }) => (
+                    <MaskInput
+                      inputFieldProps={{
+                        testID: 'ano-input',
+                        label: 'Ano',
+                        mask: '9999',
+                        input: {
+                          ...field,
+                          placeholder: '2020',
+                          disabled: isSold
+                        }
+                      }}
+                      leftIcon={<Calendar className="w-5 h-5 text-muted-foreground" />}
+                      errorMessage={errors.ano?.message}
+                      required
+                    />
+                  )}
+                />
+
+                <Input
+                  inputFieldProps={{
+                    testID: 'chassi-input',
+                    label: 'Chassi',
+                    input: {
+                      ...register('chassi'),
+                      placeholder: 'Digite o chassi (17 caracteres)',
+                      maxLength: 17,
+                      minLength: 17,
+                      disabled: isSold
+                    }
+                  }}
+                  errorMessage={errors.chassi?.message}
+                  required
+                />
+
+                <Controller
+                  name="renavam"
+                  control={control}
+                  render={({ field }) => (
+                    <MaskInput
+                      inputFieldProps={{
+                        testID: 'renavam-input',
+                        label: 'Renavam',
+                        mask: '99999999999',
+                        input: {
+                          ...field,
+                          placeholder: 'Digite o renavam (11 dígitos)',
+                          disabled: isSold
+                        }
+                      }}
+                      errorMessage={errors.renavam?.message}
+                      required
+                    />
+                  )}
+                />
+
+                <Input
+                  inputFieldProps={{
+                    testID: 'km-input',
+                    label: 'Quilometragem',
+                    input: {
+                      ...register('km'),
+                      placeholder: '0',
+                      disabled: isSold
+                    }
+                  }}
+                  errorMessage={errors.km?.message}
+                  required
+                />
+
+
+              </div>
+            </div>
+
+            <div>
+              <Title size="lg" className="text-card-foreground mb-4">
+                Informações Financeiras
+              </Title>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Controller
+                  name="valor_compra"
+                  control={control}
+                  render={({ field }) => (
+                    <NumberInput
+                      inputFieldProps={{
+                        testID: 'valor_compra-input',
+                        label: 'Valor de Compra',
+                        input: {
+                          ...field,
+                          prefix: "R$",
+                          decimalScale: 2,
+                          decimalSeparator: ",",
+                          thousandSeparator: ".",
+                          placeholder: "Insira o valor de compra",
+                          onChange: (e) => {
+                            const format = e.target.value.replace(/\D/g, '');
+                            setValue("valor_compra", Number(format))
+                          },
+                          disabled: isSold
+                        },
+                      }}
+                      errorMessage={errors.valor_compra?.message}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="valor_venda"
+                  control={control}
+                  render={({ field }) => (
+                    <NumberInput
+                      inputFieldProps={{
+                        testID: 'valor_venda-input',
+                        label: 'Valor de Venda',
+                        input: {
+                          ...field,
+                          prefix: "R$",
+                          decimalScale: 2,
+                          decimalSeparator: ",",
+                          thousandSeparator: ".",
+                          placeholder: "Insira o valor de venda",
+                          onChange: (e) => {
+                            const format = e.target.value.replace(/\D/g, '');
+                            setValue("valor_venda", Number(format))
+                          },
+                          disabled: isSold
+                        },
+                      }}
+                      errorMessage={errors.valor_venda?.message}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="valor_fipe"
+                  control={control}
+                  render={({ field }) => (
+                    <NumberInput
+                      inputFieldProps={{
+                        testID: 'valor_fipe-input',
+                        label: 'Valor FIPE',
+                        input: {
+                          ...field,
+                          prefix: "R$",
+                          decimalScale: 2,
+                          decimalSeparator: ",",
+                          thousandSeparator: ".",
+                          placeholder: "Insira o valor FIPE",
+                          onChange: (e) => {
+                            const format = e.target.value.replace(/\D/g, '');
+                            setValue("valor_fipe", Number(format))
+                          },
+                          disabled: isSold
+                        },
+                      }}
+                      errorMessage={errors.valor_fipe?.message}
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            <div>
+              <Title size="lg" className="text-card-foreground mb-4">
+                Observações
+              </Title>
+              <div className="grid grid-cols-1 gap-6">
+                <Textarea
+                  textareaFieldProps={{
+                    testID: 'observacao-textarea',
+                    label: 'Observações',
+                    textarea: {
+                      ...register('observacao'),
+                      placeholder: 'Observações adicionais sobre a motocicleta...',
+                      rows: 3,
+                      disabled: isSold
+                    }
+                  }}
+                  errorMessage={errors.observacao?.message}
+                />
+              </div>
+            </div>
+
+            <div>
+              <Title size="lg" className="text-card-foreground mb-4">
+                Fotos da Motocicleta
+              </Title>
+              <div className="grid grid-cols-1 gap-6">
+                {isSold ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {[motorcycle?.foto1, motorcycle?.foto2, motorcycle?.foto3]
+                      .filter(Boolean)
+                      .map((foto, index) => (
+                        <div key={index} className="relative aspect-video rounded-lg overflow-hidden border border-border">
+                          <img
+                            src={foto}
+                            alt={`Foto ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    {[motorcycle?.foto1, motorcycle?.foto2, motorcycle?.foto3].filter(Boolean).length === 0 && (
+                      <p className="text-sm text-muted-foreground">Nenhuma foto disponível</p>
+                    )}
+                  </div>
+                ) : (
+                  <ImageUpload
+                    label="Upload de Imagens"
+                    maxFiles={3}
+                    acceptedFileTypes={['image/jpeg', 'image/jpg', 'image/png', 'image/webp']}
+                    maxFileSize={5 * 1024 * 1024}
+                    convertToBase64={true}
+                    initialImages={[motorcycle?.foto1, motorcycle?.foto2, motorcycle?.foto3].filter(Boolean)}
+                    onImagesChange={(images) => {
+                      const foto1 = images[0]?.base64 || images[0]?.url || '';
+                      const foto2 = images[1]?.base64 || images[1]?.url || '';
+                      const foto3 = images[2]?.base64 || images[2]?.url || '';
+
+                      setValue('foto1', foto1);
+                      setValue('foto2', foto2);
+                      setValue('foto3', foto3);
+                    }}
+                    className="w-full"
+                  />
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 pt-4 border-t border-border">
+              {!isSold && (
+                <Button
+                  testID="save-button"
+                  type="primary"
+                  loading={updating}
+                  disabled={updating}
+                  className="shadow-primary"
+                >
+                  <Save className="w-5 h-5 mr-2" />
+                  Atualizar Motocicleta
+                </Button>
+              )}
+
+              <Link to="/motorcycles">
+                <Button testID="cancel-button" type="secondary">
+                  {isSold ? 'Voltar' : 'Cancelar'}
+                </Button>
+              </Link>
+            </div>
+          </form>
+        </motion.div>
+      </div>
+    </PermissionGuard>
   );
 }

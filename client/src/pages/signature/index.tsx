@@ -191,7 +191,7 @@ export default function SignContractPage() {
 
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgData = canvas.toDataURL('image/png');
-      
+
       const pdfWidth = 210;
       const imgWidth = pdfWidth;
       const imgHeight = (canvas.height * pdfWidth) / canvas.width;
@@ -199,7 +199,7 @@ export default function SignContractPage() {
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
 
       const pdfBase64 = pdf.output('datauristring');
-      
+
       return pdfBase64;
     } finally {
       document.body.removeChild(tempDiv);
@@ -214,9 +214,13 @@ export default function SignContractPage() {
 
     try {
       const signatureDataURL = sigPad.current?.toDataURL();
-      
+
+      console.log('Assinatura capturada:', signatureDataURL?.substring(0, 100));
+
       // Gerar PDF do contrato assinado
       const contractPdfBase64 = await generateContractPDF(signatureDataURL);
+
+      console.log('PDF gerado:', contractPdfBase64?.substring(0, 100));
 
       signContract({
         signature: signatureDataURL,
@@ -292,7 +296,7 @@ export default function SignContractPage() {
             Por favor, revise os detalhes e assine o contrato abaixo
           </p>
         </div>
-        
+
         <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4 text-gray-900">
             Detalhes do Contrato
@@ -324,18 +328,19 @@ export default function SignContractPage() {
           <p className="text-gray-600 mb-4">
             Use o mouse ou toque na tela para desenhar sua assinatura no campo abaixo:
           </p>
-          
-          <div className="border-2 border-dashed border-gray-300 rounded-lg mb-4 p-2">
+
+          <div className="border-2 border-dashed border-gray-300 rounded-lg mb-4 p-2 flex justify-center">
             <SignatureCanvas
               ref={sigPad}
               canvasProps={{
-                width: 500,
+                width: 600,
                 height: 200,
-                className: 'signature-canvas w-full border rounded'
+                className: 'signature-canvas border rounded',
+                style: { width: '600px', height: '200px' }
               }}
             />
           </div>
-          
+
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={clearSignature}

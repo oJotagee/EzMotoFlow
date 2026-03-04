@@ -3,7 +3,7 @@ export class ResponseAllContractsDto {
   valor: number;
   data: Date;
   observacao: string | null;
-  pagamento: string
+  pagamento: string;
   contractoPdf: string | null;
   status: string;
   motorcycle: {
@@ -26,13 +26,13 @@ export class ResponseAllContractsDto {
 }
 
 export class ResponseContractsDto {
-	message: string;
+  message: string;
 }
 
 export class PaginatedContractsResponseDto {
-	data: ResponseAllContractsDto[];
-	total: number;
-	page: number;
-	limit: number;
-	pages: number;
+  data: ResponseAllContractsDto[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
 }

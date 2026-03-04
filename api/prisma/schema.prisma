@@ -20,6 +20,8 @@ model Users {
   email      String    @unique
   created_at DateTime? @default(now())
   updated_at DateTime? @default(now())
+
+  permissions UserPermission[]
 }
 
 model MotorCycle {
@@ -118,4 +120,31 @@ enum StatusContrato {
   ativo
   cancelado
   finalizado
+}
+
+enum PermissionAction {
+  READ
+  CREATE
+  UPDATE
+  DELETE
+}
+
+enum PermissionResource {
+  USERS
+  CLIENTS
+  MOTORCYCLES
+  CONTRACTS
+}
+
+model UserPermission {
+  id       String             @id @default(cuid())
+  userId   String
+  user     Users              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resource PermissionResource
+  action   PermissionAction
+
+  created_at DateTime? @default(now())
+
+  @@unique([userId, resource, action])
+  @@index([userId])
 }

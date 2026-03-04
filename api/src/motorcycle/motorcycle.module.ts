@@ -6,8 +6,8 @@ import { AuthModule } from 'src/auth/auth.module';
 import { Module } from '@nestjs/common';
 
 @Module({
-	imports: [PrismaModule, AuthModule, AwsS3Module],
-	controllers: [MotorcycleController],
-	providers: [MotorcycleService],
+  imports: [PrismaModule, AuthModule, AwsS3Module],
+  controllers: [MotorcycleController],
+  providers: [MotorcycleService],
 })
 export class MotorcycleModule {}

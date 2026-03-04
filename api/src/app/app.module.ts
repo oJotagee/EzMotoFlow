@@ -14,28 +14,28 @@ import { Module } from '@nestjs/common';
 import { join } from 'path';
 
 @Module({
-	imports: [
-		UsersModule,
-		AuthModule,
-		MotorcycleModule,
-		AwsS3Module,
-		ClientsModule,
-		ContractModule,
-		ServeStaticModule.forRoot({
-			rootPath: join(__dirname, '..', '..', 'files'),
-			serveRoot: '/files',
-		}),
-		ConfigModule.forRoot({
-			isGlobal: true,
-		}),
-	],
-	controllers: [AppController],
-	providers: [
-		{
-			provide: APP_FILTER,
-			useClass: ApiExceptionFilter,
-		},
-		AppService,
-	],
+  imports: [
+    UsersModule,
+    AuthModule,
+    MotorcycleModule,
+    AwsS3Module,
+    ClientsModule,
+    ContractModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'files'),
+      serveRoot: '/files',
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+  ],
+  controllers: [AppController],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: ApiExceptionFilter,
+    },
+    AppService,
+  ],
 })
 export class AppModule {}
