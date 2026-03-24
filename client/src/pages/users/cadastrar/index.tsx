@@ -55,7 +55,7 @@ export default function CreateUserPage() {
         password: values.password,
       });
 
-      const userId = response.data.user.id;
+      const userId = response.data.id;
 
       // Depois atualiza as permissões
       if (selectedPermissions.length > 0) {

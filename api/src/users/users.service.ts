@@ -68,11 +68,13 @@ export class UsersService {
         pages,
       };
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new HttpException(
         'Failed to get all users',
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -101,9 +103,7 @@ export class UsersService {
 
       throw new HttpException(
         'Failed to get user',
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -132,9 +132,7 @@ export class UsersService {
 
       throw new HttpException(
         'Failed to get user',
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -172,11 +170,13 @@ export class UsersService {
 
       return user;
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new HttpException(
         'Failed to create user',
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -249,9 +249,7 @@ export class UsersService {
 
       throw new HttpException(
         'Failed to update user',
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -277,11 +275,13 @@ export class UsersService {
         message: 'User deleted successfully',
       };
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new HttpException(
         'Failed to delete user',
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -312,11 +312,13 @@ export class UsersService {
         permissions: user.permissions,
       };
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new HttpException(
         'Failed to get user permissions',
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -366,11 +368,13 @@ export class UsersService {
         permissions: updatedPermissions,
       };
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new HttpException(
         'Failed to update user permissions',
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
