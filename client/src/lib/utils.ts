@@ -15,7 +15,7 @@ export function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-  }).format(value / 100);
+  }).format(value);
 }
 
 export function formatDate(date: string | Date): string {

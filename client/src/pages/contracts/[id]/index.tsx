@@ -183,7 +183,7 @@ export default function ViewContractPage() {
               </div>
 
               <div className="my-6 border-t border-gray-300 pt-4">
-                <p className="text-black"><strong className="text-black">Valor do Contrato:</strong> R$ {(contract.valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                <p className="text-black"><strong className="text-black">Valor do Contrato:</strong> R$ {contract.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                 <p className="text-black"><strong className="text-black">Forma de Pagamento:</strong> {contract.pagamento}</p>
                 <p className="text-black"><strong className="text-black">Data do Contrato:</strong> {new Date(contract.data).toLocaleDateString('pt-BR')}</p>
                 <p className="text-black"><strong className="text-black">Status:</strong> <span className="uppercase font-semibold text-black">{contract.status}</span></p>

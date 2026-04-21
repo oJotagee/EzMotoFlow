@@ -511,6 +511,7 @@ export default function EditMotorcyclePage() {
                 <Button
                   testID="save-button"
                   type="primary"
+                  htmlType="submit"
                   loading={updating}
                   disabled={updating}
                   className="shadow-primary"
