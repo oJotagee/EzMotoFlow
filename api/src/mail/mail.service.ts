@@ -6,12 +6,17 @@ export class EmailService {
   private transporter: nodemailer.Transporter;
 
   constructor() {
+    const port = Number(process.env.SMTP_PORT) || 587;
     this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
+      port,
+      secure: port === 465,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
       },
     });
   }
