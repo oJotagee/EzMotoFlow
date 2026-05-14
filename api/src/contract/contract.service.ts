@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EmailService } from 'src/mail/mail.service';
@@ -13,6 +13,8 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class ContractService {
+  private readonly logger = new Logger(ContractService.name);
+
   constructor(
     private prismaService: PrismaService,
     private emailService: EmailService,
@@ -380,6 +382,8 @@ export class ContractService {
         );
       }
 
+      let tokenToSend = contract.signatureToken;
+
       if (contract.signatureTokenExpiry < new Date()) {
         const newToken = crypto.randomUUID();
         const tokenExpiry = new Date();
@@ -393,28 +397,39 @@ export class ContractService {
           },
         });
 
+        tokenToSend = newToken;
+      }
+
+      try {
         await this.emailService.sendSignatureLink(
           contract.client.email,
           contract.client.fullName,
           contractId,
-          newToken,
+          tokenToSend,
         );
-      } else {
-        await this.emailService.sendSignatureLink(
-          contract.client.email,
-          contract.client.fullName,
-          contractId,
-          contract.signatureToken,
+      } catch (emailError) {
+        this.logger.error(
+          `Falha ao enviar email de assinatura para contrato ${contractId}: ${emailError instanceof Error ? emailError.message : emailError}`,
+          emailError instanceof Error ? emailError.stack : undefined,
+        );
+        throw new HttpException(
+          'Erro ao enviar email de assinatura. Verifique as configurações de email.',
+          HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
 
       return { message: 'Email de assinatura reenviado com sucesso!' };
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      this.logger.error(
+        `Erro inesperado em resendSignatureEmail para contrato ${contractId}: ${error instanceof Error ? error.message : error}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw new HttpException(
         'Erro ao reenviar email de assinatura',
-        error instanceof HttpException
-          ? error.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
