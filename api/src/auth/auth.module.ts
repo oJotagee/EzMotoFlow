@@ -1,5 +1,5 @@
 import { HashingProtocol } from './hash/hashing.service';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { PrismaModule } from '@api/prisma/prisma.module';
 import { BcryptService } from './hash/bcrypt.service';
 import { AuthController } from './auth.controller';
 import { Global, Module } from '@nestjs/common';

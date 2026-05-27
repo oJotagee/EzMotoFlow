@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateMotorCycleDto } from './dto/create-motorcycle.dto';
 import { UpdateMotorcycleDto } from './dto/update-motorcycle.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { AwsS3Service } from 'src/aws/aws-s3.service';
+import { PrismaService } from '@api/prisma/prisma.service';
+import { AwsS3Service } from '@api/aws/aws-s3.service';
 import { FilterDto } from './dto/filter.dto';
 import {
   ResponseAllMotorcycleDto,

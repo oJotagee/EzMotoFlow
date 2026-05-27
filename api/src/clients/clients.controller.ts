@@ -1,11 +1,11 @@
-import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
-import { PermissionsGuard } from 'src/auth/guard/permissions.guard';
+import { AuthTokenGuard } from '@api/auth/guard/auth-token.guard';
+import { PermissionsGuard } from '@api/auth/guard/permissions.guard';
 import {
   CanReadClients,
   CanCreateClients,
   CanUpdateClients,
   CanDeleteClients,
-} from 'src/auth/commom/permissions.decorator';
+} from '@api/auth/commom/permissions.decorator';
 import { UpdateClientsDto } from './dto/update-clients.dto';
 import { CreateClientDto } from './dto/create-clients.dto';
 import { ClientsService } from './clients.service';

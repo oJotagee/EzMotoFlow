@@ -1,6 +1,6 @@
 import { IsArray, IsEnum, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { PermissionAction, PermissionResource } from 'generated/prisma/enums';
+import { PermissionAction, PermissionResource } from '@/generated/prisma/enums';
 
 export class CreatePermissionDto {
   @IsString()

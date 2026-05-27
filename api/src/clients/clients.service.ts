@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UpdateClientsDto } from './dto/update-clients.dto';
 import { CreateClientDto } from './dto/create-clients.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '@api/prisma/prisma.service';
 import { FilterDto } from './dto/filter.dto';
 import {
   ResponseAllClientsDto,

@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { CreateContractDto } from './dto/create-contract.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { EmailService } from 'src/mail/mail.service';
-import { AwsS3Service } from 'src/aws/aws-s3.service';
+import { PrismaService } from '@api/prisma/prisma.service';
+import { EmailService } from '@api/mail/mail.service';
+import { AwsS3Service } from '@api/aws/aws-s3.service';
 import { FilterDto } from './dto/filter.dto';
 import {
   ResponseAllContractsDto,

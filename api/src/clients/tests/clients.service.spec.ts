@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ClientsService } from '../clients.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '@api/prisma/prisma.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CreateClientDto, TipoCliente } from '../dto/create-clients.dto';
 import { UpdateClientsDto } from '../dto/update-clients.dto';

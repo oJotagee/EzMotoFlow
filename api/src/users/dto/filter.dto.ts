@@ -1,4 +1,4 @@
-import { PaginationDto } from 'src/commom/dto/pagination.dto';
+import { PaginationDto } from '@api/commom/dto/pagination.dto';
 import { IsOptional, IsString } from 'class-validator';
 
 export class FilterDto extends PaginationDto {

@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import { PermissionAction, PermissionResource } from 'generated/prisma/enums';
+import { PermissionAction, PermissionResource } from '@/generated/prisma/enums';
 import {
   PERMISSIONS_KEY,
   RequiredPermission,

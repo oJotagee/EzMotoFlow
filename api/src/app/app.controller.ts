@@ -1,4 +1,4 @@
-import { LoggerInterceptor } from 'src/commom/interceptors/logger.interceptor';
+import { LoggerInterceptor } from '@api/commom/interceptors/logger.interceptor';
 import { Controller, Get, Res, UseInterceptors } from '@nestjs/common';
 import { Response } from 'express';
 

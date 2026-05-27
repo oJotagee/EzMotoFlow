@@ -1,13 +1,13 @@
 import { CreateMotorCycleDto } from './dto/create-motorcycle.dto';
 import { UpdateMotorcycleDto } from './dto/update-motorcycle.dto';
-import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
-import { PermissionsGuard } from 'src/auth/guard/permissions.guard';
+import { AuthTokenGuard } from '@api/auth/guard/auth-token.guard';
+import { PermissionsGuard } from '@api/auth/guard/permissions.guard';
 import {
   CanReadMotorcycles,
   CanCreateMotorcycles,
   CanUpdateMotorcycles,
   CanDeleteMotorcycles,
-} from 'src/auth/commom/permissions.decorator';
+} from '@api/auth/commom/permissions.decorator';
 import { MotorcycleService } from './motorcycle.service';
 import { FilterDto } from './dto/filter.dto';
 import {

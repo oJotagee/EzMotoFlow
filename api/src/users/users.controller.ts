@@ -1,12 +1,12 @@
-import { TokenPayload } from 'src/auth/params/token-payload.param';
-import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
-import { PermissionsGuard } from 'src/auth/guard/permissions.guard';
+import { TokenPayload } from '@api/auth/params/token-payload.param';
+import { AuthTokenGuard } from '@api/auth/guard/auth-token.guard';
+import { PermissionsGuard } from '@api/auth/guard/permissions.guard';
 import {
   CanReadUsers,
   CanCreateUsers,
   CanUpdateUsers,
   CanDeleteUsers,
-} from 'src/auth/commom/permissions.decorator';
+} from '@api/auth/commom/permissions.decorator';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -16,7 +16,7 @@ import {
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserPermissionsDto } from './dto/permission.dto';
-import { PayloadDto } from 'src/auth/dto/payload.dto';
+import { PayloadDto } from '@api/auth/dto/payload.dto';
 import { UsersService } from './users.service';
 import {
   Body,

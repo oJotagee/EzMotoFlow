@@ -1,5 +1,5 @@
 import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
-import { PaginationDto } from 'src/commom/dto/pagination.dto';
+import { PaginationDto } from '@api/commom/dto/pagination.dto';
 import { Type } from 'class-transformer';
 
 export class FilterDto extends PaginationDto {

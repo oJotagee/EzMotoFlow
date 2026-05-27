@@ -4,13 +4,13 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
-import { AuthTokenGuard } from 'src/auth/guard/auth-token.guard';
-import { PermissionsGuard } from 'src/auth/guard/permissions.guard';
+import { AuthTokenGuard } from '@api/auth/guard/auth-token.guard';
+import { PermissionsGuard } from '@api/auth/guard/permissions.guard';
 import {
   CanReadContracts,
   CanCreateContracts,
   CanDeleteContracts,
-} from 'src/auth/commom/permissions.decorator';
+} from '@api/auth/commom/permissions.decorator';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { ContractService } from './contract.service';
 import { FilterDto } from './dto/filter.dto';

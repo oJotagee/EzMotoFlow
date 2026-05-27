@@ -5,8 +5,8 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PermissionAction, PermissionResource } from 'generated/prisma/enums';
+import { PrismaService } from '@api/prisma/prisma.service';
+import { PermissionAction, PermissionResource } from '@/generated/prisma/enums';
 import { TOKEN_PAYLOAD } from '../commom/auth.constant';
 
 export const PERMISSIONS_KEY = 'permissions';
