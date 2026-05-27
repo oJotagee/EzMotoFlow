@@ -49,8 +49,8 @@ Sistema de gestão para revendas de motos — controle de estoque, clientes, con
 │  └──────────────────────┘   └───────────────────────────────────┘    │
 │                                                                      │
 │  ┌─────────────────────────────────────────────────────────────┐     │
-│  │                  PrismaService (ORM)                         │    │
-│  │              @prisma/adapter-pg (pool de conexões)           │    │
+│  │                  PrismaService (ORM)                        │     │
+│  │              @prisma/adapter-pg (pool de conexões)          │     │
 │  └──────────────────────────────┬──────────────────────────────┘     │
 └─────────────────────────────────┼────────────────────────────────────┘
                                   │ PostgreSQL (SSL)
