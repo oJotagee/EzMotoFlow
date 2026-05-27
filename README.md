@@ -96,27 +96,27 @@ Serviços Externos:
 │       clients        │
 ├──────────────────────┤
 │ id (uuid) PK         │
-│ tipo (enum)          │         ┌──────────────────────────────┐
-│   PESSOA_FISICA      │         │         contracts            │
-│   PESSOA_JURIDICA    │         ├──────────────────────────────┤
-│ fullName             │────┐    │ id (uuid) PK                 │
-│ documento (unique)   │    │    │ clienteId (uuid) FK          │
-│ telefone             │    └───▶│ motoCycleId (uuid) FK        │
-│ email (unique)       │    ┌───▶│ valor (decimal)              │
-│ dataNascimento       │    │    │ data                         │
-│ companyName          │    │    │ pagamento (enum)             │
-│ cep / rua / numero   │    │    │   BOLETO | CARTAO | PIX      │
-│ bairro / cidade      │    │    │ status (enum)                │
-│ estado / complemento │    │    │   ativo | cancelado          │
-│ status               │    │    │   finalizado                 │
-│ created_at           │    │    │ contractoPdf (S3 URL)        │
-│ updated_at           │    │    │ signatures (JSON)            │
-└──────────────────────┘    │    │ signatureToken               │
-                            │    │ signatureTokenExpiry         │
-┌──────────────────────┐    │    │ observacao                   │
-│      motor_cycle     │    │    │ created_at                   │
-├──────────────────────┤    │    │ updated_at                   │
-│ id (uuid) PK         │────┘    └──────────────────────────────┘
+│ tipo (enum)          │          ┌──────────────────────────────┐
+│   PESSOA_FISICA      │          │         contracts            │
+│   PESSOA_JURIDICA    │          ├──────────────────────────────┤
+│ fullName             │────┐     │ id (uuid) PK                 │
+│ documento (unique)   │    │     │ clienteId (uuid) FK          │
+│ telefone             │    └───▶ │ motoCycleId (uuid) FK        │
+│ email (unique)       │    ┌───▶ │ valor (decimal)              │
+│ dataNascimento       │    │     │ data                         │
+│ companyName          │    │     │ pagamento (enum)             │
+│ cep / rua / numero   │    │     │   BOLETO | CARTAO | PIX      │
+│ bairro / cidade      │    │     │ status (enum)                │
+│ estado / complemento │    │     │   ativo | cancelado          │
+│ status               │    │     │   finalizado                 │
+│ created_at           │    │     │ contractoPdf (S3 URL)        │
+│ updated_at           │    │     │ signatures (JSON)            │
+└──────────────────────┘    │     │ signatureToken               │
+                            │     │ signatureTokenExpiry         │
+┌──────────────────────┐    │     │ observacao                   │
+│      motor_cycle     │    │     │ created_at                   │
+├──────────────────────┤    │     │ updated_at                   │
+│ id (uuid) PK         │────┘     └──────────────────────────────┘
 │ nome                 │
 │ cor                  │
 │ placa (unique)       │
