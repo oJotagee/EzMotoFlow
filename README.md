@@ -425,3 +425,10 @@ npm run dev             # http://localhost:8080
 | Banco | Neon Cloud (PostgreSQL serverless) |
 | Arquivos | AWS S3 (bucket `ezmotoflow`, região `us-east-2`) |
 | E-mail | Gmail SMTP |
+
+---
+
+## Links
+
+- **API (Produção):** [https://ezmotoflow.onrender.com](https://ezmotoflow.onrender.com)
+- **Documentação Swagger:** [https://ezmotoflow.onrender.com/docs](https://ezmotoflow.onrender.com/docs)
