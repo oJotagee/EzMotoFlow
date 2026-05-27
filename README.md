@@ -101,8 +101,8 @@ Serviços Externos:
 │   PESSOA_JURIDICA    │          ├──────────────────────────────┤
 │ fullName             │────┐     │ id (uuid) PK                 │
 │ documento (unique)   │    │     │ clienteId (uuid) FK          │
-│ telefone             │    └───▶ │ motoCycleId (uuid) FK        │
-│ email (unique)       │    ┌───▶ │ valor (decimal)              │
+│ telefone             │    └───▶│ motoCycleId (uuid) FK        │
+│ email (unique)       │    ┌───▶│ valor (decimal)              │
 │ dataNascimento       │    │     │ data                         │
 │ companyName          │    │     │ pagamento (enum)             │
 │ cep / rua / numero   │    │     │   BOLETO | CARTAO | PIX      │
