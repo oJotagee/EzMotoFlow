@@ -15,6 +15,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Input, Textarea, MaskInput, NumberInput } from "@/components/ui/Input";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { usePermissions } from "@/hooks/use-permissions";
 import { Motorcycle, MotorcycleStatus } from "@/types";
 import { useForm, Controller } from "react-hook-form";
 
@@ -60,6 +61,7 @@ export default function EditMotorcyclePage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
+  const { canUpdateMotorcycles } = usePermissions();
 
   const {
     register,
@@ -179,10 +181,12 @@ export default function EditMotorcyclePage() {
 
   const isSold = motorcycle.status === MotorcycleStatus.VENDIDO;
 
+  const canEdit = canUpdateMotorcycles() && !isSold;
+
   return (
     <PermissionGuard
       resource={PermissionResource.MOTORCYCLES}
-      action={PermissionAction.UPDATE}
+      action={PermissionAction.READ}
       fallback={
         <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
           <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center">
@@ -193,7 +197,7 @@ export default function EditMotorcyclePage() {
               Acesso Negado
             </Title>
             <Subtitle className="text-muted-foreground">
-              Você não tem permissão para editar motocicletas
+              Você não tem permissão para visualizar motocicletas
             </Subtitle>
           </div>
           <Link to="/motorcycles">
@@ -222,12 +226,14 @@ export default function EditMotorcyclePage() {
               className="text-foreground flex items-center gap-3"
             >
               <Bike className="w-8 h-8 text-primary" />
-              {isSold ? "Visualizar Motocicleta" : "Editar Motocicleta"}
+              {canEdit ? "Editar Motocicleta" : "Visualizar Motocicleta"}
             </Title>
             <Subtitle className="text-muted-foreground">
               {isSold
                 ? "Visualização de motocicleta vendida (edição bloqueada)"
-                : "Atualize as informações da motocicleta"}
+                : canEdit
+                  ? "Atualize as informações da motocicleta"
+                  : "Visualização das informações da motocicleta"}
             </Subtitle>
           </div>
           {isSold && (
@@ -259,7 +265,7 @@ export default function EditMotorcyclePage() {
                     input: {
                       ...register("nome"),
                       placeholder: "Ex: Honda CB 600F Hornet",
-                      disabled: isSold,
+                      disabled: !canEdit,
                     },
                   }}
                   leftIcon={<Bike className="w-5 h-5 text-muted-foreground" />}
@@ -274,7 +280,7 @@ export default function EditMotorcyclePage() {
                     input: {
                       ...register("cor"),
                       placeholder: "Ex: Vermelho",
-                      disabled: isSold,
+                      disabled: !canEdit,
                     },
                   }}
                   leftIcon={
@@ -300,7 +306,7 @@ export default function EditMotorcyclePage() {
                             const value = e.target.value.toUpperCase();
                             field.onChange(value);
                           },
-                          disabled: isSold,
+                          disabled: !canEdit,
                         },
                       }}
                       leftIcon={
@@ -324,7 +330,7 @@ export default function EditMotorcyclePage() {
                         input: {
                           ...field,
                           placeholder: "2020",
-                          disabled: isSold,
+                          disabled: !canEdit,
                         },
                       }}
                       leftIcon={
@@ -345,7 +351,7 @@ export default function EditMotorcyclePage() {
                       placeholder: "Digite o chassi (17 caracteres)",
                       maxLength: 17,
                       minLength: 17,
-                      disabled: isSold,
+                      disabled: !canEdit,
                     },
                   }}
                   errorMessage={errors.chassi?.message}
@@ -364,7 +370,7 @@ export default function EditMotorcyclePage() {
                         input: {
                           ...field,
                           placeholder: "Digite o renavam (11 dígitos)",
-                          disabled: isSold,
+                          disabled: !canEdit,
                         },
                       }}
                       errorMessage={errors.renavam?.message}
@@ -380,7 +386,7 @@ export default function EditMotorcyclePage() {
                     input: {
                       ...register("km"),
                       placeholder: "0",
-                      disabled: isSold,
+                      disabled: !canEdit,
                     },
                   }}
                   errorMessage={errors.km?.message}
@@ -413,7 +419,7 @@ export default function EditMotorcyclePage() {
                             const format = e.target.value.replace(/\D/g, "");
                             setValue("valor_compra", Number(format));
                           },
-                          disabled: isSold,
+                          disabled: !canEdit,
                         },
                       }}
                       errorMessage={errors.valor_compra?.message}
@@ -440,7 +446,7 @@ export default function EditMotorcyclePage() {
                             const format = e.target.value.replace(/\D/g, "");
                             setValue("valor_venda", Number(format));
                           },
-                          disabled: isSold,
+                          disabled: !canEdit,
                         },
                       }}
                       errorMessage={errors.valor_venda?.message}
@@ -467,7 +473,7 @@ export default function EditMotorcyclePage() {
                             const format = e.target.value.replace(/\D/g, "");
                             setValue("valor_fipe", Number(format));
                           },
-                          disabled: isSold,
+                          disabled: !canEdit,
                         },
                       }}
                       errorMessage={errors.valor_fipe?.message}
@@ -491,7 +497,7 @@ export default function EditMotorcyclePage() {
                       placeholder:
                         "Observações adicionais sobre a motocicleta...",
                       rows: 3,
-                      disabled: isSold,
+                      disabled: !canEdit,
                     },
                   }}
                   errorMessage={errors.observacao?.message}
@@ -504,7 +510,7 @@ export default function EditMotorcyclePage() {
                 Fotos da Motocicleta
               </Title>
               <div className="grid grid-cols-1 gap-6">
-                {isSold ? (
+                {!canEdit ? (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {[motorcycle?.foto1, motorcycle?.foto2, motorcycle?.foto3]
                       .filter(Boolean)
@@ -563,7 +569,7 @@ export default function EditMotorcyclePage() {
             </div>
 
             <div className="flex items-center gap-4 pt-4 border-t border-border">
-              {!isSold && (
+              {canEdit && (
                 <Button
                   testID="save-button"
                   type="primary"
@@ -579,7 +585,7 @@ export default function EditMotorcyclePage() {
 
               <Link to="/motorcycles">
                 <Button testID="cancel-button" type="secondary">
-                  {isSold ? "Voltar" : "Cancelar"}
+                  {canEdit ? "Cancelar" : "Voltar"}
                 </Button>
               </Link>
             </div>

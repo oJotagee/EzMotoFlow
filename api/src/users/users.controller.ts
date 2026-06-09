@@ -118,8 +118,7 @@ export class UsersController {
 
   @Get(':id/permissions')
   @ApiBearerAuth()
-  @UseGuards(AuthTokenGuard, PermissionsGuard)
-  @CanReadUsers()
+  @UseGuards(AuthTokenGuard)
   @ApiOperation({ summary: 'Get user permissions' })
   @ApiParam({
     name: 'id',

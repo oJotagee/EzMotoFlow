@@ -11,42 +11,54 @@ import {
   X,
 } from "lucide-react";
 import { useSidebar } from "@/stores/sidebar";
+import { usePermissions } from "@/hooks/use-permissions";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 import { Title } from "@/components/ui/Title";
 import clsx from "clsx";
 
-const menuItems = [
-  {
-    title: "Dashboard",
-    icon: LayoutDashboard,
-    path: "/dashboard",
-  },
-  {
-    title: "Usuários",
-    icon: Users,
-    path: "/users",
-  },
-  {
-    title: "Clientes",
-    icon: UserCheck,
-    path: "/clients",
-  },
-  {
-    title: "Motocicletas",
-    icon: Bike,
-    path: "/motorcycles",
-  },
-  {
-    title: "Contratos",
-    icon: FileText,
-    path: "/contracts",
-  },
-];
-
 export function Sidebar() {
   const { isOpen, close, isMobile, setMobile } = useSidebar();
   const location = useLocation();
+  const {
+    canReadUsers,
+    canReadClients,
+    canReadMotorcycles,
+    canReadContracts,
+  } = usePermissions();
+
+  const menuItems = [
+    {
+      title: "Dashboard",
+      icon: LayoutDashboard,
+      path: "/dashboard",
+      visible: true,
+    },
+    {
+      title: "Usuários",
+      icon: Users,
+      path: "/users",
+      visible: canReadUsers(),
+    },
+    {
+      title: "Clientes",
+      icon: UserCheck,
+      path: "/clients",
+      visible: canReadClients(),
+    },
+    {
+      title: "Motocicletas",
+      icon: Bike,
+      path: "/motorcycles",
+      visible: canReadMotorcycles(),
+    },
+    {
+      title: "Contratos",
+      icon: FileText,
+      path: "/contracts",
+      visible: canReadContracts(),
+    },
+  ];
 
   useEffect(() => {
     const checkMobile = () => {
@@ -95,7 +107,7 @@ export function Sidebar() {
         </div>
 
         <nav className="flex-1 p-4 space-y-2">
-          {menuItems.map((item) => {
+          {menuItems.filter((item) => item.visible).map((item) => {
             const Icon = item.icon;
             const isActive =
               location.pathname === item.path ||

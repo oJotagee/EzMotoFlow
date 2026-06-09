@@ -16,6 +16,7 @@ import { Subtitle } from "@/components/ui/Subtitle";
 import { Button } from "@/components/ui/Button";
 import { Title } from "@/components/ui/Title";
 import { User as UserType } from "@/types";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
@@ -50,6 +51,7 @@ export default function EditUserPage() {
   const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>(
     [],
   );
+  const { canUpdateUsers } = usePermissions();
 
   const {
     register,
@@ -160,10 +162,12 @@ export default function EditUserPage() {
     );
   }
 
+  const canEdit = canUpdateUsers();
+
   return (
     <PermissionGuard
       resource={PermissionResource.USERS}
-      action={PermissionAction.UPDATE}
+      action={PermissionAction.READ}
       fallback={
         <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
           <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center">
@@ -174,7 +178,7 @@ export default function EditUserPage() {
               Acesso Negado
             </Title>
             <Subtitle className="text-muted-foreground">
-              Você não tem permissão para editar usuários
+              Você não tem permissão para visualizar usuários
             </Subtitle>
           </div>
           <Link to="/users">
@@ -203,10 +207,10 @@ export default function EditUserPage() {
               className="text-foreground flex items-center gap-3"
             >
               <User className="w-8 h-8 text-primary" />
-              Editar Usuário
+              {canEdit ? "Editar Usuário" : "Visualizar Usuário"}
             </Title>
             <Subtitle className="text-muted-foreground">
-              Atualize as informações do usuário
+              {canEdit ? "Atualize as informações do usuário" : "Visualização das informações do usuário"}
             </Subtitle>
           </div>
         </motion.div>
@@ -230,6 +234,7 @@ export default function EditUserPage() {
                     input: {
                       ...register("name"),
                       placeholder: "Digite o nome completo",
+                      disabled: !canEdit,
                     },
                   }}
                   leftIcon={<User className="w-5 h-5 text-muted-foreground" />}
@@ -245,6 +250,7 @@ export default function EditUserPage() {
                       ...register("email"),
                       type: "email",
                       placeholder: "usuario@exemplo.com",
+                      disabled: !canEdit,
                     },
                   }}
                   leftIcon={<Mail className="w-5 h-5 text-muted-foreground" />}
@@ -252,23 +258,25 @@ export default function EditUserPage() {
                   required
                 />
 
-                <div className="md:col-span-2">
-                  <PasswordInput
-                    inputFieldProps={{
-                      testID: "password-input",
-                      label: "Nova Senha (opcional)",
-                      input: {
-                        ...register("password"),
-                        placeholder:
-                          "Deixe em branco para manter a senha atual",
-                      },
-                    }}
-                    leftIcon={
-                      <Lock className="w-5 h-5 text-muted-foreground" />
-                    }
-                    errorMessage={errors.password?.message}
-                  />
-                </div>
+                {canEdit && (
+                  <div className="md:col-span-2">
+                    <PasswordInput
+                      inputFieldProps={{
+                        testID: "password-input",
+                        label: "Nova Senha (opcional)",
+                        input: {
+                          ...register("password"),
+                          placeholder:
+                            "Deixe em branco para manter a senha atual",
+                        },
+                      }}
+                      leftIcon={
+                        <Lock className="w-5 h-5 text-muted-foreground" />
+                      }
+                      errorMessage={errors.password?.message}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -283,21 +291,23 @@ export default function EditUserPage() {
             </div>
 
             <div className="flex items-center gap-4 pt-4 border-t border-border">
-              <Button
-                testID="save-button"
-                type="primary"
-                htmlType="submit"
-                loading={updating}
-                disabled={updating}
-                className="shadow-primary"
-              >
-                <Save className="w-5 h-5 mr-2" />
-                Atualizar Usuário
-              </Button>
+              {canEdit && (
+                <Button
+                  testID="save-button"
+                  type="primary"
+                  htmlType="submit"
+                  loading={updating}
+                  disabled={updating}
+                  className="shadow-primary"
+                >
+                  <Save className="w-5 h-5 mr-2" />
+                  Atualizar Usuário
+                </Button>
+              )}
 
               <Link to="/users">
                 <Button testID="cancel-button" type="secondary">
-                  Cancelar
+                  {canEdit ? "Cancelar" : "Voltar"}
                 </Button>
               </Link>
             </div>

@@ -20,6 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Subtitle } from "@/components/ui/Subtitle";
 import { Button } from "@/components/ui/Button";
 import { Title } from "@/components/ui/Title";
+import { usePermissions } from "@/hooks/use-permissions";
 import { ClientType, Client } from "@/types";
 import { motion } from "framer-motion";
 import { cepApi } from "@/lib/cep";
@@ -51,6 +52,7 @@ export default function EditClientPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
+  const { canUpdateClients } = usePermissions();
 
   const {
     register,
@@ -189,10 +191,12 @@ export default function EditClientPage() {
     );
   }
 
+  const canEdit = canUpdateClients();
+
   return (
     <PermissionGuard
       resource={PermissionResource.CLIENTS}
-      action={PermissionAction.UPDATE}
+      action={PermissionAction.READ}
       fallback={
         <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
           <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center">
@@ -203,7 +207,7 @@ export default function EditClientPage() {
               Acesso Negado
             </Title>
             <Subtitle className="text-muted-foreground">
-              Você não tem permissão para editar clientes
+              Você não tem permissão para visualizar clientes
             </Subtitle>
           </div>
           <Link to="/clients">
@@ -232,10 +236,10 @@ export default function EditClientPage() {
               className="text-foreground flex items-center gap-3"
             >
               <User className="w-8 h-8 text-primary" />
-              Editar Cliente
+              {canEdit ? "Editar Cliente" : "Visualizar Cliente"}
             </Title>
             <Subtitle className="text-muted-foreground">
-              Atualize as informações do cliente
+              {canEdit ? "Atualize as informações do cliente" : "Visualização das informações do cliente"}
             </Subtitle>
           </div>
         </motion.div>
@@ -276,6 +280,7 @@ export default function EditClientPage() {
                       : []
                   }
                   setSelectedOptions={(options) => {
+                    if (!canEdit) return;
                     if (options.length > 0 && options[0].value) {
                       setValue("tipo", options[0].value as ClientType);
                     } else {
@@ -287,6 +292,7 @@ export default function EditClientPage() {
                   error={!!errors.tipo}
                   errorMessage={errors.tipo?.message}
                   placeholder="Selecione o tipo de cliente"
+                  disabled={!canEdit}
                 />
 
                 <Input
@@ -302,6 +308,7 @@ export default function EditClientPage() {
                         watchedTipo === ClientType.PESSOA_FISICA
                           ? "Digite o nome completo"
                           : "Digite a razão social",
+                      disabled: !canEdit,
                     },
                   }}
                   leftIcon={
@@ -336,6 +343,7 @@ export default function EditClientPage() {
                             watchedTipo === ClientType.PESSOA_FISICA
                               ? "000.000.000-00"
                               : "00.000.000/0000-00",
+                          disabled: !canEdit,
                         },
                       }}
                       errorMessage={errors.documento?.message}
@@ -352,6 +360,7 @@ export default function EditClientPage() {
                       ...register("email"),
                       type: "email",
                       placeholder: "Digite o email",
+                      disabled: !canEdit,
                     },
                   }}
                   leftIcon={<Mail className="w-5 h-5 text-muted-foreground" />}
@@ -371,6 +380,7 @@ export default function EditClientPage() {
                         input: {
                           ...field,
                           placeholder: "(00) 00000-0000",
+                          disabled: !canEdit,
                         },
                       }}
                       leftIcon={
@@ -391,6 +401,7 @@ export default function EditClientPage() {
                       input: {
                         ...register("dataNascimento"),
                         type: "date",
+                        disabled: !canEdit,
                       },
                     }}
                     leftIcon={
@@ -408,6 +419,7 @@ export default function EditClientPage() {
                       input: {
                         ...register("companyName"),
                         placeholder: "Digite o nome fantasia",
+                        disabled: !canEdit,
                       },
                     }}
                     leftIcon={
@@ -436,7 +448,9 @@ export default function EditClientPage() {
                         input: {
                           ...field,
                           placeholder: "00000-000",
+                          disabled: !canEdit,
                           onChange: (e) => {
+                            if (!canEdit) return;
                             const value = e.target.value;
                             setValue("cep", value);
                             callCep(value);
@@ -459,6 +473,7 @@ export default function EditClientPage() {
                     input: {
                       ...register("rua"),
                       placeholder: "Digite a rua",
+                      disabled: !canEdit,
                     },
                   }}
                   errorMessage={errors.rua?.message}
@@ -472,6 +487,7 @@ export default function EditClientPage() {
                     input: {
                       ...register("numero"),
                       placeholder: "123",
+                      disabled: !canEdit,
                     },
                   }}
                   errorMessage={errors.numero?.message}
@@ -485,6 +501,7 @@ export default function EditClientPage() {
                     input: {
                       ...register("bairro"),
                       placeholder: "Digite o bairro",
+                      disabled: !canEdit,
                     },
                   }}
                   errorMessage={errors.bairro?.message}
@@ -498,6 +515,7 @@ export default function EditClientPage() {
                     input: {
                       ...register("cidade"),
                       placeholder: "Digite a cidade",
+                      disabled: !canEdit,
                     },
                   }}
                   errorMessage={errors.cidade?.message}
@@ -511,6 +529,7 @@ export default function EditClientPage() {
                     input: {
                       ...register("estado"),
                       placeholder: "SP",
+                      disabled: !canEdit,
                     },
                   }}
                   errorMessage={errors.estado?.message}
@@ -525,6 +544,7 @@ export default function EditClientPage() {
                       input: {
                         ...register("complementos"),
                         placeholder: "Apto, bloco, etc.",
+                        disabled: !canEdit,
                       },
                     }}
                     errorMessage={errors.complementos?.message}
@@ -534,21 +554,23 @@ export default function EditClientPage() {
             </div>
 
             <div className="flex items-center gap-4 pt-4 border-t border-border">
-              <Button
-                testID="save-button"
-                type="primary"
-                htmlType="submit"
-                loading={updating}
-                disabled={updating}
-                className="shadow-primary"
-              >
-                <Save className="w-5 h-5 mr-2" />
-                Atualizar Cliente
-              </Button>
+              {canEdit && (
+                <Button
+                  testID="save-button"
+                  type="primary"
+                  htmlType="submit"
+                  loading={updating}
+                  disabled={updating}
+                  className="shadow-primary"
+                >
+                  <Save className="w-5 h-5 mr-2" />
+                  Atualizar Cliente
+                </Button>
+              )}
 
               <Link to="/clients">
                 <Button testID="cancel-button" type="secondary">
-                  Cancelar
+                  {canEdit ? "Cancelar" : "Voltar"}
                 </Button>
               </Link>
             </div>

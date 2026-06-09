@@ -18,6 +18,7 @@ import {
   Users,
   Plus,
   Search,
+  Eye,
   Edit,
   Trash2,
   MoreVertical,
@@ -263,17 +264,19 @@ export default function UsersList() {
                                 sideOffset={5}
                                 align="end"
                               >
-                                {canUpdateUsers() && (
-                                  <button
-                                    onClick={() =>
-                                      navigate(`/users/${user.id}`)
-                                    }
-                                    className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors"
-                                  >
+                                <button
+                                  onClick={() => navigate(`/users/${user.id}`)}
+                                  className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors"
+                                >
+                                  {canUpdateUsers() ? (
                                     <Edit className="w-4 h-4" />
-                                    <span className="text-sm">Editar</span>
-                                  </button>
-                                )}
+                                  ) : (
+                                    <Eye className="w-4 h-4" />
+                                  )}
+                                  <span className="text-sm">
+                                    {canUpdateUsers() ? "Editar" : "Visualizar"}
+                                  </span>
+                                </button>
 
                                 {canDeleteUsers() && (
                                   <button

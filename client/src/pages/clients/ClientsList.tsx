@@ -19,6 +19,7 @@ import {
   Users,
   Plus,
   Search,
+  Eye,
   Edit,
   Trash2,
   MoreVertical,
@@ -374,14 +375,18 @@ export default function ClientsList() {
                                 sideOffset={5}
                                 align="end"
                               >
-                                {canUpdateClients() && (
-                                  <Link to={`/clients/${client.id}`}>
-                                    <button className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors">
+                                <Link to={`/clients/${client.id}`}>
+                                  <button className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors">
+                                    {canUpdateClients() ? (
                                       <Edit className="w-4 h-4" />
-                                      <span className="text-sm">Editar</span>
-                                    </button>
-                                  </Link>
-                                )}
+                                    ) : (
+                                      <Eye className="w-4 h-4" />
+                                    )}
+                                    <span className="text-sm">
+                                      {canUpdateClients() ? "Editar" : "Visualizar"}
+                                    </span>
+                                  </button>
+                                </Link>
 
                                 {canDeleteClients() && (
                                   <button
