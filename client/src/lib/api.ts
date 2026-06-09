@@ -5,7 +5,7 @@ const token = Cookies.get("user-auth");
 
 const api = axios.create({
     baseURL: process.env.NODE_ENV === 'production'
-        ? 'https://ezmotoflow.onrender.com/'
+        ? 'https://ezmotoflow-api.fly.dev/'
         : 'http://localhost:3000/',
     headers: {
         Authorization: `Bearer ${token}`,
