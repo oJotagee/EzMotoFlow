@@ -1,7 +1,7 @@
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/stores/auth';
-import { ReactNode, useEffect } from 'react';
-import Cookies from 'js-cookie';
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/stores/auth";
+import { ReactNode, useEffect } from "react";
+import Cookies from "js-cookie";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
-  const token = Cookies.get('user-auth');
+  const token = Cookies.get("user-auth");
 
   useEffect(() => {
     if (!token && isAuthenticated) {

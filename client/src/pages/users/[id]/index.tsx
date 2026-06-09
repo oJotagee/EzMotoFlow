@@ -1,32 +1,39 @@
-"use client"
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { User, Save, ArrowLeft, Mail, Lock, AlertTriangle } from 'lucide-react';
-import { PermissionGuard } from '@/components/auth/PermissionGuard';
-import { PermissionResource, PermissionAction, UserPermissionsResponse } from '@/types/permissions';
-import { PermissionsSelector } from '@/components/ui/PermissionsSelector';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Input, PasswordInput } from '@/components/ui/Input';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Subtitle } from '@/components/ui/Subtitle';
-import { Button } from '@/components/ui/Button';
-import { Title } from '@/components/ui/Title';
-import { User as UserType } from '@/types';
-import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
-import api from '@/lib/api';
-import { z } from 'zod';
-import { getErrorMessage } from '@/lib/error-messages';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { User, Save, ArrowLeft, Mail, Lock, AlertTriangle } from "lucide-react";
+import { PermissionGuard } from "@/components/auth/PermissionGuard";
+import {
+  PermissionResource,
+  PermissionAction,
+  UserPermissionsResponse,
+} from "@/types/permissions";
+import { PermissionsSelector } from "@/components/ui/PermissionsSelector";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Input, PasswordInput } from "@/components/ui/Input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Subtitle } from "@/components/ui/Subtitle";
+import { Button } from "@/components/ui/Button";
+import { Title } from "@/components/ui/Title";
+import { User as UserType } from "@/types";
+import { useForm } from "react-hook-form";
+import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import api from "@/lib/api";
+import { z } from "zod";
+import { getErrorMessage } from "@/lib/error-messages";
 
 const userSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório'),
-  email: z.string().email('Email inválido').min(1, 'Email é obrigatório'),
-  password: z.string().optional().or(z.literal('')).refine(
-    (val) => !val || val.length >= 6,
-    { message: 'Senha deve ter pelo menos 6 caracteres' }
-  ),
+  name: z.string().min(1, "Nome é obrigatório"),
+  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
+  password: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .refine((val) => !val || val.length >= 6, {
+      message: "Senha deve ter pelo menos 6 caracteres",
+    }),
 });
 
 type UserForm = z.infer<typeof userSchema>;
@@ -40,13 +47,15 @@ export default function EditUserPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
-  const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>([]);
+  const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>(
+    [],
+  );
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue
+    setValue,
   } = useForm<UserForm>({
     resolver: zodResolver(userSchema),
   });
@@ -56,13 +65,13 @@ export default function EditUserPage() {
   };
 
   const { data: user, isLoading } = useQuery<UserType>({
-    queryKey: ['get-user', id],
+    queryKey: ["get-user", id],
     queryFn: async () => {
       const { data } = await api.get<UserType>(`/users/${id}`);
 
-      setValue('name', data.name);
-      setValue('email', data.email);
-      setValue('password', '');
+      setValue("name", data.name);
+      setValue("email", data.email);
+      setValue("password", "");
 
       return data;
     },
@@ -75,9 +84,11 @@ export default function EditUserPage() {
 
   // Carregar permissões do usuário
   const { data: userPermissions } = useQuery<UserPermissionsResponse>({
-    queryKey: ['get-user-permissions', id],
+    queryKey: ["get-user-permissions", id],
     queryFn: async () => {
-      const { data } = await api.get<UserPermissionsResponse>(`/users/${id}/permissions`);
+      const { data } = await api.get<UserPermissionsResponse>(
+        `/users/${id}/permissions`,
+      );
       return data;
     },
     enabled: !!id,
@@ -89,10 +100,10 @@ export default function EditUserPage() {
   useEffect(() => {
     if (userPermissions?.permissions) {
       setSelectedPermissions(
-        userPermissions.permissions.map(p => ({
+        userPermissions.permissions.map((p) => ({
           resource: p.resource,
-          action: p.action
-        }))
+          action: p.action,
+        })),
       );
     }
   }, [userPermissions]);
@@ -109,18 +120,18 @@ export default function EditUserPage() {
       // Atualizar permissões
       await api.post(`/users/${id}/permissions`, {
         userId: id,
-        permissions: selectedPermissions
+        permissions: selectedPermissions,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['get-users'] });
-      queryClient.invalidateQueries({ queryKey: ['get-user-permissions', id] });
-      toast.success('Usuário atualizado com sucesso!');
-      navigate('/users');
+      queryClient.invalidateQueries({ queryKey: ["get-users"] });
+      queryClient.invalidateQueries({ queryKey: ["get-user-permissions", id] });
+      toast.success("Usuário atualizado com sucesso!");
+      navigate("/users");
     },
     onError: (error: any) => {
       toast.error(getErrorMessage(error));
-    }
+    },
   });
 
   if (isLoading) {
@@ -140,7 +151,9 @@ export default function EditUserPage() {
         <div className="text-center">
           <p className="text-muted-foreground">Usuário não encontrado</p>
           <Link to="/users">
-            <Button testID='back' className="mt-4">Voltar para lista</Button>
+            <Button testID="back" className="mt-4">
+              Voltar para lista
+            </Button>
           </Link>
         </div>
       </div>
@@ -165,7 +178,9 @@ export default function EditUserPage() {
             </Subtitle>
           </div>
           <Link to="/users">
-            <Button testID="back-to-users" type="secondary">Voltar para Usuários</Button>
+            <Button testID="back-to-users" type="secondary">
+              Voltar para Usuários
+            </Button>
           </Link>
         </div>
       }
@@ -183,7 +198,10 @@ export default function EditUserPage() {
           </Link>
 
           <div>
-            <Title size="2xl" className="text-foreground flex items-center gap-3">
+            <Title
+              size="2xl"
+              className="text-foreground flex items-center gap-3"
+            >
               <User className="w-8 h-8 text-primary" />
               Editar Usuário
             </Title>
@@ -207,12 +225,12 @@ export default function EditUserPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Input
                   inputFieldProps={{
-                    testID: 'name-input',
-                    label: 'Nome',
+                    testID: "name-input",
+                    label: "Nome",
                     input: {
-                      ...register('name'),
-                      placeholder: 'Digite o nome completo'
-                    }
+                      ...register("name"),
+                      placeholder: "Digite o nome completo",
+                    },
                   }}
                   leftIcon={<User className="w-5 h-5 text-muted-foreground" />}
                   errorMessage={errors.name?.message}
@@ -221,13 +239,13 @@ export default function EditUserPage() {
 
                 <Input
                   inputFieldProps={{
-                    testID: 'email-input',
-                    label: 'Email',
+                    testID: "email-input",
+                    label: "Email",
                     input: {
-                      ...register('email'),
-                      type: 'email',
-                      placeholder: 'usuario@exemplo.com'
-                    }
+                      ...register("email"),
+                      type: "email",
+                      placeholder: "usuario@exemplo.com",
+                    },
                   }}
                   leftIcon={<Mail className="w-5 h-5 text-muted-foreground" />}
                   errorMessage={errors.email?.message}
@@ -237,14 +255,17 @@ export default function EditUserPage() {
                 <div className="md:col-span-2">
                   <PasswordInput
                     inputFieldProps={{
-                      testID: 'password-input',
-                      label: 'Nova Senha (opcional)',
+                      testID: "password-input",
+                      label: "Nova Senha (opcional)",
                       input: {
-                        ...register('password'),
-                        placeholder: 'Deixe em branco para manter a senha atual'
-                      }
+                        ...register("password"),
+                        placeholder:
+                          "Deixe em branco para manter a senha atual",
+                      },
                     }}
-                    leftIcon={<Lock className="w-5 h-5 text-muted-foreground" />}
+                    leftIcon={
+                      <Lock className="w-5 h-5 text-muted-foreground" />
+                    }
                     errorMessage={errors.password?.message}
                   />
                 </div>

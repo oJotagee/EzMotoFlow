@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import { BsMoon, BsSun } from 'react-icons/bs';
-import { useThemeStore } from "@/stores/theme"
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion';
+import { BsMoon, BsSun } from "react-icons/bs";
+import { useThemeStore } from "@/stores/theme";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 export function ToggleDarkModeButton() {
   const { darkMode, setDarkMode } = useThemeStore();
@@ -16,9 +16,9 @@ export function ToggleDarkModeButton() {
   useEffect(() => {
     if (mounted) {
       if (darkMode) {
-        document.documentElement.classList.add('dark')
+        document.documentElement.classList.add("dark");
       } else {
-        document.documentElement.classList.remove('dark')
+        document.documentElement.classList.remove("dark");
       }
     }
   }, [darkMode, mounted]);
@@ -39,7 +39,7 @@ export function ToggleDarkModeButton() {
       <motion.div
         initial={false}
         animate={{ rotate: darkMode ? 180 : 0 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
       >
         {darkMode ? (
           <BsSun className="w-5 h-5 text-warning" />
@@ -48,5 +48,5 @@ export function ToggleDarkModeButton() {
         )}
       </motion.div>
     </motion.button>
-  )
+  );
 }

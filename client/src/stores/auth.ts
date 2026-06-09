@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import Cookies from 'js-cookie';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import Cookies from "js-cookie";
 
 export interface User {
   id: string;
@@ -24,31 +24,31 @@ export const useAuth = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
-      
+
       login: (user: User) => {
-        Cookies.set('user-auth', user.token, { expires: 30 });
+        Cookies.set("user-auth", user.token, { expires: 30 });
         set({ user, isAuthenticated: true });
       },
-      
+
       logout: () => {
-        Cookies.remove('user-auth');
-        Cookies.remove('user-area');
+        Cookies.remove("user-auth");
+        Cookies.remove("user-area");
         set({ user: null, token: null, isAuthenticated: false });
       },
-      
+
       updateUser: (userData: Partial<User>) => {
         const currentUser = get().user;
         if (currentUser) {
           set({ user: { ...currentUser, ...userData } });
         }
-      }
+      },
     }),
     {
-      name: 'ez-moto-auth',
+      name: "ez-moto-auth",
       partialize: (state) => ({
         user: state.user,
-        isAuthenticated: state.isAuthenticated
-      })
-    }
-  )
+        isAuthenticated: state.isAuthenticated,
+      }),
+    },
+  ),
 );

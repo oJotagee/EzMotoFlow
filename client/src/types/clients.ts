@@ -1,11 +1,11 @@
 export enum ClientType {
-  PESSOA_FISICA = 'PESSOA_FISICA',
-  PESSOA_JURIDICA = 'PESSOA_JURIDICA'
+  PESSOA_FISICA = "PESSOA_FISICA",
+  PESSOA_JURIDICA = "PESSOA_JURIDICA",
 }
 
 export enum ClientStatus {
-  ATIVO = 'ativo',
-  INATIVO = 'inativo'
+  ATIVO = "ativo",
+  INATIVO = "inativo",
 }
 
 export interface Client {

@@ -1,47 +1,47 @@
-'use client'
+"use client";
 
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  UserCheck, 
-  Bike, 
+import { Link, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Users,
+  UserCheck,
+  Bike,
   FileText,
   Menu,
-  X
-} from 'lucide-react';
-import { useSidebar } from '@/stores/sidebar';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect } from 'react';
-import { Title } from '@/components/ui/Title';
-import clsx from 'clsx';
+  X,
+} from "lucide-react";
+import { useSidebar } from "@/stores/sidebar";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
+import { Title } from "@/components/ui/Title";
+import clsx from "clsx";
 
 const menuItems = [
   {
-    title: 'Dashboard',
+    title: "Dashboard",
     icon: LayoutDashboard,
-    path: '/dashboard'
+    path: "/dashboard",
   },
   {
-    title: 'Usuários',
+    title: "Usuários",
     icon: Users,
-    path: '/users'
+    path: "/users",
   },
   {
-    title: 'Clientes',
+    title: "Clientes",
     icon: UserCheck,
-    path: '/clients'
+    path: "/clients",
   },
   {
-    title: 'Motocicletas',
+    title: "Motocicletas",
     icon: Bike,
-    path: '/motorcycles'
+    path: "/motorcycles",
   },
   {
-    title: 'Contratos',
+    title: "Contratos",
     icon: FileText,
-    path: '/contracts'
-  }
+    path: "/contracts",
+  },
 ];
 
 export function Sidebar() {
@@ -52,10 +52,10 @@ export function Sidebar() {
     const checkMobile = () => {
       setMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, [setMobile]);
 
   useEffect(() => {
@@ -67,10 +67,10 @@ export function Sidebar() {
   const sidebarContent = (
     <motion.div
       initial={false}
-      animate={{ 
-        width: isOpen ? (isMobile ? '100vw' : '280px') : '0px' 
+      animate={{
+        width: isOpen ? (isMobile ? "100vw" : "280px") : "0px",
       }}
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
       className="h-full bg-sidebar border-r border-sidebar-border shadow-xl overflow-hidden"
     >
       <div className="flex flex-col h-full">
@@ -83,7 +83,7 @@ export function Sidebar() {
               </Title>
             </div>
           </div>
-          
+
           {isMobile && (
             <button
               onClick={close}
@@ -97,30 +97,35 @@ export function Sidebar() {
         <nav className="flex-1 p-4 space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path || (item.path !== '/dashboard' && location.pathname.startsWith(item.path));
-            
+            const isActive =
+              location.pathname === item.path ||
+              (item.path !== "/dashboard" &&
+                location.pathname.startsWith(item.path));
+
             return (
               <Link
                 key={item.path}
                 to={item.path}
                 className={clsx(
-                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 group',
-                  'hover:bg-sidebar-accent hover:shadow-lg transform hover:scale-[1.02]',
+                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 group",
+                  "hover:bg-sidebar-accent hover:shadow-lg transform hover:scale-[1.02]",
                   {
-                    'bg-sidebar-primary text-sidebar-primary-foreground shadow-glow': isActive,
-                    'text-sidebar-foreground hover:text-sidebar-accent-foreground': !isActive
-                  }
+                    "bg-sidebar-primary text-sidebar-primary-foreground shadow-glow":
+                      isActive,
+                    "text-sidebar-foreground hover:text-sidebar-accent-foreground":
+                      !isActive,
+                  },
                 )}
               >
-                <Icon className={clsx(
-                  'w-5 h-5 transition-colors',
-                  {
-                    'text-sidebar-primary-foreground': isActive,
-                    'text-sidebar-foreground group-hover:text-primary': !isActive
-                  }
-                )} />
+                <Icon
+                  className={clsx("w-5 h-5 transition-colors", {
+                    "text-sidebar-primary-foreground": isActive,
+                    "text-sidebar-foreground group-hover:text-primary":
+                      !isActive,
+                  })}
+                />
                 <span className="font-medium">{item.title}</span>
-                
+
                 {isActive && (
                   <motion.div
                     layoutId="activeIndicator"
@@ -150,12 +155,12 @@ export function Sidebar() {
               onClick={close}
               className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
             />
-            
+
             <motion.div
-              initial={{ x: '-100%' }}
+              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              exit={{ x: "-100%" }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
               className="fixed left-0 top-0 h-full z-50"
             >
               {sidebarContent}
@@ -166,16 +171,12 @@ export function Sidebar() {
     );
   }
 
-  return (
-    <div className="h-full">
-      {sidebarContent}
-    </div>
-  );
+  return <div className="h-full">{sidebarContent}</div>;
 }
 
 export function MobileMenuButton() {
   const { toggle } = useSidebar();
-  
+
   return (
     <button
       onClick={toggle}

@@ -71,7 +71,9 @@ export class AwsS3Service {
   async uploadBase64Pdf(base64: string): Promise<string> {
     try {
       // Regex mais flexível para aceitar parâmetros opcionais (como filename)
-      const matches = base64.match(/^data:(application\/pdf)(?:;[^;]+)*;base64,(.+)$/);
+      const matches = base64.match(
+        /^data:(application\/pdf)(?:;[^;]+)*;base64,(.+)$/,
+      );
       if (!matches) throw new Error('Base64 inválido ou não é um PDF');
 
       const mimeType = matches[1];

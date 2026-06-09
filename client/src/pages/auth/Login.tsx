@@ -1,20 +1,20 @@
-import { Input, PasswordInput } from '@/components/ui/Input';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Subtitle } from '@/components/ui/Subtitle';
-import { useLogin } from '@/services/auth.service';
-import { Mail, Lock } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { useNavigate } from 'react-router-dom';
-import { Title } from '@/components/ui/Title';
-import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
-import { toast } from 'sonner';
-import { z } from 'zod';
-import { getErrorMessage } from '@/lib/error-messages';
+import { Input, PasswordInput } from "@/components/ui/Input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Subtitle } from "@/components/ui/Subtitle";
+import { useLogin } from "@/services/auth.service";
+import { Mail, Lock } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { useNavigate } from "react-router-dom";
+import { Title } from "@/components/ui/Title";
+import { useForm } from "react-hook-form";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { z } from "zod";
+import { getErrorMessage } from "@/lib/error-messages";
 
 const loginSchema = z.object({
-  email: z.string().email('Email inválido').min(1, 'Email é obrigatório'),
-  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
+  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -34,8 +34,8 @@ export default function Login() {
   const onSubmit = (data: LoginForm) => {
     login(data, {
       onSuccess: () => {
-        toast.success('Login realizado com sucesso!');
-        navigate('/dashboard');
+        toast.success("Login realizado com sucesso!");
+        navigate("/dashboard");
       },
       onError: (error: any) => {
         toast.error(getErrorMessage(error));
@@ -78,13 +78,13 @@ export default function Login() {
 
             <Input
               inputFieldProps={{
-                testID: 'email-input',
-                label: 'Email',
+                testID: "email-input",
+                label: "Email",
                 input: {
-                  ...register('email'),
-                  type: 'email',
-                  placeholder: 'seu@email.com',
-                }
+                  ...register("email"),
+                  type: "email",
+                  placeholder: "seu@email.com",
+                },
               }}
               leftIcon={<Mail className="w-5 h-5 text-muted-foreground" />}
               errorMessage={errors.email?.message}
@@ -93,12 +93,12 @@ export default function Login() {
 
             <PasswordInput
               inputFieldProps={{
-                testID: 'password-input',
-                label: 'Senha',
+                testID: "password-input",
+                label: "Senha",
                 input: {
-                  ...register('password'),
-                  placeholder: 'Digite sua senha',
-                }
+                  ...register("password"),
+                  placeholder: "Digite sua senha",
+                },
               }}
               leftIcon={<Lock className="w-5 h-5 text-muted-foreground" />}
               errorMessage={errors.password?.message}
@@ -112,7 +112,7 @@ export default function Login() {
               disabled={isPending}
               className="w-full h-12 shadow-primary"
             >
-              {isPending ? 'Entrando...' : 'Entrar'}
+              {isPending ? "Entrando..." : "Entrar"}
             </Button>
           </form>
         </motion.div>

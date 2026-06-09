@@ -24,7 +24,7 @@ import CreateClientPage from "./pages/clients/cadastrar/index";
 import EditClientPage from "./pages/clients/[id]/index";
 
 // Páginas públicas (layout simples)
-import SignContractPage from '@/pages/signature';
+import SignContractPage from "@/pages/signature";
 import PublicLayout from "./components/layout/Public";
 
 const queryClient = new QueryClient({
@@ -59,15 +59,15 @@ const AppRoutes = () => {
         <Route index element={<SignContractPage />} />
       </Route>
 
-      <Route 
-        path="/" 
+      <Route
+        path="/"
         element={
           isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
-        } 
+        }
       />
-      
-      <Route 
-        path="/*" 
+
+      <Route
+        path="/*"
         element={
           <ProtectedRoute>
             <Layout />
@@ -75,19 +75,22 @@ const AppRoutes = () => {
         }
       >
         <Route path="dashboard" element={<Dashboard />} />
-        
+
         <Route path="users" element={<UsersList />} />
         <Route path="users/cadastrar" element={<CreateUserPage />} />
         <Route path="users/:id" element={<EditUserPage />} />
-        
+
         <Route path="clients" element={<ClientsList />} />
         <Route path="clients/cadastrar" element={<CreateClientPage />} />
         <Route path="clients/:id" element={<EditClientPage />} />
-        
+
         <Route path="motorcycles" element={<MotorcyclesList />} />
-        <Route path="motorcycles/cadastrar" element={<CreateMotorcyclePage />} />
+        <Route
+          path="motorcycles/cadastrar"
+          element={<CreateMotorcyclePage />}
+        />
         <Route path="motorcycles/:id" element={<EditMotorcyclePage />} />
-        
+
         <Route path="contracts" element={<ContractsList />} />
         <Route path="contracts/cadastrar" element={<CreateContractPage />} />
         <Route path="contracts/:id" element={<EditContractPage />} />

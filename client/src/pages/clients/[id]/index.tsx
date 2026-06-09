@@ -1,37 +1,47 @@
-import { User, Save, ArrowLeft, Mail, Phone, Building, MapPin, Calendar, AlertTriangle } from 'lucide-react';
-import { PermissionGuard } from '@/components/auth/PermissionGuard';
-import { PermissionResource, PermissionAction } from '@/types/permissions';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Input, MaskInput } from '@/components/ui/Input';
-import { useForm, Controller } from 'react-hook-form';
-import { Selectize } from '@/components/ui/Selectize';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Subtitle } from '@/components/ui/Subtitle';
-import { Button } from '@/components/ui/Button';
-import { Title } from '@/components/ui/Title';
-import { ClientType, Client } from '@/types';
-import { motion } from 'framer-motion';
-import { cepApi } from '@/lib/cep';
-import { toast } from 'sonner';
-import api from '@/lib/api';
-import { z } from 'zod';
-import { getErrorMessage } from '@/lib/error-messages';
+import {
+  User,
+  Save,
+  ArrowLeft,
+  Mail,
+  Phone,
+  Building,
+  MapPin,
+  Calendar,
+  AlertTriangle,
+} from "lucide-react";
+import { PermissionGuard } from "@/components/auth/PermissionGuard";
+import { PermissionResource, PermissionAction } from "@/types/permissions";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Input, MaskInput } from "@/components/ui/Input";
+import { useForm, Controller } from "react-hook-form";
+import { Selectize } from "@/components/ui/Selectize";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Subtitle } from "@/components/ui/Subtitle";
+import { Button } from "@/components/ui/Button";
+import { Title } from "@/components/ui/Title";
+import { ClientType, Client } from "@/types";
+import { motion } from "framer-motion";
+import { cepApi } from "@/lib/cep";
+import { toast } from "sonner";
+import api from "@/lib/api";
+import { z } from "zod";
+import { getErrorMessage } from "@/lib/error-messages";
 
 const clientSchema = z.object({
-  tipo: z.string().min(1, 'Tipo de cliente é obrigatório'),
-  fullName: z.string().min(1, 'Nome é obrigatório'),
-  documento: z.string().min(1, 'Documento é obrigatório'),
+  tipo: z.string().min(1, "Tipo de cliente é obrigatório"),
+  fullName: z.string().min(1, "Nome é obrigatório"),
+  documento: z.string().min(1, "Documento é obrigatório"),
   telefone: z.string().optional(),
-  email: z.string().email('Email inválido').min(1, 'Email é obrigatório'),
+  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
   dataNascimento: z.string().optional(),
   companyName: z.string().optional(),
-  cep: z.string().min(1, 'CEP é obrigatório'),
-  rua: z.string().min(1, 'Rua é obrigatória'),
-  numero: z.string().min(1, 'Número é obrigatório'),
-  bairro: z.string().min(1, 'Bairro é obrigatório'),
-  cidade: z.string().min(1, 'Cidade é obrigatória'),
-  estado: z.string().min(1, 'Estado é obrigatório'),
+  cep: z.string().min(1, "CEP é obrigatório"),
+  rua: z.string().min(1, "Rua é obrigatória"),
+  numero: z.string().min(1, "Número é obrigatório"),
+  bairro: z.string().min(1, "Bairro é obrigatório"),
+  cidade: z.string().min(1, "Cidade é obrigatória"),
+  estado: z.string().min(1, "Estado é obrigatório"),
   complementos: z.string().optional(),
 });
 
@@ -49,37 +59,37 @@ export default function EditClientPage() {
     watch,
     setValue,
     control,
-    setError
+    setError,
   } = useForm<ClientForm>({
     resolver: zodResolver(clientSchema),
     defaultValues: {
-      tipo: ''
-    }
+      tipo: "",
+    },
   });
 
-  const watchedTipo = watch('tipo');
+  const watchedTipo = watch("tipo");
 
   const onSubmit = (data: ClientForm) => update(data);
 
   const { data: client, isLoading } = useQuery<Client>({
-    queryKey: ['get-client', id],
+    queryKey: ["get-client", id],
     queryFn: async () => {
       const { data } = await api.get<Client>(`/clients/${id}`);
 
-      setValue('tipo', data.tipo);
-      setValue('fullName', data.fullName);
-      setValue('documento', data.documento);
-      setValue('telefone', data.telefone || '');
-      setValue('email', data.email);
-      setValue('dataNascimento', data.dataNascimento.split("T")[0] || '');
-      setValue('companyName', data.companyName || '');
-      setValue('cep', data.cep);
-      setValue('rua', data.rua);
-      setValue('numero', data.numero);
-      setValue('bairro', data.bairro);
-      setValue('cidade', data.cidade);
-      setValue('estado', data.estado);
-      setValue('complementos', data.complementos || '');
+      setValue("tipo", data.tipo);
+      setValue("fullName", data.fullName);
+      setValue("documento", data.documento);
+      setValue("telefone", data.telefone || "");
+      setValue("email", data.email);
+      setValue("dataNascimento", data.dataNascimento.split("T")[0] || "");
+      setValue("companyName", data.companyName || "");
+      setValue("cep", data.cep);
+      setValue("rua", data.rua);
+      setValue("numero", data.numero);
+      setValue("bairro", data.bairro);
+      setValue("cidade", data.cidade);
+      setValue("estado", data.estado);
+      setValue("complementos", data.complementos || "");
 
       return data;
     },
@@ -95,12 +105,12 @@ export default function EditClientPage() {
       await api.patch(`/clients/${id}`, {
         tipo: values.tipo,
         fullName: values.fullName,
-        documento: values.documento.replace(/\D/g, ''),
-        telefone: values.telefone.replace(/\D/g, ''),
+        documento: values.documento.replace(/\D/g, ""),
+        telefone: values.telefone.replace(/\D/g, ""),
         email: values.email,
         dataNascimento: values.dataNascimento,
         companyName: values.companyName,
-        cep: values.cep.replace(/\D/g, ''),
+        cep: values.cep.replace(/\D/g, ""),
         rua: values.rua,
         numero: values.numero,
         bairro: values.bairro,
@@ -110,19 +120,19 @@ export default function EditClientPage() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['get-clients'] });
-      toast.success('Cliente atualizado com sucesso!');
-      navigate('/clients');
+      queryClient.invalidateQueries({ queryKey: ["get-clients"] });
+      toast.success("Cliente atualizado com sucesso!");
+      navigate("/clients");
     },
     onError: (error: any) => {
       toast.error(getErrorMessage(error));
-    }
+    },
   });
 
   const { mutate: callCep, isPending: isCallingCep } = useMutation({
     mutationKey: ["CallCep"],
     mutationFn: async (cep: string) => {
-      const cepFormated = cep.replace("-", "").replace("_", "")
+      const cepFormated = cep.replace("-", "").replace("_", "");
 
       setValue("rua", "");
       setValue("numero", "");
@@ -133,9 +143,9 @@ export default function EditClientPage() {
 
       if (cepFormated.length === 8) {
         try {
-          const { data } = await cepApi.get(`${cepFormated}/json`)
+          const { data } = await cepApi.get(`${cepFormated}/json`);
 
-          if (data.erro) throw new Error("Cep Invalido")
+          if (data.erro) throw new Error("Cep Invalido");
 
           setValue("rua", data.logradouro || "");
           setValue("bairro", data.bairro || "");
@@ -170,7 +180,9 @@ export default function EditClientPage() {
         <div className="text-center">
           <p className="text-muted-foreground">Cliente não encontrado</p>
           <Link to="/clients">
-            <Button testID='back' className="mt-4">Voltar para lista</Button>
+            <Button testID="back" className="mt-4">
+              Voltar para lista
+            </Button>
           </Link>
         </div>
       </div>
@@ -195,7 +207,9 @@ export default function EditClientPage() {
             </Subtitle>
           </div>
           <Link to="/clients">
-            <Button testID="back-to-clients" type="secondary">Voltar para Clientes</Button>
+            <Button testID="back-to-clients" type="secondary">
+              Voltar para Clientes
+            </Button>
           </Link>
         </div>
       }
@@ -213,7 +227,10 @@ export default function EditClientPage() {
           </Link>
 
           <div>
-            <Title size="2xl" className="text-foreground flex items-center gap-3">
+            <Title
+              size="2xl"
+              className="text-foreground flex items-center gap-3"
+            >
               <User className="w-8 h-8 text-primary" />
               Editar Cliente
             </Title>
@@ -238,18 +255,31 @@ export default function EditClientPage() {
                 <Selectize
                   label="Tipo de Cliente"
                   allOptions={[
-                    { text: 'Selecione...', value: '' },
-                    { text: 'Pessoa Física', value: ClientType.PESSOA_FISICA },
-                    { text: 'Pessoa Jurídica', value: ClientType.PESSOA_JURIDICA }
+                    { text: "Selecione...", value: "" },
+                    { text: "Pessoa Física", value: ClientType.PESSOA_FISICA },
+                    {
+                      text: "Pessoa Jurídica",
+                      value: ClientType.PESSOA_JURIDICA,
+                    },
                   ]}
-                  selectedOptions={watchedTipo ? [
-                    { text: watchedTipo === ClientType.PESSOA_FISICA ? 'Pessoa Física' : 'Pessoa Jurídica', value: watchedTipo }
-                  ] : []}
+                  selectedOptions={
+                    watchedTipo
+                      ? [
+                          {
+                            text:
+                              watchedTipo === ClientType.PESSOA_FISICA
+                                ? "Pessoa Física"
+                                : "Pessoa Jurídica",
+                            value: watchedTipo,
+                          },
+                        ]
+                      : []
+                  }
                   setSelectedOptions={(options) => {
                     if (options.length > 0 && options[0].value) {
-                      setValue('tipo', options[0].value as ClientType)
+                      setValue("tipo", options[0].value as ClientType);
                     } else {
-                      setValue('tipo', '' as any)
+                      setValue("tipo", "" as any);
                     }
                   }}
                   multiple={false}
@@ -261,16 +291,25 @@ export default function EditClientPage() {
 
                 <Input
                   inputFieldProps={{
-                    testID: 'fullName-input',
-                    label: watchedTipo === ClientType.PESSOA_FISICA ? 'Nome Completo' : 'Razão Social',
+                    testID: "fullName-input",
+                    label:
+                      watchedTipo === ClientType.PESSOA_FISICA
+                        ? "Nome Completo"
+                        : "Razão Social",
                     input: {
-                      ...register('fullName'),
-                      placeholder: watchedTipo === ClientType.PESSOA_FISICA ? 'Digite o nome completo' : 'Digite a razão social'
-                    }
+                      ...register("fullName"),
+                      placeholder:
+                        watchedTipo === ClientType.PESSOA_FISICA
+                          ? "Digite o nome completo"
+                          : "Digite a razão social",
+                    },
                   }}
-                  leftIcon={watchedTipo === ClientType.PESSOA_FISICA ?
-                    <User className="w-5 h-5 text-muted-foreground" /> :
-                    <Building className="w-5 h-5 text-muted-foreground" />
+                  leftIcon={
+                    watchedTipo === ClientType.PESSOA_FISICA ? (
+                      <User className="w-5 h-5 text-muted-foreground" />
+                    ) : (
+                      <Building className="w-5 h-5 text-muted-foreground" />
+                    )
                   }
                   errorMessage={errors.fullName?.message}
                   required
@@ -282,13 +321,22 @@ export default function EditClientPage() {
                   render={({ field }) => (
                     <MaskInput
                       inputFieldProps={{
-                        testID: 'documento-input',
-                        label: watchedTipo === ClientType.PESSOA_FISICA ? 'CPF' : 'CNPJ',
-                        mask: watchedTipo === ClientType.PESSOA_FISICA ? '999.999.999-99' : '99.999.999/9999-99',
+                        testID: "documento-input",
+                        label:
+                          watchedTipo === ClientType.PESSOA_FISICA
+                            ? "CPF"
+                            : "CNPJ",
+                        mask:
+                          watchedTipo === ClientType.PESSOA_FISICA
+                            ? "999.999.999-99"
+                            : "99.999.999/9999-99",
                         input: {
                           ...field,
-                          placeholder: watchedTipo === ClientType.PESSOA_FISICA ? '000.000.000-00' : '00.000.000/0000-00'
-                        }
+                          placeholder:
+                            watchedTipo === ClientType.PESSOA_FISICA
+                              ? "000.000.000-00"
+                              : "00.000.000/0000-00",
+                        },
                       }}
                       errorMessage={errors.documento?.message}
                       required
@@ -298,13 +346,13 @@ export default function EditClientPage() {
 
                 <Input
                   inputFieldProps={{
-                    testID: 'email-input',
-                    label: 'Email',
+                    testID: "email-input",
+                    label: "Email",
                     input: {
-                      ...register('email'),
-                      type: 'email',
-                      placeholder: 'Digite o email'
-                    }
+                      ...register("email"),
+                      type: "email",
+                      placeholder: "Digite o email",
+                    },
                   }}
                   leftIcon={<Mail className="w-5 h-5 text-muted-foreground" />}
                   errorMessage={errors.email?.message}
@@ -317,15 +365,17 @@ export default function EditClientPage() {
                   render={({ field }) => (
                     <MaskInput
                       inputFieldProps={{
-                        testID: 'telefone-input',
-                        label: 'Telefone',
-                        mask: '(99) 99999-9999',
+                        testID: "telefone-input",
+                        label: "Telefone",
+                        mask: "(99) 99999-9999",
                         input: {
                           ...field,
-                          placeholder: '(00) 00000-0000'
-                        }
+                          placeholder: "(00) 00000-0000",
+                        },
                       }}
-                      leftIcon={<Phone className="w-5 h-5 text-muted-foreground" />}
+                      leftIcon={
+                        <Phone className="w-5 h-5 text-muted-foreground" />
+                      }
                       errorMessage={errors.telefone?.message}
                     />
                   )}
@@ -336,14 +386,16 @@ export default function EditClientPage() {
                 {watchedTipo === ClientType.PESSOA_FISICA && (
                   <Input
                     inputFieldProps={{
-                      testID: 'dataNascimento-input',
-                      label: 'Data de Nascimento',
+                      testID: "dataNascimento-input",
+                      label: "Data de Nascimento",
                       input: {
-                        ...register('dataNascimento'),
-                        type: 'date'
-                      }
+                        ...register("dataNascimento"),
+                        type: "date",
+                      },
                     }}
-                    leftIcon={<Calendar className="w-5 h-5 text-muted-foreground" />}
+                    leftIcon={
+                      <Calendar className="w-5 h-5 text-muted-foreground" />
+                    }
                     errorMessage={errors.dataNascimento?.message}
                   />
                 )}
@@ -351,14 +403,16 @@ export default function EditClientPage() {
                 {watchedTipo === ClientType.PESSOA_JURIDICA && (
                   <Input
                     inputFieldProps={{
-                      testID: 'companyName-input',
-                      label: 'Nome Fantasia',
+                      testID: "companyName-input",
+                      label: "Nome Fantasia",
                       input: {
-                        ...register('companyName'),
-                        placeholder: 'Digite o nome fantasia'
-                      }
+                        ...register("companyName"),
+                        placeholder: "Digite o nome fantasia",
+                      },
                     }}
-                    leftIcon={<Building className="w-5 h-5 text-muted-foreground" />}
+                    leftIcon={
+                      <Building className="w-5 h-5 text-muted-foreground" />
+                    }
                     errorMessage={errors.companyName?.message}
                   />
                 )}
@@ -376,20 +430,22 @@ export default function EditClientPage() {
                   render={({ field }) => (
                     <MaskInput
                       inputFieldProps={{
-                        testID: 'cep-input',
-                        label: 'CEP',
-                        mask: '99999-999',
+                        testID: "cep-input",
+                        label: "CEP",
+                        mask: "99999-999",
                         input: {
                           ...field,
-                          placeholder: '00000-000',
+                          placeholder: "00000-000",
                           onChange: (e) => {
                             const value = e.target.value;
-                            setValue('cep', value);
+                            setValue("cep", value);
                             callCep(value);
-                          }
-                        }
+                          },
+                        },
                       }}
-                      leftIcon={<MapPin className="w-5 h-5 text-muted-foreground" />}
+                      leftIcon={
+                        <MapPin className="w-5 h-5 text-muted-foreground" />
+                      }
                       errorMessage={errors.cep?.message}
                       required
                     />
@@ -398,12 +454,12 @@ export default function EditClientPage() {
 
                 <Input
                   inputFieldProps={{
-                    testID: 'rua-input',
-                    label: 'Rua/Logradouro',
+                    testID: "rua-input",
+                    label: "Rua/Logradouro",
                     input: {
-                      ...register('rua'),
-                      placeholder: 'Digite a rua'
-                    }
+                      ...register("rua"),
+                      placeholder: "Digite a rua",
+                    },
                   }}
                   errorMessage={errors.rua?.message}
                   required
@@ -411,12 +467,12 @@ export default function EditClientPage() {
 
                 <Input
                   inputFieldProps={{
-                    testID: 'numero-input',
-                    label: 'Número',
+                    testID: "numero-input",
+                    label: "Número",
                     input: {
-                      ...register('numero'),
-                      placeholder: '123'
-                    }
+                      ...register("numero"),
+                      placeholder: "123",
+                    },
                   }}
                   errorMessage={errors.numero?.message}
                   required
@@ -424,12 +480,12 @@ export default function EditClientPage() {
 
                 <Input
                   inputFieldProps={{
-                    testID: 'bairro-input',
-                    label: 'Bairro',
+                    testID: "bairro-input",
+                    label: "Bairro",
                     input: {
-                      ...register('bairro'),
-                      placeholder: 'Digite o bairro'
-                    }
+                      ...register("bairro"),
+                      placeholder: "Digite o bairro",
+                    },
                   }}
                   errorMessage={errors.bairro?.message}
                   required
@@ -437,12 +493,12 @@ export default function EditClientPage() {
 
                 <Input
                   inputFieldProps={{
-                    testID: 'cidade-input',
-                    label: 'Cidade',
+                    testID: "cidade-input",
+                    label: "Cidade",
                     input: {
-                      ...register('cidade'),
-                      placeholder: 'Digite a cidade'
-                    }
+                      ...register("cidade"),
+                      placeholder: "Digite a cidade",
+                    },
                   }}
                   errorMessage={errors.cidade?.message}
                   required
@@ -450,12 +506,12 @@ export default function EditClientPage() {
 
                 <Input
                   inputFieldProps={{
-                    testID: 'estado-input',
-                    label: 'Estado',
+                    testID: "estado-input",
+                    label: "Estado",
                     input: {
-                      ...register('estado'),
-                      placeholder: 'SP'
-                    }
+                      ...register("estado"),
+                      placeholder: "SP",
+                    },
                   }}
                   errorMessage={errors.estado?.message}
                   required
@@ -464,12 +520,12 @@ export default function EditClientPage() {
                 <div className="lg:col-span-2">
                   <Input
                     inputFieldProps={{
-                      testID: 'complementos-input',
-                      label: 'Complemento',
+                      testID: "complementos-input",
+                      label: "Complemento",
                       input: {
-                        ...register('complementos'),
-                        placeholder: 'Apto, bloco, etc.'
-                      }
+                        ...register("complementos"),
+                        placeholder: "Apto, bloco, etc.",
+                      },
                     }}
                     errorMessage={errors.complementos?.message}
                   />

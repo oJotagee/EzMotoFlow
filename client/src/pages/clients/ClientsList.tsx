@@ -1,20 +1,20 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ClientType, ClientStatus, Client, PaginatedResponse } from '@/types';
-import { PermissionGuard } from '@/components/auth/PermissionGuard';
-import { PermissionResource, PermissionAction } from '@/types/permissions';
-import { usePermissions } from '@/hooks/use-permissions';
-import { formatDocument, formatPhone } from '@/lib/utils';
-import { Selectize } from '@/components/ui/Selectize';
-import { Subtitle } from '@/components/ui/Subtitle';
-import * as Popover from '@radix-ui/react-popover';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Title } from '@/components/ui/Title';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import api from '@/lib/api';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ClientType, ClientStatus, Client, PaginatedResponse } from "@/types";
+import { PermissionGuard } from "@/components/auth/PermissionGuard";
+import { PermissionResource, PermissionAction } from "@/types/permissions";
+import { usePermissions } from "@/hooks/use-permissions";
+import { formatDocument, formatPhone } from "@/lib/utils";
+import { Selectize } from "@/components/ui/Selectize";
+import { Subtitle } from "@/components/ui/Subtitle";
+import * as Popover from "@radix-ui/react-popover";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Title } from "@/components/ui/Title";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { toast } from "sonner";
+import api from "@/lib/api";
 import {
   Users,
   Plus,
@@ -25,41 +25,37 @@ import {
   Filter,
   Building,
   User,
-  AlertTriangle
-} from 'lucide-react';
+  AlertTriangle,
+} from "lucide-react";
 
 export default function ClientsList() {
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<ClientStatus | ''>('');
-  const [tipo, setTipo] = useState<ClientType | ''>('');
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<ClientStatus | "">("");
+  const [tipo, setTipo] = useState<ClientType | "">("");
   const [page, setPage] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const queryClient = useQueryClient();
-  const { canCreateClients, canUpdateClients, canDeleteClients } = usePermissions();
+  const { canCreateClients, canUpdateClients, canDeleteClients } =
+    usePermissions();
 
   const { data: clientsResponse, isLoading } = useQuery({
-    queryKey: [
-      'get-clients',
-      page,
-      10,
-      search,
-      status,
-      tipo,
-    ],
+    queryKey: ["get-clients", page, 10, search, status, tipo],
     queryFn: async () => {
       const params = new URLSearchParams({
         limit: String(10),
         offset: String((page - 1) * 10),
       });
 
-      if (search) params.append('nome', search);
-      if (status) params.append('status', status);
-      if (tipo) params.append('tipo', tipo);
+      if (search) params.append("nome", search);
+      if (status) params.append("status", status);
+      if (tipo) params.append("tipo", tipo);
 
-      const { data } = await api.get<PaginatedResponse<Client>>(`/clients?${params.toString()}`);
+      const { data } = await api.get<PaginatedResponse<Client>>(
+        `/clients?${params.toString()}`,
+      );
 
-      queryClient.setQueryData(['GetClientsListing'], {
+      queryClient.setQueryData(["GetClientsListing"], {
         page: data.page,
         limit: data.limit,
         count: data.total,
@@ -79,14 +75,14 @@ export default function ClientsList() {
       await api.delete(`/clients/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['get-clients'] });
-      toast.success('Cliente excluído com sucesso!');
+      queryClient.invalidateQueries({ queryKey: ["get-clients"] });
+      toast.success("Cliente excluído com sucesso!");
       setShowDeleteModal(false);
       setClientToDelete(null);
     },
     onError: () => {
-      toast.error('Erro ao excluir cliente');
-    }
+      toast.error("Erro ao excluir cliente");
+    },
   });
 
   const handleDeleteClick = (client: Client) => {
@@ -108,11 +104,11 @@ export default function ClientsList() {
   const getStatusColor = (status: ClientStatus) => {
     switch (status) {
       case ClientStatus.ATIVO:
-        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+        return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400";
       case ClientStatus.INATIVO:
-        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
+        return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
     }
   };
 
@@ -138,7 +134,9 @@ export default function ClientsList() {
             </Subtitle>
           </div>
           <Link to="/">
-            <Button testID="back-to-home" type="secondary">Voltar ao Início</Button>
+            <Button testID="back-to-home" type="secondary">
+              Voltar ao Início
+            </Button>
           </Link>
         </div>
       }
@@ -150,7 +148,10 @@ export default function ClientsList() {
           className="flex flex-col md:flex-row md:items-center justify-between gap-4"
         >
           <div>
-            <Title size="2xl" className="text-foreground flex items-center gap-3">
+            <Title
+              size="2xl"
+              className="text-foreground flex items-center gap-3"
+            >
               <Users className="w-8 h-8 text-primary" />
               Clientes
             </Title>
@@ -161,7 +162,11 @@ export default function ClientsList() {
 
           {canCreateClients() && (
             <Link to="/clients/cadastrar">
-              <Button testID="new-client" type="primary" className="shadow-primary">
+              <Button
+                testID="new-client"
+                type="primary"
+                className="shadow-primary"
+              >
                 <Plus className="w-5 h-5 mr-2" />
                 Novo Cliente
               </Button>
@@ -185,13 +190,13 @@ export default function ClientsList() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
               inputFieldProps={{
-                testID: 'search-input',
-                label: 'Buscar',
+                testID: "search-input",
+                label: "Buscar",
                 input: {
-                  placeholder: 'Nome do cliente...',
+                  placeholder: "Nome do cliente...",
                   value: search,
-                  onChange: (e) => setSearch(e.target.value)
-                }
+                  onChange: (e) => setSearch(e.target.value),
+                },
               }}
               leftIcon={<Search className="w-5 h-5 text-muted-foreground" />}
             />
@@ -199,11 +204,27 @@ export default function ClientsList() {
             <Selectize
               label="Tipo"
               allOptions={[
-                { text: 'Pessoa Física', value: ClientType.PESSOA_FISICA },
-                { text: 'Pessoa Jurídica', value: ClientType.PESSOA_JURIDICA }
+                { text: "Pessoa Física", value: ClientType.PESSOA_FISICA },
+                { text: "Pessoa Jurídica", value: ClientType.PESSOA_JURIDICA },
               ]}
-              selectedOptions={tipo ? [{ text: tipo === ClientType.PESSOA_FISICA ? 'Pessoa Física' : 'Pessoa Jurídica', value: tipo }] : []}
-              setSelectedOptions={(options) => setTipo(options.length > 0 ? options[0].value as ClientType : '')}
+              selectedOptions={
+                tipo
+                  ? [
+                      {
+                        text:
+                          tipo === ClientType.PESSOA_FISICA
+                            ? "Pessoa Física"
+                            : "Pessoa Jurídica",
+                        value: tipo,
+                      },
+                    ]
+                  : []
+              }
+              setSelectedOptions={(options) =>
+                setTipo(
+                  options.length > 0 ? (options[0].value as ClientType) : "",
+                )
+              }
               multiple={false}
               search={false}
               placeholder="Selecione o tipo"
@@ -212,11 +233,25 @@ export default function ClientsList() {
             <Selectize
               label="Status"
               allOptions={[
-                { text: 'Ativo', value: ClientStatus.ATIVO },
-                { text: 'Inativo', value: ClientStatus.INATIVO }
+                { text: "Ativo", value: ClientStatus.ATIVO },
+                { text: "Inativo", value: ClientStatus.INATIVO },
               ]}
-              selectedOptions={status ? [{ text: status === ClientStatus.ATIVO ? 'Ativo' : 'Inativo', value: status }] : []}
-              setSelectedOptions={(options) => setStatus(options.length > 0 ? options[0].value as ClientStatus : '')}
+              selectedOptions={
+                status
+                  ? [
+                      {
+                        text:
+                          status === ClientStatus.ATIVO ? "Ativo" : "Inativo",
+                        value: status,
+                      },
+                    ]
+                  : []
+              }
+              setSelectedOptions={(options) =>
+                setStatus(
+                  options.length > 0 ? (options[0].value as ClientStatus) : "",
+                )
+              }
               multiple={false}
               search={false}
               placeholder="Selecione o status"
@@ -310,13 +345,17 @@ export default function ClientsList() {
                         {formatDocument(client.documento)}
                       </td>
                       <td className="p-4 text-muted-foreground">
-                        {client.tipo === ClientType.PESSOA_FISICA ? 'Pessoa Física' : 'Pessoa Jurídica'}
+                        {client.tipo === ClientType.PESSOA_FISICA
+                          ? "Pessoa Física"
+                          : "Pessoa Jurídica"}
                       </td>
                       <td className="p-4 text-muted-foreground">
-                        {client.telefone ? formatPhone(client.telefone) : '-'}
+                        {client.telefone ? formatPhone(client.telefone) : "-"}
                       </td>
                       <td className="p-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(client.status)}`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(client.status)}`}
+                        >
                           {client.status}
                         </span>
                       </td>
@@ -371,13 +410,15 @@ export default function ClientsList() {
                           </p>
                           <p className="text-muted-foreground text-sm">
                             {search || status || tipo
-                              ? 'Tente ajustar os filtros de busca'
-                              : 'Comece adicionando o primeiro cliente'
-                            }
+                              ? "Tente ajustar os filtros de busca"
+                              : "Comece adicionando o primeiro cliente"}
                           </p>
                         </div>
                         <Link to="/clients/cadastrar">
-                          <Button testID="empty-state-new-client" type="primary">
+                          <Button
+                            testID="empty-state-new-client"
+                            type="primary"
+                          >
                             <Plus className="w-4 h-4 mr-2" />
                             Novo Cliente
                           </Button>
@@ -393,7 +434,8 @@ export default function ClientsList() {
           {total > 0 && pages > 1 && (
             <div className="flex items-center justify-between p-4 border-t border-border">
               <div className="text-sm text-muted-foreground">
-                Mostrando {((page - 1) * 10) + 1} até {Math.min(page * 10, total)} de {total} clientes
+                Mostrando {(page - 1) * 10 + 1} até {Math.min(page * 10, total)}{" "}
+                de {total} clientes
               </div>
 
               <div className="flex items-center gap-2">
@@ -435,8 +477,9 @@ export default function ClientsList() {
                       Excluir Cliente
                     </h3>
                     <p className="text-muted-foreground mt-2">
-                      Tem certeza que deseja excluir o cliente <strong>{clientToDelete?.fullName}</strong>?
-                      Esta ação não pode ser desfeita.
+                      Tem certeza que deseja excluir o cliente{" "}
+                      <strong>{clientToDelete?.fullName}</strong>? Esta ação não
+                      pode ser desfeita.
                     </p>
                   </div>
 

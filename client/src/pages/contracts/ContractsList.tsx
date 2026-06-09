@@ -1,20 +1,25 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ContractStatus, PaymentMethod, Contract, PaginatedResponse } from '@/types';
-import { PermissionGuard } from '@/components/auth/PermissionGuard';
-import { PermissionResource, PermissionAction } from '@/types/permissions';
-import { usePermissions } from '@/hooks/use-permissions';
-import { formatCurrency, formatDate } from '@/lib/utils';
-import { Selectize } from '@/components/ui/Selectize';
-import { Subtitle } from '@/components/ui/Subtitle';
-import * as Popover from '@radix-ui/react-popover';
-import { Button } from '@/components/ui/Button';
-import { Title } from '@/components/ui/Title';
-import { Input } from '@/components/ui/Input';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import api from '@/lib/api';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  ContractStatus,
+  PaymentMethod,
+  Contract,
+  PaginatedResponse,
+} from "@/types";
+import { PermissionGuard } from "@/components/auth/PermissionGuard";
+import { PermissionResource, PermissionAction } from "@/types/permissions";
+import { usePermissions } from "@/hooks/use-permissions";
+import { formatCurrency, formatDate } from "@/lib/utils";
+import { Selectize } from "@/components/ui/Selectize";
+import { Subtitle } from "@/components/ui/Subtitle";
+import * as Popover from "@radix-ui/react-popover";
+import { Button } from "@/components/ui/Button";
+import { Title } from "@/components/ui/Title";
+import { Input } from "@/components/ui/Input";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { toast } from "sonner";
+import api from "@/lib/api";
 import {
   FileText,
   Plus,
@@ -25,41 +30,36 @@ import {
   Filter,
   Download,
   Mail,
-  AlertTriangle
-} from 'lucide-react';
+  AlertTriangle,
+} from "lucide-react";
 
 export default function ContractsList() {
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<ContractStatus | ''>('');
-  const [anoMin, setAnoMin] = useState('');
-  const [anoMax, setAnoMax] = useState('');
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<ContractStatus | "">("");
+  const [anoMin, setAnoMin] = useState("");
+  const [anoMax, setAnoMax] = useState("");
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
   const { canCreateContracts, canDeleteContracts } = usePermissions();
 
   const { data: contractsData, isLoading } = useQuery({
-    queryKey: [
-      'get-contracts',
-      10,
-      search,
-      status,
-      anoMin,
-      anoMax,
-    ],
+    queryKey: ["get-contracts", 10, search, status, anoMin, anoMax],
     queryFn: async () => {
       const params = new URLSearchParams({
         limit: String(10),
         offset: String((page - 1) * 10),
       });
 
-      if (search) params.append('nomeCliente', search);
-      if (status) params.append('status', status);
-      if (anoMin) params.append('dataInicio', anoMin);
-      if (anoMax) params.append('dataFim', anoMax);
+      if (search) params.append("nomeCliente", search);
+      if (status) params.append("status", status);
+      if (anoMin) params.append("dataInicio", anoMin);
+      if (anoMax) params.append("dataFim", anoMax);
 
-      const { data } = await api.get<PaginatedResponse<Contract>>(`/contract?${params.toString()}`);
+      const { data } = await api.get<PaginatedResponse<Contract>>(
+        `/contract?${params.toString()}`,
+      );
 
-      queryClient.setQueryData(['GetContractsListing'], {
+      queryClient.setQueryData(["GetContractsListing"], {
         page: data.page,
         limit: data.limit,
         count: data.total,
@@ -80,22 +80,26 @@ export default function ContractsList() {
       await api.delete(`/contract/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['get-contracts'] });
-      queryClient.invalidateQueries({ queryKey: ['get-contract', contractToDelete?.id] });
-      queryClient.invalidateQueries({ queryKey: ['get-motorcycles'] });
+      queryClient.invalidateQueries({ queryKey: ["get-contracts"] });
+      queryClient.invalidateQueries({
+        queryKey: ["get-contract", contractToDelete?.id],
+      });
+      queryClient.invalidateQueries({ queryKey: ["get-motorcycles"] });
 
-      toast.success('Contrato excluído com sucesso!');
+      toast.success("Contrato excluído com sucesso!");
 
       setShowDeleteModal(false);
       setContractToDelete(null);
     },
     onError: () => {
-      toast.error('Erro ao excluir contrato');
-    }
+      toast.error("Erro ao excluir contrato");
+    },
   });
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [contractToDelete, setContractToDelete] = useState<Contract | null>(null);
+  const [contractToDelete, setContractToDelete] = useState<Contract | null>(
+    null,
+  );
 
   const handleDeleteClick = (contract: Contract) => {
     setContractToDelete(contract);
@@ -104,7 +108,7 @@ export default function ContractsList() {
 
   const handleConfirmDelete = () => {
     if (contractToDelete) {
-      console.log(contractToDelete.id)
+      console.log(contractToDelete.id);
       deleteContract(contractToDelete.id);
     }
   };
@@ -117,36 +121,36 @@ export default function ContractsList() {
   const handleResendSignature = async (contractId: string) => {
     try {
       await api.post(`/contract/${contractId}/resend-signature`);
-      toast.success('Email de assinatura reenviado com sucesso!');
+      toast.success("Email de assinatura reenviado com sucesso!");
     } catch (error) {
-      console.log(error)
-      toast.error('Erro ao reenviar email de assinatura');
+      console.log(error);
+      toast.error("Erro ao reenviar email de assinatura");
     }
   };
 
   const getStatusColor = (status: ContractStatus) => {
     switch (status) {
       case ContractStatus.ATIVO:
-        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+        return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400";
       case ContractStatus.CANCELADO:
-        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
+        return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
       case ContractStatus.FINALIZADO:
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400";
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
     }
   };
 
   const getPaymentColor = (payment: PaymentMethod) => {
     switch (payment) {
       case PaymentMethod.PIX:
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400';
+        return "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400";
       case PaymentMethod.CARTAO:
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400";
       case PaymentMethod.BOLETO:
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
+        return "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400";
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
     }
   };
 
@@ -172,7 +176,9 @@ export default function ContractsList() {
             </Subtitle>
           </div>
           <Link to="/">
-            <Button testID="back-to-home" type="secondary">Voltar ao Início</Button>
+            <Button testID="back-to-home" type="secondary">
+              Voltar ao Início
+            </Button>
           </Link>
         </div>
       }
@@ -184,7 +190,10 @@ export default function ContractsList() {
           className="flex flex-col md:flex-row md:items-center justify-between gap-4"
         >
           <div>
-            <Title size="2xl" className="text-foreground flex items-center gap-3">
+            <Title
+              size="2xl"
+              className="text-foreground flex items-center gap-3"
+            >
               <FileText className="w-8 h-8 text-primary" />
               Contratos
             </Title>
@@ -195,7 +204,11 @@ export default function ContractsList() {
 
           {canCreateContracts() && (
             <Link to="/contracts/cadastrar">
-              <Button testID="new-contract" type="primary" className="shadow-primary">
+              <Button
+                testID="new-contract"
+                type="primary"
+                className="shadow-primary"
+              >
                 <Plus className="w-5 h-5 mr-2" />
                 Novo Contrato
               </Button>
@@ -219,13 +232,13 @@ export default function ContractsList() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Input
               inputFieldProps={{
-                testID: 'search-input',
-                label: 'Buscar',
+                testID: "search-input",
+                label: "Buscar",
                 input: {
-                  placeholder: 'Nome do cliente...',
+                  placeholder: "Nome do cliente...",
                   value: search,
-                  onChange: (e) => setSearch(e.target.value)
-                }
+                  onChange: (e) => setSearch(e.target.value),
+                },
               }}
               leftIcon={<Search className="w-5 h-5 text-muted-foreground" />}
             />
@@ -233,19 +246,33 @@ export default function ContractsList() {
             <Selectize
               label="Status"
               allOptions={[
-                { text: 'Todos os status', value: '' },
-                { text: 'Ativo', value: ContractStatus.ATIVO },
-                { text: 'Cancelado', value: ContractStatus.CANCELADO },
-                { text: 'Finalizado', value: ContractStatus.FINALIZADO }
+                { text: "Todos os status", value: "" },
+                { text: "Ativo", value: ContractStatus.ATIVO },
+                { text: "Cancelado", value: ContractStatus.CANCELADO },
+                { text: "Finalizado", value: ContractStatus.FINALIZADO },
               ]}
-              selectedOptions={status ? [
-                {
-                  text: status === ContractStatus.ATIVO ? 'Ativo' :
-                    status === ContractStatus.CANCELADO ? 'Cancelado' : 'Finalizado',
-                  value: status
-                }
-              ] : []}
-              setSelectedOptions={(options) => setStatus(options.length > 0 ? options[0].value as ContractStatus : '')}
+              selectedOptions={
+                status
+                  ? [
+                      {
+                        text:
+                          status === ContractStatus.ATIVO
+                            ? "Ativo"
+                            : status === ContractStatus.CANCELADO
+                              ? "Cancelado"
+                              : "Finalizado",
+                        value: status,
+                      },
+                    ]
+                  : []
+              }
+              setSelectedOptions={(options) =>
+                setStatus(
+                  options.length > 0
+                    ? (options[0].value as ContractStatus)
+                    : "",
+                )
+              }
               multiple={false}
               search={false}
               placeholder="Todos os status"
@@ -253,25 +280,25 @@ export default function ContractsList() {
 
             <Input
               inputFieldProps={{
-                testID: 'data-inicio-input',
-                label: 'Data Início',
+                testID: "data-inicio-input",
+                label: "Data Início",
                 input: {
-                  type: 'date',
+                  type: "date",
                   value: anoMin,
-                  onChange: (e) => setAnoMin(e.target.value)
-                }
+                  onChange: (e) => setAnoMin(e.target.value),
+                },
               }}
             />
 
             <Input
               inputFieldProps={{
-                testID: 'data-fim-input',
-                label: 'Data Fim',
+                testID: "data-fim-input",
+                label: "Data Fim",
                 input: {
-                  type: 'date',
+                  type: "date",
                   value: anoMax,
-                  onChange: (e) => setAnoMax(e.target.value)
-                }
+                  onChange: (e) => setAnoMax(e.target.value),
+                },
               }}
             />
           </div>
@@ -347,10 +374,13 @@ export default function ContractsList() {
                           </div>
                           <div>
                             <p className="font-medium text-card-foreground">
-                              {contract.client?.fullName || 'Cliente não encontrado'}
+                              {contract.client?.fullName ||
+                                "Cliente não encontrado"}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                              {contract.motorcycle?.nome || 'Moto não encontrada'} - {contract.motorcycle?.placa}
+                              {contract.motorcycle?.nome ||
+                                "Moto não encontrada"}{" "}
+                              - {contract.motorcycle?.placa}
                             </p>
                           </div>
                         </div>
@@ -362,12 +392,16 @@ export default function ContractsList() {
                         {formatDate(contract.data)}
                       </td>
                       <td className="p-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPaymentColor(contract.pagamento)}`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${getPaymentColor(contract.pagamento)}`}
+                        >
                           {contract.pagamento.toUpperCase()}
                         </span>
                       </td>
                       <td className="p-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(contract.status)}`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(contract.status)}`}
+                        >
                           {contract.status}
                         </span>
                       </td>
@@ -390,17 +424,23 @@ export default function ContractsList() {
                                   <Link to={`/contracts/${contract.id}`}>
                                     <button className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors">
                                       <Eye className="w-4 h-4" />
-                                      <span className="text-sm">Visualizar</span>
+                                      <span className="text-sm">
+                                        Visualizar
+                                      </span>
                                     </button>
                                   </Link>
 
                                   {contract.status === ContractStatus.ATIVO && (
                                     <button
-                                      onClick={() => handleResendSignature(contract.id)}
+                                      onClick={() =>
+                                        handleResendSignature(contract.id)
+                                      }
                                       className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors"
                                     >
                                       <Mail className="w-4 h-4" />
-                                      <span className="text-sm">Reenviar Email</span>
+                                      <span className="text-sm">
+                                        Reenviar Email
+                                      </span>
                                     </button>
                                   )}
 
@@ -412,20 +452,26 @@ export default function ContractsList() {
                                       className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors"
                                     >
                                       <Download className="w-4 h-4" />
-                                      <span className="text-sm">Baixar PDF</span>
+                                      <span className="text-sm">
+                                        Baixar PDF
+                                      </span>
                                     </a>
                                   )}
 
-                                  {contract.status === ContractStatus.ATIVO && canDeleteContracts() && (
-                                    <button
-                                      onClick={() => handleDeleteClick(contract)}
-                                      className="flex items-center gap-2 w-full p-2 text-left hover:bg-destructive/10 hover:text-destructive rounded transition-colors"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                      <span className="text-sm">Cancelar</span>
-                                    </button>
-                                  )}
-
+                                  {contract.status === ContractStatus.ATIVO &&
+                                    canDeleteContracts() && (
+                                      <button
+                                        onClick={() =>
+                                          handleDeleteClick(contract)
+                                        }
+                                        className="flex items-center gap-2 w-full p-2 text-left hover:bg-destructive/10 hover:text-destructive rounded transition-colors"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-sm">
+                                          Cancelar
+                                        </span>
+                                      </button>
+                                    )}
                                 </Popover.Content>
                               </Popover.Portal>
                             </Popover.Root>
@@ -445,13 +491,15 @@ export default function ContractsList() {
                           </p>
                           <p className="text-muted-foreground text-sm">
                             {search || status || anoMin || anoMax
-                              ? 'Tente ajustar os filtros de busca'
-                              : 'Comece criando o primeiro contrato'
-                            }
+                              ? "Tente ajustar os filtros de busca"
+                              : "Comece criando o primeiro contrato"}
                           </p>
                         </div>
                         <Link to="/contracts/cadastrar">
-                          <Button testID="empty-state-new-contract" type="primary">
+                          <Button
+                            testID="empty-state-new-contract"
+                            type="primary"
+                          >
                             <Plus className="w-4 h-4 mr-2" />
                             Novo Contrato
                           </Button>
@@ -467,7 +515,8 @@ export default function ContractsList() {
           {total > 0 && pages > 1 && (
             <div className="flex items-center justify-between p-4 border-t border-border">
               <div className="text-sm text-muted-foreground">
-                Mostrando {((page - 1) * 10) + 1} até {Math.min(page * 10, total)} de {total} clientes
+                Mostrando {(page - 1) * 10 + 1} até {Math.min(page * 10, total)}{" "}
+                de {total} clientes
               </div>
 
               <div className="flex items-center gap-2">
@@ -509,8 +558,11 @@ export default function ContractsList() {
                       Excluir Contrato
                     </h3>
                     <p className="text-muted-foreground mt-2">
-                      Tem certeza que deseja cancelar o contrato do cliente <strong>{contractToDelete?.client?.fullName || 'Cliente'}</strong>?
-                      Esta ação não pode ser desfeita.
+                      Tem certeza que deseja cancelar o contrato do cliente{" "}
+                      <strong>
+                        {contractToDelete?.client?.fullName || "Cliente"}
+                      </strong>
+                      ? Esta ação não pode ser desfeita.
                     </p>
                   </div>
 

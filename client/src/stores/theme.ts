@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface ThemeState {
   darkMode: boolean;
@@ -11,17 +11,17 @@ export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
       darkMode: false,
-      
+
       setDarkMode: (darkMode: boolean) => {
         set({ darkMode });
       },
-      
+
       toggleDarkMode: () => {
         set({ darkMode: !get().darkMode });
-      }
+      },
     }),
     {
-      name: 'ez-moto-theme'
-    }
-  )
+      name: "ez-moto-theme",
+    },
+  ),
 );

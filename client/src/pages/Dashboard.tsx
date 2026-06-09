@@ -1,21 +1,29 @@
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import {
   Users,
   UserCheck,
   Bike,
   FileText,
   Calendar,
-  Loader2
-} from 'lucide-react';
-import { Title } from '@/components/ui/Title';
-import { Subtitle } from '@/components/ui/Subtitle';
-import { Button } from '@/components/ui/Button';
-import { useAuth } from '@/stores/auth';
-import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import api from '@/lib/api';
-import { PaginatedResponse, User, Client, Motorcycle, Contract, ClientStatus, ContractStatus } from '@/types';
-import { formatCurrency } from '@/lib/utils';
+  Loader2,
+} from "lucide-react";
+import { Title } from "@/components/ui/Title";
+import { Subtitle } from "@/components/ui/Subtitle";
+import { Button } from "@/components/ui/Button";
+import { useAuth } from "@/stores/auth";
+import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import api from "@/lib/api";
+import {
+  PaginatedResponse,
+  User,
+  Client,
+  Motorcycle,
+  Contract,
+  ClientStatus,
+  ContractStatus,
+} from "@/types";
+import { formatCurrency } from "@/lib/utils";
 
 interface DashboardStats {
   totalUsers: number;
@@ -40,36 +48,44 @@ export default function Dashboard() {
   const { user } = useAuth();
 
   const { data: usersData, isLoading: usersLoading } = useQuery({
-    queryKey: ['dashboard-users'],
+    queryKey: ["dashboard-users"],
     queryFn: async () => {
-      const { data } = await api.get<PaginatedResponse<User>>('/users?limit=999&offset=0');
+      const { data } = await api.get<PaginatedResponse<User>>(
+        "/users?limit=999&offset=0",
+      );
       return data;
     },
     staleTime: 0,
   });
 
   const { data: clientsData, isLoading: clientsLoading } = useQuery({
-    queryKey: ['dashboard-clients'],
+    queryKey: ["dashboard-clients"],
     queryFn: async () => {
-      const { data } = await api.get<PaginatedResponse<Client>>('/clients?limit=9999&offset=0');
+      const { data } = await api.get<PaginatedResponse<Client>>(
+        "/clients?limit=9999&offset=0",
+      );
       return data;
     },
     staleTime: 0,
   });
 
   const { data: motorcyclesData, isLoading: motorcyclesLoading } = useQuery({
-    queryKey: ['dashboard-motorcycles'],
+    queryKey: ["dashboard-motorcycles"],
     queryFn: async () => {
-      const { data } = await api.get<PaginatedResponse<Motorcycle>>('/motorcycle?limit=9999&offset=0');
+      const { data } = await api.get<PaginatedResponse<Motorcycle>>(
+        "/motorcycle?limit=9999&offset=0",
+      );
       return data;
     },
     staleTime: 0,
   });
 
   const { data: contractsData, isLoading: contractsLoading } = useQuery({
-    queryKey: ['dashboard-contracts'],
+    queryKey: ["dashboard-contracts"],
     queryFn: async () => {
-      const { data } = await api.get<PaginatedResponse<Contract>>('/contract?limit=999&offset=0');
+      const { data } = await api.get<PaginatedResponse<Contract>>(
+        "/contract?limit=999&offset=0",
+      );
       return data;
     },
     staleTime: 0,
@@ -77,87 +93,115 @@ export default function Dashboard() {
 
   const stats: DashboardStats = {
     totalUsers: usersData?.total || 0,
-    activeClients: clientsData?.data?.filter(client => client.status === ClientStatus.ATIVO).length || 0,
+    activeClients:
+      clientsData?.data?.filter(
+        (client) => client.status === ClientStatus.ATIVO,
+      ).length || 0,
     totalMotorcycles: motorcyclesData?.total || 0,
-    activeContracts: contractsData?.data?.filter(contract => contract.status === ContractStatus.ATIVO).length || 0,
-    monthlyRevenue: contractsData?.data?.filter(contract => {
-      const contractDate = new Date(contract.data);
-      const currentDate = new Date();
-      return contractDate.getMonth() === currentDate.getMonth() &&
-        contractDate.getFullYear() === currentDate.getFullYear() &&
-        contract.status === ContractStatus.ATIVO;
-    }).reduce((sum, contract) => sum + contract.valor, 0) || 0,
-    pendingContracts: contractsData?.data?.filter(contract => contract.status === ContractStatus.ATIVO).length || 0,
+    activeContracts:
+      contractsData?.data?.filter(
+        (contract) => contract.status === ContractStatus.ATIVO,
+      ).length || 0,
+    monthlyRevenue:
+      contractsData?.data
+        ?.filter((contract) => {
+          const contractDate = new Date(contract.data);
+          const currentDate = new Date();
+          return (
+            contractDate.getMonth() === currentDate.getMonth() &&
+            contractDate.getFullYear() === currentDate.getFullYear() &&
+            contract.status === ContractStatus.ATIVO
+          );
+        })
+        .reduce((sum, contract) => sum + contract.valor, 0) || 0,
+    pendingContracts:
+      contractsData?.data?.filter(
+        (contract) => contract.status === ContractStatus.ATIVO,
+      ).length || 0,
     monthlyGoal: 15000000,
   };
 
   const sortDesc = <T extends { created_at: string }>(arr: T[]) =>
-    [...arr].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    [...arr].sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    );
 
   const recentActivities: RecentActivity[] = [
-    ...sortDesc(contractsData?.data ?? []).slice(0, 2).map(contract => ({
-      id: contract.id,
-      action: 'Novo contrato criado',
-      client: contract.client?.fullName,
-      motorcycle: contract.motorcycle?.nome,
-      time: new Date(contract.created_at).toLocaleDateString('pt-BR'),
-      _sort: contract.created_at,
-      value: formatCurrency(contract.valor)
-    })),
-    ...sortDesc(clientsData?.data ?? []).slice(0, 1).map(client => ({
-      id: client.id,
-      action: 'Cliente cadastrado',
-      client: client.fullName,
-      time: new Date(client.created_at).toLocaleDateString('pt-BR'),
-      _sort: client.created_at,
-    })),
-    ...sortDesc(motorcyclesData?.data ?? []).slice(0, 1).map(motorcycle => ({
-      id: motorcycle.id,
-      action: 'Motocicleta adicionada',
-      motorcycle: motorcycle.nome,
-      time: new Date(motorcycle.created_at).toLocaleDateString('pt-BR'),
-      _sort: motorcycle.created_at,
-      value: formatCurrency(motorcycle.valor_venda)
-    }))
+    ...sortDesc(contractsData?.data ?? [])
+      .slice(0, 2)
+      .map((contract) => ({
+        id: contract.id,
+        action: "Novo contrato criado",
+        client: contract.client?.fullName,
+        motorcycle: contract.motorcycle?.nome,
+        time: new Date(contract.created_at).toLocaleDateString("pt-BR"),
+        _sort: contract.created_at,
+        value: formatCurrency(contract.valor),
+      })),
+    ...sortDesc(clientsData?.data ?? [])
+      .slice(0, 1)
+      .map((client) => ({
+        id: client.id,
+        action: "Cliente cadastrado",
+        client: client.fullName,
+        time: new Date(client.created_at).toLocaleDateString("pt-BR"),
+        _sort: client.created_at,
+      })),
+    ...sortDesc(motorcyclesData?.data ?? [])
+      .slice(0, 1)
+      .map((motorcycle) => ({
+        id: motorcycle.id,
+        action: "Motocicleta adicionada",
+        motorcycle: motorcycle.nome,
+        time: new Date(motorcycle.created_at).toLocaleDateString("pt-BR"),
+        _sort: motorcycle.created_at,
+        value: formatCurrency(motorcycle.valor_venda),
+      })),
   ]
-    .sort((a, b) => new Date((b as any)._sort).getTime() - new Date((a as any)._sort).getTime())
+    .sort(
+      (a, b) =>
+        new Date((b as any)._sort).getTime() -
+        new Date((a as any)._sort).getTime(),
+    )
     .slice(0, 4);
 
-  const isLoading = usersLoading || clientsLoading || motorcyclesLoading || contractsLoading;
+  const isLoading =
+    usersLoading || clientsLoading || motorcyclesLoading || contractsLoading;
 
   const statsData = [
     {
-      title: 'Total de Usuários',
+      title: "Total de Usuários",
       value: stats.totalUsers.toString(),
-      changeType: 'increase' as const,
+      changeType: "increase" as const,
       icon: Users,
-      color: 'bg-primary',
-      path: '/users'
+      color: "bg-primary",
+      path: "/users",
     },
     {
-      title: 'Clientes Ativos',
+      title: "Clientes Ativos",
       value: stats.activeClients.toString(),
-      changeType: 'increase' as const,
+      changeType: "increase" as const,
       icon: UserCheck,
-      color: 'bg-secondary',
-      path: '/clients'
+      color: "bg-secondary",
+      path: "/clients",
     },
     {
-      title: 'Motocicletas',
+      title: "Motocicletas",
       value: stats.totalMotorcycles.toString(),
-      changeType: 'increase' as const,
+      changeType: "increase" as const,
       icon: Bike,
-      color: 'bg-accent',
-      path: '/motorcycles'
+      color: "bg-accent",
+      path: "/motorcycles",
     },
     {
-      title: 'Contratos Ativos',
+      title: "Contratos Ativos",
       value: stats.activeContracts.toString(),
-      changeType: 'decrease' as const,
+      changeType: "decrease" as const,
       icon: FileText,
-      color: 'bg-warning',
-      path: '/contracts'
-    }
+      color: "bg-warning",
+      path: "/contracts",
+    },
   ];
 
   if (isLoading) {
@@ -182,7 +226,8 @@ export default function Dashboard() {
           Dashboard
         </Title>
         <Subtitle className="text-muted-foreground">
-          Bem-vindo de volta, {user?.name}! Aqui está o resumo do seu negócio hoje.
+          Bem-vindo de volta, {user?.name}! Aqui está o resumo do seu negócio
+          hoje.
         </Subtitle>
       </motion.div>
 
@@ -253,7 +298,7 @@ export default function Dashboard() {
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {activity.client && `Cliente: ${activity.client}`}
-                        {activity.client && activity.motorcycle && ' • '}
+                        {activity.client && activity.motorcycle && " • "}
                         {activity.motorcycle && `Moto: ${activity.motorcycle}`}
                       </p>
                     </div>
@@ -289,28 +334,44 @@ export default function Dashboard() {
 
             <div className="flex flex-col gap-4">
               <Link to="/clients/cadastrar">
-                <Button testID="new-client" type="primary" className="w-full justify-start">
+                <Button
+                  testID="new-client"
+                  type="primary"
+                  className="w-full justify-start"
+                >
                   <UserCheck className="w-5 h-5 mr-3" />
                   Novo Cliente
                 </Button>
               </Link>
 
               <Link to="/motorcycles/cadastrar">
-                <Button testID="new-motorcycle" type="secondary" className="w-full justify-start">
+                <Button
+                  testID="new-motorcycle"
+                  type="secondary"
+                  className="w-full justify-start"
+                >
                   <Bike className="w-5 h-5 mr-3" />
                   Nova Motocicleta
                 </Button>
               </Link>
 
               <Link to="/contracts/cadastrar">
-                <Button testID="new-contract" type="accent" className="w-full justify-start">
+                <Button
+                  testID="new-contract"
+                  type="accent"
+                  className="w-full justify-start"
+                >
                   <FileText className="w-5 h-5 mr-3" />
                   Novo Contrato
                 </Button>
               </Link>
 
               <Link to="/users/cadastrar">
-                <Button testID="new-user" type="off" className="w-full justify-start">
+                <Button
+                  testID="new-user"
+                  type="off"
+                  className="w-full justify-start"
+                >
                   <Users className="w-5 h-5 mr-3" />
                   Novo Usuário
                 </Button>

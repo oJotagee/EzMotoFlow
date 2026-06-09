@@ -1,24 +1,28 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { LoginRequest, LoginResponse } from '@/types';
-import { UserPermissionsResponse } from '@/types/permissions';
-import { useAuth } from '@/stores/auth';
-import { usePermissionsStore } from '@/stores/permissions';
-import api from '@/lib/api';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { LoginRequest, LoginResponse } from "@/types";
+import { UserPermissionsResponse } from "@/types/permissions";
+import { useAuth } from "@/stores/auth";
+import { usePermissionsStore } from "@/stores/permissions";
+import api from "@/lib/api";
 
 export const authService = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
-    const response = await api.post<LoginResponse>('/auth', data);
+    const response = await api.post<LoginResponse>("/auth", data);
     return response.data;
   },
 
   logout: async (): Promise<void> => {
-    await api.post('/auth/logout');
+    await api.post("/auth/logout");
   },
 
-  getUserPermissions: async (userId: string): Promise<UserPermissionsResponse> => {
-    const response = await api.get<UserPermissionsResponse>(`/users/${userId}/permissions`);
+  getUserPermissions: async (
+    userId: string,
+  ): Promise<UserPermissionsResponse> => {
+    const response = await api.get<UserPermissionsResponse>(
+      `/users/${userId}/permissions`,
+    );
     return response.data;
-  }
+  },
 };
 
 export const useLogin = () => {
@@ -35,15 +39,15 @@ export const useLogin = () => {
         const permissionsData = await authService.getUserPermissions(data.id);
         setPermissions(permissionsData.permissions);
       } catch (error) {
-        console.error('Failed to load user permissions:', error);
+        console.error("Failed to load user permissions:", error);
       }
 
-      queryClient.invalidateQueries({ queryKey: ['me'] });
+      queryClient.invalidateQueries({ queryKey: ["me"] });
     },
     onError: (error: any) => {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       throw error;
-    }
+    },
   });
 };
 
@@ -58,13 +62,13 @@ export const useLogout = () => {
       logout();
       clearPermissions();
       queryClient.clear();
-      window.location.href = '/';
+      window.location.href = "/";
     },
     onError: () => {
       logout();
       clearPermissions();
       queryClient.clear();
-      window.location.href = '/';
-    }
+      window.location.href = "/";
+    },
   });
 };

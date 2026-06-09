@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet } from "react-router-dom";
 
 export default function PublicLayout() {
   return (
@@ -7,14 +7,12 @@ export default function PublicLayout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">
-                EzMotoFlow
-              </h1>
+              <h1 className="text-xl font-bold text-gray-900">EzMotoFlow</h1>
             </div>
           </div>
         </div>
       </header>
-      
+
       <main className="flex-1">
         <Outlet />
       </main>

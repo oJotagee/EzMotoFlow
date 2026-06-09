@@ -1,22 +1,22 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { useParams, useSearchParams } from 'react-router-dom';
-import SignatureCanvas from 'react-signature-canvas';
-import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
-import html2canvas from 'html2canvas';
-import { toast } from 'sonner';
-import api from '@/lib/api';
-import jsPDF from 'jspdf';
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useParams, useSearchParams } from "react-router-dom";
+import SignatureCanvas from "react-signature-canvas";
+import { useState, useRef } from "react";
+import { motion } from "framer-motion";
+import html2canvas from "html2canvas";
+import { toast } from "sonner";
+import api from "@/lib/api";
+import jsPDF from "jspdf";
 
 export default function SignContractPage() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
+  const token = searchParams.get("token");
   const sigPad = useRef<SignatureCanvas>(null);
   const [isSigned, setIsSigned] = useState(false);
 
   const { data: contract, isLoading } = useQuery({
-    queryKey: ['contract-signature', id, token],
+    queryKey: ["contract-signature", id, token],
     queryFn: async () => {
       const { data } = await api.get(`/contract/sign/${id}?token=${token}`);
       return data;
@@ -36,24 +36,24 @@ export default function SignContractPage() {
       });
     },
     onSuccess: () => {
-      toast.success('Contrato assinado com sucesso!');
+      toast.success("Contrato assinado com sucesso!");
       setIsSigned(true);
     },
     onError: () => {
-      toast.error('Erro ao assinar contrato');
+      toast.error("Erro ao assinar contrato");
     },
   });
 
   const generateContractPDF = async (signatureDataURL: string) => {
-    const tempDiv = document.createElement('div');
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-    tempDiv.style.width = '210mm';
-    tempDiv.style.backgroundColor = 'white';
-    tempDiv.style.fontFamily = 'Arial, sans-serif';
-    tempDiv.style.fontSize = '14px';
-    tempDiv.style.lineHeight = '1.5';
-    tempDiv.style.color = 'black';
+    const tempDiv = document.createElement("div");
+    tempDiv.style.position = "absolute";
+    tempDiv.style.left = "-9999px";
+    tempDiv.style.width = "210mm";
+    tempDiv.style.backgroundColor = "white";
+    tempDiv.style.fontFamily = "Arial, sans-serif";
+    tempDiv.style.fontSize = "14px";
+    tempDiv.style.lineHeight = "1.5";
+    tempDiv.style.color = "black";
 
     // Conteúdo do contrato com a assinatura
     tempDiv.innerHTML = `
@@ -80,23 +80,23 @@ export default function SignContractPage() {
           </p>
 
           <div style="margin: 32px 0;">
-            <p><strong>Cliente:</strong> ${contract.client?.fullName || 'N/A'}</p>
-            <p><strong>CPF:</strong> ${contract.client?.documento || 'N/A'}</p>
-            <p><strong>Telefone:</strong> ${contract.client?.telefone || 'N/A'}</p>
-            <p><strong>E-mail:</strong> ${contract.client?.email || 'N/A'}</p>
+            <p><strong>Cliente:</strong> ${contract.client?.fullName || "N/A"}</p>
+            <p><strong>CPF:</strong> ${contract.client?.documento || "N/A"}</p>
+            <p><strong>Telefone:</strong> ${contract.client?.telefone || "N/A"}</p>
+            <p><strong>E-mail:</strong> ${contract.client?.email || "N/A"}</p>
             
             <div style="margin: 24px 0; border-top: 1px solid #ccc; padding-top: 16px;">
-              <p><strong>Modelo da Moto:</strong> ${contract.motorcycle?.nome || 'N/A'}</p>
-              <p><strong>Placa:</strong> ${contract.motorcycle?.placa || 'N/A'}</p>
-              <p><strong>Ano:</strong> ${contract.motorcycle?.ano || 'N/A'}</p>
-              <p><strong>Chassi:</strong> ${contract.motorcycle?.chassi || 'N/A'}</p>
-              <p><strong>RENAVAM:</strong> ${contract.motorcycle?.renavam || 'N/A'}</p>
+              <p><strong>Modelo da Moto:</strong> ${contract.motorcycle?.nome || "N/A"}</p>
+              <p><strong>Placa:</strong> ${contract.motorcycle?.placa || "N/A"}</p>
+              <p><strong>Ano:</strong> ${contract.motorcycle?.ano || "N/A"}</p>
+              <p><strong>Chassi:</strong> ${contract.motorcycle?.chassi || "N/A"}</p>
+              <p><strong>RENAVAM:</strong> ${contract.motorcycle?.renavam || "N/A"}</p>
             </div>
 
             <div style="margin: 24px 0; border-top: 1px solid #ccc; padding-top: 16px;">
-              <p><strong>Valor do Contrato:</strong> R$ ${(contract.valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              <p><strong>Valor do Contrato:</strong> R$ ${(contract.valor / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
               <p><strong>Forma de Pagamento:</strong> ${contract.pagamento}</p>
-              <p><strong>Data do Contrato:</strong> ${new Date(contract.data).toLocaleDateString('pt-BR')}</p>
+              <p><strong>Data do Contrato:</strong> ${new Date(contract.data).toLocaleDateString("pt-BR")}</p>
               <p><strong>Status:</strong> ${contract.status}</p>
             </div>
           </div>
@@ -131,12 +131,16 @@ export default function SignContractPage() {
             Com gratidão, respeito e reconhecimento.
           </p>
 
-          ${contract.observacao ? `
+          ${
+            contract.observacao
+              ? `
             <div style="margin: 32px 0; padding: 16px; background-color: #f9f9f9; border-left: 4px solid #2563eb;">
               <p style="font-weight: bold;">Observações:</p>
               <p style="font-size: 12px;">${contract.observacao}</p>
             </div>
-          ` : ''}
+          `
+              : ""
+          }
 
           <!-- Termos e Condições -->
           <div style="margin: 48px 0; border-top: 1px solid #ccc; padding-top: 24px;">
@@ -162,7 +166,7 @@ export default function SignContractPage() {
                   <p style="font-size: 12px;">${contract.client?.fullName}</p>
                   <p style="font-size: 12px;">CPF: ${contract.client?.documento}</p>
                   <p style="font-size: 10px; color: #666; margin-top: 4px;">
-                    Assinado em: ${new Date().toLocaleString('pt-BR')}
+                    Assinado em: ${new Date().toLocaleString("pt-BR")}
                   </p>
                 </div>
               </div>
@@ -186,19 +190,19 @@ export default function SignContractPage() {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: "#ffffff",
       });
 
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF("p", "mm", "a4");
+      const imgData = canvas.toDataURL("image/png");
 
       const pdfWidth = 210;
       const imgWidth = pdfWidth;
       const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
-      const pdfBase64 = pdf.output('datauristring');
+      const pdfBase64 = pdf.output("datauristring");
 
       return pdfBase64;
     } finally {
@@ -208,29 +212,29 @@ export default function SignContractPage() {
 
   const handleSign = async () => {
     if (sigPad.current?.isEmpty()) {
-      toast.error('Por favor, faça sua assinatura');
+      toast.error("Por favor, faça sua assinatura");
       return;
     }
 
     try {
       const signatureDataURL = sigPad.current?.toDataURL();
 
-      console.log('Assinatura capturada:', signatureDataURL?.substring(0, 100));
+      console.log("Assinatura capturada:", signatureDataURL?.substring(0, 100));
 
       // Gerar PDF do contrato assinado
       const contractPdfBase64 = await generateContractPDF(signatureDataURL);
 
-      console.log('PDF gerado:', contractPdfBase64?.substring(0, 100));
+      console.log("PDF gerado:", contractPdfBase64?.substring(0, 100));
 
       signContract({
         signature: signatureDataURL,
         signedAt: new Date().toISOString(),
         signerName: contract?.client?.fullName,
-        contractPdf: contractPdfBase64
+        contractPdf: contractPdfBase64,
       });
     } catch (error) {
-      toast.error('Erro ao gerar PDF do contrato');
-      console.error('Erro ao gerar PDF:', error);
+      toast.error("Erro ao gerar PDF do contrato");
+      console.error("Erro ao gerar PDF:", error);
     }
   };
 
@@ -274,7 +278,8 @@ export default function SignContractPage() {
             Contrato Assinado com Sucesso!
           </h1>
           <p className="text-lg text-gray-600">
-            Obrigado por assinar o contrato. Um email de confirmação foi enviado.
+            Obrigado por assinar o contrato. Um email de confirmação foi
+            enviado.
           </p>
         </div>
       </div>
@@ -312,11 +317,15 @@ export default function SignContractPage() {
             </div>
             <div className="p-4 bg-gray-50 rounded">
               <strong className="text-gray-700">Valor:</strong>
-              <p className="text-gray-900">R$ {(contract.valor / 100).toFixed(2)}</p>
+              <p className="text-gray-900">
+                R$ {(contract.valor / 100).toFixed(2)}
+              </p>
             </div>
             <div className="p-4 bg-gray-50 rounded">
               <strong className="text-gray-700">Data:</strong>
-              <p className="text-gray-900">{new Date(contract.data).toLocaleDateString()}</p>
+              <p className="text-gray-900">
+                {new Date(contract.data).toLocaleDateString()}
+              </p>
             </div>
           </div>
         </div>
@@ -326,7 +335,8 @@ export default function SignContractPage() {
             Sua Assinatura
           </h3>
           <p className="text-gray-600 mb-4">
-            Use o mouse ou toque na tela para desenhar sua assinatura no campo abaixo:
+            Use o mouse ou toque na tela para desenhar sua assinatura no campo
+            abaixo:
           </p>
 
           <div className="border-2 border-dashed border-gray-300 rounded-lg mb-4 p-2 flex justify-center">
@@ -335,8 +345,8 @@ export default function SignContractPage() {
               canvasProps={{
                 width: 600,
                 height: 200,
-                className: 'signature-canvas border rounded',
-                style: { width: '600px', height: '200px' }
+                className: "signature-canvas border rounded",
+                style: { width: "600px", height: "200px" },
               }}
             />
           </div>
@@ -359,7 +369,7 @@ export default function SignContractPage() {
                   Assinando...
                 </span>
               ) : (
-                'Assinar Contrato'
+                "Assinar Contrato"
               )}
             </button>
           </div>

@@ -1,15 +1,15 @@
 export enum PermissionResource {
-  USERS = 'USERS',
-  CLIENTS = 'CLIENTS',
-  MOTORCYCLES = 'MOTORCYCLES',
-  CONTRACTS = 'CONTRACTS',
+  USERS = "USERS",
+  CLIENTS = "CLIENTS",
+  MOTORCYCLES = "MOTORCYCLES",
+  CONTRACTS = "CONTRACTS",
 }
 
 export enum PermissionAction {
-  READ = 'READ',
-  CREATE = 'CREATE',
-  UPDATE = 'UPDATE',
-  DELETE = 'DELETE',
+  READ = "READ",
+  CREATE = "CREATE",
+  UPDATE = "UPDATE",
+  DELETE = "DELETE",
 }
 
 export interface UserPermission {

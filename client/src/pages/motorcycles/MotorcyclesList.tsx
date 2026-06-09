@@ -1,21 +1,21 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MotorcycleStatus, Motorcycle, PaginatedResponse } from '@/types';
-import { PermissionGuard } from '@/components/auth/PermissionGuard';
-import { PermissionResource, PermissionAction } from '@/types/permissions';
-import { usePermissions } from '@/hooks/use-permissions';
-import { Selectize } from '@/components/ui/Selectize';
-import { Subtitle } from '@/components/ui/Subtitle';
-import * as Popover from '@radix-ui/react-popover';
-import { Button } from '@/components/ui/Button';
-import { Title } from '@/components/ui/Title';
-import { Input } from '@/components/ui/Input';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { MotorcycleStatus, Motorcycle, PaginatedResponse } from "@/types";
+import { PermissionGuard } from "@/components/auth/PermissionGuard";
+import { PermissionResource, PermissionAction } from "@/types/permissions";
+import { usePermissions } from "@/hooks/use-permissions";
+import { Selectize } from "@/components/ui/Selectize";
+import { Subtitle } from "@/components/ui/Subtitle";
+import * as Popover from "@radix-ui/react-popover";
+import { Button } from "@/components/ui/Button";
+import { Title } from "@/components/ui/Title";
+import { Input } from "@/components/ui/Input";
 
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import moment from 'moment';
-import api from '@/lib/api';
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { toast } from "sonner";
+import moment from "moment";
+import api from "@/lib/api";
 import {
   Bike,
   Plus,
@@ -24,41 +24,37 @@ import {
   Eye,
   MoreVertical,
   Filter,
-  AlertTriangle
-} from 'lucide-react';
+  AlertTriangle,
+} from "lucide-react";
 
 export default function MotorcyclesList() {
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<MotorcycleStatus | ''>('');
-  const [anoMin, setAnoMin] = useState('');
-  const [anoMax, setAnoMax] = useState('');
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<MotorcycleStatus | "">("");
+  const [anoMin, setAnoMin] = useState("");
+  const [anoMax, setAnoMax] = useState("");
   const [page, setPage] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [motorcycleToDelete, setMotorcycleToDelete] = useState<Motorcycle | null>(null);
+  const [motorcycleToDelete, setMotorcycleToDelete] =
+    useState<Motorcycle | null>(null);
   const queryClient = useQueryClient();
   const { canCreateMotorcycles, canDeleteMotorcycles } = usePermissions();
 
   const { data: motorcyclesData, isLoading } = useQuery({
-    queryKey: [
-      'get-motorcycles',
-      page,
-      search,
-      status,
-      anoMin,
-      anoMax,
-    ],
+    queryKey: ["get-motorcycles", page, search, status, anoMin, anoMax],
     queryFn: async () => {
       const params = new URLSearchParams({
         limit: String(10),
         offset: String((page - 1) * 10),
       });
 
-      if (search) params.append('nome', search);
-      if (status) params.append('status', status);
-      if (anoMin && anoMin.length === 4) params.append('anoMin', anoMin);
-      if (anoMax && anoMax.length === 4) params.append('anoMax', anoMax);
+      if (search) params.append("nome", search);
+      if (status) params.append("status", status);
+      if (anoMin && anoMin.length === 4) params.append("anoMin", anoMin);
+      if (anoMax && anoMax.length === 4) params.append("anoMax", anoMax);
 
-      const { data } = await api.get<PaginatedResponse<Motorcycle>>(`/motorcycle?${params.toString()}`);
+      const { data } = await api.get<PaginatedResponse<Motorcycle>>(
+        `/motorcycle?${params.toString()}`,
+      );
 
       return data;
     },
@@ -71,14 +67,14 @@ export default function MotorcyclesList() {
       await api.delete(`/motorcycle/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['get-motorcycles'] });
-      toast.success('Motocicleta excluída com sucesso!');
+      queryClient.invalidateQueries({ queryKey: ["get-motorcycles"] });
+      toast.success("Motocicleta excluída com sucesso!");
       setShowDeleteModal(false);
       setMotorcycleToDelete(null);
     },
     onError: () => {
-      toast.error('Erro ao excluir motocicleta');
-    }
+      toast.error("Erro ao excluir motocicleta");
+    },
   });
 
   const handleDelete = (motorcycle: Motorcycle) => {
@@ -100,15 +96,15 @@ export default function MotorcyclesList() {
   const getStatusColor = (status: MotorcycleStatus) => {
     switch (status) {
       case MotorcycleStatus.ATIVO:
-        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+        return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400";
       case MotorcycleStatus.INATIVO:
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400";
       case MotorcycleStatus.VENDIDO:
-        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
+        return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
       case MotorcycleStatus.ANDAMENTO:
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400";
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
     }
   };
 
@@ -130,7 +126,9 @@ export default function MotorcyclesList() {
             </Subtitle>
           </div>
           <Link to="/">
-            <Button testID="back-to-home" type="secondary">Voltar ao Início</Button>
+            <Button testID="back-to-home" type="secondary">
+              Voltar ao Início
+            </Button>
           </Link>
         </div>
       }
@@ -142,7 +140,10 @@ export default function MotorcyclesList() {
           className="flex flex-col md:flex-row md:items-center justify-between gap-4"
         >
           <div>
-            <Title size="2xl" className="text-foreground flex items-center gap-3">
+            <Title
+              size="2xl"
+              className="text-foreground flex items-center gap-3"
+            >
               <Bike className="w-8 h-8 text-primary" />
               Motocicletas
             </Title>
@@ -153,7 +154,11 @@ export default function MotorcyclesList() {
 
           {canCreateMotorcycles() && (
             <Link to="/motorcycles/cadastrar">
-              <Button testID="new-motorcycle" type="primary" className="shadow-primary">
+              <Button
+                testID="new-motorcycle"
+                type="primary"
+                className="shadow-primary"
+              >
                 <Plus className="w-5 h-5 mr-2" />
                 Nova Motocicleta
               </Button>
@@ -177,13 +182,13 @@ export default function MotorcyclesList() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Input
               inputFieldProps={{
-                testID: 'search-input',
-                label: 'Buscar',
+                testID: "search-input",
+                label: "Buscar",
                 input: {
-                  placeholder: 'Nome da motocicleta...',
+                  placeholder: "Nome da motocicleta...",
                   value: search,
-                  onChange: (e) => setSearch(e.target.value)
-                }
+                  onChange: (e) => setSearch(e.target.value),
+                },
               }}
               leftIcon={<Search className="w-5 h-5 text-muted-foreground" />}
             />
@@ -191,18 +196,33 @@ export default function MotorcyclesList() {
             <Selectize
               label="Status"
               allOptions={[
-                { text: 'Todos os status', value: '' },
-                { text: 'Ativo', value: MotorcycleStatus.ATIVO },
-                { text: 'Inativo', value: MotorcycleStatus.INATIVO },
-                { text: 'Vendido', value: MotorcycleStatus.VENDIDO }
+                { text: "Todos os status", value: "" },
+                { text: "Ativo", value: MotorcycleStatus.ATIVO },
+                { text: "Inativo", value: MotorcycleStatus.INATIVO },
+                { text: "Vendido", value: MotorcycleStatus.VENDIDO },
               ]}
-              selectedOptions={status ? [{
-                text: status === MotorcycleStatus.ATIVO
-                  ? 'Ativo' : status === MotorcycleStatus.INATIVO
-                    ? 'Inativo' : 'Vendido',
-                value: status
-              }] : []}
-              setSelectedOptions={(options) => setStatus(options.length > 0 ? options[0].value as MotorcycleStatus : '')}
+              selectedOptions={
+                status
+                  ? [
+                      {
+                        text:
+                          status === MotorcycleStatus.ATIVO
+                            ? "Ativo"
+                            : status === MotorcycleStatus.INATIVO
+                              ? "Inativo"
+                              : "Vendido",
+                        value: status,
+                      },
+                    ]
+                  : []
+              }
+              setSelectedOptions={(options) =>
+                setStatus(
+                  options.length > 0
+                    ? (options[0].value as MotorcycleStatus)
+                    : "",
+                )
+              }
               multiple={false}
               search={false}
               placeholder="Todos os status"
@@ -210,33 +230,33 @@ export default function MotorcyclesList() {
 
             <Input
               inputFieldProps={{
-                testID: 'ano-min-input',
-                label: 'Ano Mínimo',
+                testID: "ano-min-input",
+                label: "Ano Mínimo",
                 input: {
-                  placeholder: '2017',
+                  placeholder: "2017",
                   value: anoMin,
                   onChange: (e) => {
-                    const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 4);
                     setAnoMin(value);
                   },
-                  maxLength: 4
-                }
+                  maxLength: 4,
+                },
               }}
             />
 
             <Input
               inputFieldProps={{
-                testID: 'ano-max-input',
-                label: 'Ano Máximo',
+                testID: "ano-max-input",
+                label: "Ano Máximo",
                 input: {
-                  placeholder: '2025',
+                  placeholder: "2025",
                   value: anoMax,
                   onChange: (e) => {
-                    const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 4);
                     setAnoMax(value);
                   },
-                  maxLength: 4
-                }
+                  maxLength: 4,
+                },
               }}
             />
           </div>
@@ -321,22 +341,25 @@ export default function MotorcyclesList() {
                         </div>
                       </td>
                       <td className="p-4 text-muted-foreground font-mono">
-                        {motorcycle.placa ?
-                          motorcycle.placa.replace(/([A-Za-z]{3})(\d{4})/, '$1-$2').toUpperCase()
-                          : '-'
-                        }
+                        {motorcycle.placa
+                          ? motorcycle.placa
+                              .replace(/([A-Za-z]{3})(\d{4})/, "$1-$2")
+                              .toUpperCase()
+                          : "-"}
                       </td>
                       <td className="p-4 text-muted-foreground">
-                        {moment(motorcycle.ano, 'YYYY').format('YYYY')}
+                        {moment(motorcycle.ano, "YYYY").format("YYYY")}
                       </td>
                       <td className="p-4 text-card-foreground font-semibold">
-                        {new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL'
+                        {new Intl.NumberFormat("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
                         }).format(motorcycle.valor_venda)}
                       </td>
                       <td className="p-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(motorcycle.status)}`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(motorcycle.status)}`}
+                        >
                           {motorcycle.status}
                         </span>
                       </td>
@@ -388,14 +411,19 @@ export default function MotorcyclesList() {
                             Nenhuma motocicleta encontrada
                           </p>
                           <p className="text-muted-foreground text-sm">
-                            {search || status || (anoMin && anoMin.length === 4) || (anoMax && anoMax.length === 4)
-                              ? 'Tente ajustar os filtros de busca'
-                              : 'Comece adicionando a primeira motocicleta'
-                            }
+                            {search ||
+                            status ||
+                            (anoMin && anoMin.length === 4) ||
+                            (anoMax && anoMax.length === 4)
+                              ? "Tente ajustar os filtros de busca"
+                              : "Comece adicionando a primeira motocicleta"}
                           </p>
                         </div>
                         <Link to="/motorcycles/cadastrar">
-                          <Button testID="empty-state-new-motorcycle" type="primary">
+                          <Button
+                            testID="empty-state-new-motorcycle"
+                            type="primary"
+                          >
                             <Plus className="w-4 h-4 mr-2" />
                             Nova Motocicleta
                           </Button>
@@ -408,37 +436,45 @@ export default function MotorcyclesList() {
             </table>
           </div>
 
-          {motorcyclesData && motorcyclesData.total > 0 && motorcyclesData.pages > 1 && (
-            <div className="flex items-center justify-between p-4 border-t border-border">
-              <div className="text-sm text-muted-foreground">
-                Mostrando {((motorcyclesData.page - 1) * motorcyclesData.limit) + 1} até {Math.min(motorcyclesData.page * motorcyclesData.limit, motorcyclesData.total)} de {motorcyclesData.total} motocicletas
+          {motorcyclesData &&
+            motorcyclesData.total > 0 &&
+            motorcyclesData.pages > 1 && (
+              <div className="flex items-center justify-between p-4 border-t border-border">
+                <div className="text-sm text-muted-foreground">
+                  Mostrando{" "}
+                  {(motorcyclesData.page - 1) * motorcyclesData.limit + 1} até{" "}
+                  {Math.min(
+                    motorcyclesData.page * motorcyclesData.limit,
+                    motorcyclesData.total,
+                  )}{" "}
+                  de {motorcyclesData.total} motocicletas
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    testID="prev-page"
+                    type="secondary"
+                    disabled={motorcyclesData.page === 1}
+                    onClick={() => setPage(motorcyclesData.page - 1)}
+                  >
+                    Anterior
+                  </Button>
+
+                  <span className="px-4 py-2 text-sm">
+                    {motorcyclesData.page} de {motorcyclesData.pages}
+                  </span>
+
+                  <Button
+                    testID="next-page"
+                    type="secondary"
+                    disabled={motorcyclesData.page === motorcyclesData.pages}
+                    onClick={() => setPage(motorcyclesData.page + 1)}
+                  >
+                    Próximo
+                  </Button>
+                </div>
               </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  testID="prev-page"
-                  type="secondary"
-                  disabled={motorcyclesData.page === 1}
-                  onClick={() => setPage(motorcyclesData.page - 1)}
-                >
-                  Anterior
-                </Button>
-
-                <span className="px-4 py-2 text-sm">
-                  {motorcyclesData.page} de {motorcyclesData.pages}
-                </span>
-
-                <Button
-                  testID="next-page"
-                  type="secondary"
-                  disabled={motorcyclesData.page === motorcyclesData.pages}
-                  onClick={() => setPage(motorcyclesData.page + 1)}
-                >
-                  Próximo
-                </Button>
-              </div>
-            </div>
-          )}
+            )}
         </motion.div>
 
         {showDeleteModal && (
@@ -454,8 +490,9 @@ export default function MotorcyclesList() {
                     Excluir Motocicleta
                   </h3>
                   <p className="text-muted-foreground mt-2">
-                    Tem certeza que deseja excluir a motocicleta <strong>{motorcycleToDelete?.nome}</strong>?
-                    Esta ação não pode ser desfeita.
+                    Tem certeza que deseja excluir a motocicleta{" "}
+                    <strong>{motorcycleToDelete?.nome}</strong>? Esta ação não
+                    pode ser desfeita.
                   </p>
                 </div>
 

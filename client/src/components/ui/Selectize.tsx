@@ -1,36 +1,36 @@
-'use client'
+"use client";
 
-import { useState, useRef, useEffect } from 'react'
-import { Title } from './Title'
-import { Subtitle } from './Subtitle'
-import { X, ChevronDown, Search } from 'lucide-react'
-import clsx from 'clsx'
+import { useState, useRef, useEffect } from "react";
+import { Title } from "./Title";
+import { Subtitle } from "./Subtitle";
+import { X, ChevronDown, Search } from "lucide-react";
+import clsx from "clsx";
 
 export interface SelectizeItem {
-  text: string
-  value: string
+  text: string;
+  value: string;
 }
 
 interface SelectizeProps {
-  allOptions: SelectizeItem[]
-  selectedOptions: SelectizeItem[]
-  setSelectedOptions: (items: SelectizeItem[]) => void
-  
-  active?: boolean
-  query?: string
-  setQuery?: (query: string) => void
-  
-  hiddenLabel?: boolean
-  label?: string
-  sublabel?: string
-  multiple?: boolean
-  placeholder?: string
-  disabled?: boolean
-  error?: boolean
-  errorMessage?: string
-  search?: boolean
-  
-  className?: string
+  allOptions: SelectizeItem[];
+  selectedOptions: SelectizeItem[];
+  setSelectedOptions: (items: SelectizeItem[]) => void;
+
+  active?: boolean;
+  query?: string;
+  setQuery?: (query: string) => void;
+
+  hiddenLabel?: boolean;
+  label?: string;
+  sublabel?: string;
+  multiple?: boolean;
+  placeholder?: string;
+  disabled?: boolean;
+  error?: boolean;
+  errorMessage?: string;
+  search?: boolean;
+
+  className?: string;
 }
 
 export function Selectize({
@@ -44,72 +44,80 @@ export function Selectize({
   className,
   ...props
 }: SelectizeProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [localQuery, setLocalQuery] = useState('')
-  const [localActive, setLocalActive] = useState(active)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const [localQuery, setLocalQuery] = useState("");
+  const [localActive, setLocalActive] = useState(active);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const query = props.query ?? localQuery
-  const setQuery = props.setQuery ?? setLocalQuery
-  const isActive = active
+  const query = props.query ?? localQuery;
+  const setQuery = props.setQuery ?? setLocalQuery;
+  const isActive = active;
 
   const availableOptions = props.allOptions.filter(
-    (option) => !props.selectedOptions.some((selected) => selected.value === option.value)
-  )
+    (option) =>
+      !props.selectedOptions.some(
+        (selected) => selected.value === option.value,
+      ),
+  );
 
   const filteredOptions = availableOptions.filter((option) =>
-    option.text.toLowerCase().includes(query.toLowerCase())
-  )
+    option.text.toLowerCase().includes(query.toLowerCase()),
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-        setLocalActive(false)
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+        setLocalActive(false);
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const toggleDropdown = () => {
-    if (disabled) return
-    setIsOpen(!isOpen)
-    setLocalActive(!isOpen)
+    if (disabled) return;
+    setIsOpen(!isOpen);
+    setLocalActive(!isOpen);
     if (!isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 100)
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }
+  };
 
   const selectOption = (option: SelectizeItem) => {
     if (multiple) {
-      props.setSelectedOptions([...props.selectedOptions, option])
+      props.setSelectedOptions([...props.selectedOptions, option]);
     } else {
-      props.setSelectedOptions([option])
-      setIsOpen(false)
-      setLocalActive(false)
+      props.setSelectedOptions([option]);
+      setIsOpen(false);
+      setLocalActive(false);
     }
-    setQuery('')
-  }
+    setQuery("");
+  };
 
   const removeOption = (valueToRemove: string) => {
     props.setSelectedOptions(
-      props.selectedOptions.filter((option) => option.value !== valueToRemove)
-    )
-  }
+      props.selectedOptions.filter((option) => option.value !== valueToRemove),
+    );
+  };
 
   const clearAll = () => {
-    props.setSelectedOptions([])
-    setQuery('')
-  }
+    props.setSelectedOptions([]);
+    setQuery("");
+  };
 
   return (
     <div className={clsx("flex flex-col gap-2 w-full", className)}>
       {!props.hiddenLabel && props.label && (
         <div className="flex flex-col gap-0">
-          <Title size="xs" bold="normal">{props.label}</Title>
+          <Title size="xs" bold="normal">
+            {props.label}
+          </Title>
           {props.sublabel && <Subtitle size="xs">{props.sublabel}</Subtitle>}
         </div>
       )}
@@ -120,11 +128,13 @@ export function Selectize({
             "flex rounded-lg h-12 w-full items-center border gap-2 px-3 bg-background transition-all duration-300 cursor-pointer",
             "focus-within:ring-2 shadow-elegant hover:shadow-lg",
             {
-              'border-border focus-within:ring-primary focus-within:border-transparent': !error && !disabled,
-              'border-destructive focus-within:ring-destructive bg-destructive/5': error,
-              'border-muted bg-muted/50 cursor-not-allowed': disabled,
-              'ring-2 ring-primary border-transparent': isActive
-            }
+              "border-border focus-within:ring-primary focus-within:border-transparent":
+                !error && !disabled,
+              "border-destructive focus-within:ring-destructive bg-destructive/5":
+                error,
+              "border-muted bg-muted/50 cursor-not-allowed": disabled,
+              "ring-2 ring-primary border-transparent": isActive,
+            },
           )}
           onClick={toggleDropdown}
         >
@@ -139,8 +149,8 @@ export function Selectize({
                   <button
                     type="button"
                     onClick={(e) => {
-                      e.stopPropagation()
-                      removeOption(option.value)
+                      e.stopPropagation();
+                      removeOption(option.value);
                     }}
                     className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
                     title="Remover opção"
@@ -160,8 +170,8 @@ export function Selectize({
             <button
               type="button"
               onClick={(e) => {
-                e.stopPropagation()
-                clearAll()
+                e.stopPropagation();
+                clearAll();
               }}
               className="p-1 hover:bg-muted rounded-md transition-colors"
             >
@@ -169,11 +179,11 @@ export function Selectize({
             </button>
           )}
 
-          <ChevronDown 
+          <ChevronDown
             className={clsx(
               "w-4 h-4 text-muted-foreground transition-transform duration-200",
-              { "rotate-180": isOpen }
-            )} 
+              { "rotate-180": isOpen },
+            )}
           />
         </div>
 
@@ -208,7 +218,9 @@ export function Selectize({
                 ))
               ) : (
                 <div className="px-3 py-4 text-center text-sm text-muted-foreground">
-                  {query ? 'Nenhuma opção encontrada' : 'Nenhuma opção disponível'}
+                  {query
+                    ? "Nenhuma opção encontrada"
+                    : "Nenhuma opção disponível"}
                 </div>
               )}
             </div>
@@ -220,5 +232,5 @@ export function Selectize({
         <span className="text-xs text-destructive">{errorMessage}</span>
       )}
     </div>
-  )
+  );
 }

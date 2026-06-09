@@ -1,27 +1,27 @@
-"use client"
+"use client";
 
-import { User, Save, ArrowLeft, Mail, Lock } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Input, PasswordInput } from '@/components/ui/Input';
-import { PermissionsSelector } from '@/components/ui/PermissionsSelector';
-import { PermissionResource, PermissionAction } from '@/types/permissions';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useNavigate } from 'react-router-dom';
-import { Subtitle } from '@/components/ui/Subtitle';
-import { Button } from '@/components/ui/Button';
-import { Title } from '@/components/ui/Title';
-import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import api from '@/lib/api';
-import { z } from 'zod';
-import { getErrorMessage } from '@/lib/error-messages';
+import { User, Save, ArrowLeft, Mail, Lock } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Input, PasswordInput } from "@/components/ui/Input";
+import { PermissionsSelector } from "@/components/ui/PermissionsSelector";
+import { PermissionResource, PermissionAction } from "@/types/permissions";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useNavigate } from "react-router-dom";
+import { Subtitle } from "@/components/ui/Subtitle";
+import { Button } from "@/components/ui/Button";
+import { Title } from "@/components/ui/Title";
+import { useForm } from "react-hook-form";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { toast } from "sonner";
+import api from "@/lib/api";
+import { z } from "zod";
+import { getErrorMessage } from "@/lib/error-messages";
 
 const userSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório'),
-  email: z.string().email('Email inválido').min(1, 'Email é obrigatório'),
-  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
+  name: z.string().min(1, "Nome é obrigatório"),
+  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
 type UserForm = z.infer<typeof userSchema>;
@@ -34,12 +34,14 @@ interface Permission {
 export default function CreateUserPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>([]);
+  const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>(
+    [],
+  );
 
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<UserForm>({
     resolver: zodResolver(userSchema),
   });
@@ -49,7 +51,7 @@ export default function CreateUserPage() {
   const { mutate: save, isPending: sending } = useMutation({
     mutationFn: async (values: UserForm) => {
       // Primeiro cria o usuário
-      const response = await api.post('/users', {
+      const response = await api.post("/users", {
         name: values.name,
         email: values.email,
         password: values.password,
@@ -61,20 +63,20 @@ export default function CreateUserPage() {
       if (selectedPermissions.length > 0) {
         await api.post(`/users/${userId}/permissions`, {
           userId,
-          permissions: selectedPermissions
+          permissions: selectedPermissions,
         });
       }
 
       return response.data;
     },
     onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ['get-users'] });
-      toast.success('Usuário criado com sucesso!');
-      navigate('/users');
+      queryClient.invalidateQueries({ queryKey: ["get-users"] });
+      toast.success("Usuário criado com sucesso!");
+      navigate("/users");
     },
     onError(error: any) {
       toast.error(getErrorMessage(error));
-    }
+    },
   });
 
   return (
@@ -115,12 +117,12 @@ export default function CreateUserPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 inputFieldProps={{
-                  testID: 'name-input',
-                  label: 'Nome',
+                  testID: "name-input",
+                  label: "Nome",
                   input: {
-                    ...register('name'),
-                    placeholder: 'Digite o nome completo'
-                  }
+                    ...register("name"),
+                    placeholder: "Digite o nome completo",
+                  },
                 }}
                 leftIcon={<User className="w-5 h-5 text-muted-foreground" />}
                 errorMessage={errors.name?.message}
@@ -129,13 +131,13 @@ export default function CreateUserPage() {
 
               <Input
                 inputFieldProps={{
-                  testID: 'email-input',
-                  label: 'Email',
+                  testID: "email-input",
+                  label: "Email",
                   input: {
-                    ...register('email'),
-                    type: 'email',
-                    placeholder: 'usuario@exemplo.com'
-                  }
+                    ...register("email"),
+                    type: "email",
+                    placeholder: "usuario@exemplo.com",
+                  },
                 }}
                 leftIcon={<Mail className="w-5 h-5 text-muted-foreground" />}
                 errorMessage={errors.email?.message}
@@ -151,12 +153,12 @@ export default function CreateUserPage() {
             <div className="grid grid-cols-1 gap-6">
               <PasswordInput
                 inputFieldProps={{
-                  testID: 'password-input',
-                  label: 'Senha',
+                  testID: "password-input",
+                  label: "Senha",
                   input: {
-                    ...register('password'),
-                    placeholder: 'Mínimo 6 caracteres'
-                  }
+                    ...register("password"),
+                    placeholder: "Mínimo 6 caracteres",
+                  },
                 }}
                 leftIcon={<Lock className="w-5 h-5 text-muted-foreground" />}
                 errorMessage={errors.password?.message}

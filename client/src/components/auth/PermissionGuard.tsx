@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
-import { usePermissions } from '@/hooks/use-permissions';
-import { PermissionResource, PermissionAction } from '@/types/permissions';
+import { ReactNode } from "react";
+import { usePermissions } from "@/hooks/use-permissions";
+import { PermissionResource, PermissionAction } from "@/types/permissions";
 
 interface PermissionGuardProps {
   resource: PermissionResource;

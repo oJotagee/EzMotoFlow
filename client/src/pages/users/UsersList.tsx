@@ -1,19 +1,19 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PermissionGuard } from '@/components/auth/PermissionGuard';
-import { PermissionResource, PermissionAction } from '@/types/permissions';
-import { usePermissions } from '@/hooks/use-permissions';
-import { Subtitle } from '@/components/ui/Subtitle';
-import * as Popover from '@radix-ui/react-popover';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Title } from '@/components/ui/Title';
-import { formatDate } from '@/lib/utils';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { User, PaginatedResponse } from '@/types';
-import { toast } from 'sonner';
-import api from '@/lib/api';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { PermissionGuard } from "@/components/auth/PermissionGuard";
+import { PermissionResource, PermissionAction } from "@/types/permissions";
+import { usePermissions } from "@/hooks/use-permissions";
+import { Subtitle } from "@/components/ui/Subtitle";
+import * as Popover from "@radix-ui/react-popover";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Title } from "@/components/ui/Title";
+import { formatDate } from "@/lib/utils";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { User, PaginatedResponse } from "@/types";
+import { toast } from "sonner";
+import api from "@/lib/api";
 import {
   Users,
   Plus,
@@ -21,11 +21,11 @@ import {
   Edit,
   Trash2,
   MoreVertical,
-  AlertTriangle
-} from 'lucide-react';
+  AlertTriangle,
+} from "lucide-react";
 
 export default function UsersList() {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
@@ -34,23 +34,20 @@ export default function UsersList() {
   const { canCreateUsers, canUpdateUsers, canDeleteUsers } = usePermissions();
 
   const { data: usersResponse, isLoading } = useQuery({
-    queryKey: [
-      'get-users',
-      page,
-      10,
-      search,
-    ],
+    queryKey: ["get-users", page, 10, search],
     queryFn: async () => {
       const params = new URLSearchParams({
         limit: String(10),
         offset: String((page - 1) * 10),
       });
 
-      if (search) params.append('nomeUser', search);
+      if (search) params.append("nomeUser", search);
 
-      const { data } = await api.get<PaginatedResponse<User>>(`/users?${params.toString()}`);
+      const { data } = await api.get<PaginatedResponse<User>>(
+        `/users?${params.toString()}`,
+      );
 
-      queryClient.setQueryData(['GetUsersListing'], {
+      queryClient.setQueryData(["GetUsersListing"], {
         page: data.page,
         limit: data.limit,
         count: data.total,
@@ -68,14 +65,14 @@ export default function UsersList() {
       await api.delete(`/users/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['get-users'] });
-      toast.success('Usuário excluído com sucesso!');
+      queryClient.invalidateQueries({ queryKey: ["get-users"] });
+      toast.success("Usuário excluído com sucesso!");
       setShowDeleteModal(false);
       setUserToDelete(null);
     },
     onError: () => {
-      toast.error('Erro ao excluir usuário');
-    }
+      toast.error("Erro ao excluir usuário");
+    },
   });
 
   const handleDelete = (user: User) => {
@@ -116,7 +113,9 @@ export default function UsersList() {
             </Subtitle>
           </div>
           <Link to="/">
-            <Button testID="back-to-home" type="secondary">Voltar ao Início</Button>
+            <Button testID="back-to-home" type="secondary">
+              Voltar ao Início
+            </Button>
           </Link>
         </div>
       }
@@ -128,7 +127,10 @@ export default function UsersList() {
           className="flex flex-col md:flex-row md:items-center justify-between gap-4"
         >
           <div>
-            <Title size="2xl" className="text-foreground flex items-center gap-3">
+            <Title
+              size="2xl"
+              className="text-foreground flex items-center gap-3"
+            >
               <Users className="w-8 h-8 text-primary" />
               Usuários
             </Title>
@@ -139,7 +141,11 @@ export default function UsersList() {
 
           {canCreateUsers() && (
             <Link to="/users/cadastrar">
-              <Button testID="new-user" type="primary" className="shadow-primary">
+              <Button
+                testID="new-user"
+                type="primary"
+                className="shadow-primary"
+              >
                 <Plus className="w-5 h-5 mr-2" />
                 Novo Usuário
               </Button>
@@ -157,13 +163,13 @@ export default function UsersList() {
             <div className="flex-1">
               <Input
                 inputFieldProps={{
-                  testID: 'search-input',
-                  label: 'Buscar usuários',
+                  testID: "search-input",
+                  label: "Buscar usuários",
                   input: {
-                    placeholder: 'Digite o nome...',
+                    placeholder: "Digite o nome...",
                     value: search,
-                    onChange: (e) => setSearch(e.target.value)
-                  }
+                    onChange: (e) => setSearch(e.target.value),
+                  },
                 }}
                 leftIcon={<Search className="w-5 h-5 text-muted-foreground" />}
               />
@@ -259,7 +265,9 @@ export default function UsersList() {
                               >
                                 {canUpdateUsers() && (
                                   <button
-                                    onClick={() => navigate(`/users/${user.id}`)}
+                                    onClick={() =>
+                                      navigate(`/users/${user.id}`)
+                                    }
                                     className="flex items-center gap-2 w-full p-2 text-left hover:bg-muted rounded transition-colors"
                                   >
                                     <Edit className="w-4 h-4" />
@@ -294,9 +302,8 @@ export default function UsersList() {
                           </p>
                           <p className="text-muted-foreground text-sm">
                             {search
-                              ? 'Tente ajustar os filtros de busca'
-                              : 'Comece adicionando o primeiro usuário'
-                            }
+                              ? "Tente ajustar os filtros de busca"
+                              : "Comece adicionando o primeiro usuário"}
                           </p>
                         </div>
                         <Link to="/users/cadastrar">
@@ -316,7 +323,8 @@ export default function UsersList() {
           {total > 0 && pages > 1 && (
             <div className="flex items-center justify-between p-4 border-t border-border">
               <div className="text-sm text-muted-foreground">
-                Mostrando {((page - 1) * 10) + 1} até {Math.min(page * 10, total)} de {total} usuários
+                Mostrando {(page - 1) * 10 + 1} até {Math.min(page * 10, total)}{" "}
+                de {total} usuários
               </div>
 
               <div className="flex items-center gap-2">
@@ -359,8 +367,9 @@ export default function UsersList() {
                     Excluir Usuário
                   </h3>
                   <p className="text-muted-foreground mt-2">
-                    Tem certeza que deseja excluir o usuário <strong>{userToDelete?.name}</strong>?
-                    Esta ação não pode ser desfeita.
+                    Tem certeza que deseja excluir o usuário{" "}
+                    <strong>{userToDelete?.name}</strong>? Esta ação não pode
+                    ser desfeita.
                   </p>
                 </div>
 

@@ -1,13 +1,13 @@
 export enum ContractStatus {
-  ATIVO = 'ativo',
-  CANCELADO = 'cancelado',
-  FINALIZADO = 'finalizado'
+  ATIVO = "ativo",
+  CANCELADO = "cancelado",
+  FINALIZADO = "finalizado",
 }
 
 export enum PaymentMethod {
-  BOLETO = 'boleto',
-  CARTAO = 'cartao',
-  PIX = 'pix'
+  BOLETO = "boleto",
+  CARTAO = "cartao",
+  PIX = "pix",
 }
 
 export interface Contract {
@@ -29,8 +29,8 @@ export interface Contract {
   motorcycleId: string;
   clientId: string;
   // Relations
-  motorcycle?: import('./motorcycles').Motorcycle;
-  client?: import('./clients').Client;
+  motorcycle?: import("./motorcycles").Motorcycle;
+  client?: import("./clients").Client;
 }
 
 export interface ContractFilters {

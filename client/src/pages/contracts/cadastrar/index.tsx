@@ -1,29 +1,29 @@
-"use client"
+"use client";
 
-import { PaymentMethod, Client, Motorcycle, PaginatedResponse } from '@/types';
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { FileText, Save, ArrowLeft, AlertTriangle } from 'lucide-react';
-import { PermissionGuard } from '@/components/auth/PermissionGuard';
-import { PermissionResource, PermissionAction } from '@/types/permissions';
-import { Selectize } from '@/components/ui/Selectize';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useNavigate } from 'react-router-dom';
-import { Subtitle } from '@/components/ui/Subtitle';
-import { Textarea } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { Title } from '@/components/ui/Title';
-import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
-import { toast } from 'sonner';
-import api from '@/lib/api';
-import { z } from 'zod';
-import { getErrorMessage } from '@/lib/error-messages';
+import { PaymentMethod, Client, Motorcycle, PaginatedResponse } from "@/types";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { FileText, Save, ArrowLeft, AlertTriangle } from "lucide-react";
+import { PermissionGuard } from "@/components/auth/PermissionGuard";
+import { PermissionResource, PermissionAction } from "@/types/permissions";
+import { Selectize } from "@/components/ui/Selectize";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useNavigate } from "react-router-dom";
+import { Subtitle } from "@/components/ui/Subtitle";
+import { Textarea } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { Title } from "@/components/ui/Title";
+import { useForm } from "react-hook-form";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
+import api from "@/lib/api";
+import { z } from "zod";
+import { getErrorMessage } from "@/lib/error-messages";
 
 const contractSchema = z.object({
   observacao: z.string().optional(),
-  pagamento: z.string().min(1, 'Forma de pagamento é obrigatória'),
-  motorcycleId: z.string().min(1, 'Motocicleta é obrigatória'),
-  clientId: z.string().min(1, 'Cliente é obrigatório'),
+  pagamento: z.string().min(1, "Forma de pagamento é obrigatória"),
+  motorcycleId: z.string().min(1, "Motocicleta é obrigatória"),
+  clientId: z.string().min(1, "Cliente é obrigatório"),
 });
 
 type ContractForm = z.infer<typeof contractSchema>;
@@ -37,25 +37,25 @@ export default function CreateContractPage() {
     handleSubmit,
     formState: { errors },
     watch,
-    setValue
+    setValue,
   } = useForm<ContractForm>({
     resolver: zodResolver(contractSchema),
     defaultValues: {
-      pagamento: '',
-      motorcycleId: '',
-      clientId: ''
-    }
+      pagamento: "",
+      motorcycleId: "",
+      clientId: "",
+    },
   });
 
-  const watchedPagamento = watch('pagamento');
-  const watchedMotorcycleId = watch('motorcycleId');
-  const watchedClientId = watch('clientId');
+  const watchedPagamento = watch("pagamento");
+  const watchedMotorcycleId = watch("motorcycleId");
+  const watchedClientId = watch("clientId");
 
   const onSubmit = (data: ContractForm) => save(data);
 
   const { mutate: save, isPending: sending } = useMutation({
     mutationFn: async (values: ContractForm) => {
-      await api.post('/contract', {
+      await api.post("/contract", {
         observacao: values.observacao,
         pagamento: values.pagamento,
         motorcycleId: values.motorcycleId,
@@ -63,20 +63,22 @@ export default function CreateContractPage() {
       });
     },
     onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ['get-contracts'] });
-      queryClient.invalidateQueries({ queryKey: ['get-motorcycles'] });
-      toast.success('Contrato criado com sucesso!');
-      navigate('/contracts');
+      queryClient.invalidateQueries({ queryKey: ["get-contracts"] });
+      queryClient.invalidateQueries({ queryKey: ["get-motorcycles"] });
+      toast.success("Contrato criado com sucesso!");
+      navigate("/contracts");
     },
     onError(error: any) {
       toast.error(getErrorMessage(error));
-    }
+    },
   });
 
   const { data: clientsData } = useQuery({
-    queryKey: ['get-clients'],
+    queryKey: ["get-clients"],
     queryFn: async () => {
-      const { data } = await api.get<PaginatedResponse<Client>>('/clients?limit=9999&offset=0');
+      const { data } = await api.get<PaginatedResponse<Client>>(
+        "/clients?limit=9999&offset=0",
+      );
       return data.data;
     },
     refetchOnReconnect: false,
@@ -84,9 +86,11 @@ export default function CreateContractPage() {
   });
 
   const { data: motorcyclesData } = useQuery({
-    queryKey: ['get-motorcycles'],
+    queryKey: ["get-motorcycles"],
     queryFn: async () => {
-      const { data } = await api.get<PaginatedResponse<Motorcycle>>('/motorcycle?status=ativo&limit=9999&offset=0');
+      const { data } = await api.get<PaginatedResponse<Motorcycle>>(
+        "/motorcycle?status=ativo&limit=9999&offset=0",
+      );
       return data.data;
     },
     refetchOnReconnect: false,
@@ -111,7 +115,9 @@ export default function CreateContractPage() {
             </Subtitle>
           </div>
           <Link to="/contracts">
-            <Button testID="back-to-contracts" type="secondary">Voltar para Contratos</Button>
+            <Button testID="back-to-contracts" type="secondary">
+              Voltar para Contratos
+            </Button>
           </Link>
         </div>
       }
@@ -129,7 +135,10 @@ export default function CreateContractPage() {
           </Link>
 
           <div>
-            <Title size="2xl" className="text-foreground flex items-center gap-3">
+            <Title
+              size="2xl"
+              className="text-foreground flex items-center gap-3"
+            >
               <FileText className="w-8 h-8 text-primary" />
               Novo Contrato
             </Title>
@@ -154,23 +163,29 @@ export default function CreateContractPage() {
                 <Selectize
                   label="Cliente"
                   allOptions={[
-                    { text: 'Selecione um cliente', value: '' },
+                    { text: "Selecione um cliente", value: "" },
                     ...(clientsData?.map((client) => ({
                       text: `${client.fullName} - ${client.documento}`,
-                      value: client.id
-                    })) || [])
+                      value: client.id,
+                    })) || []),
                   ]}
-                  selectedOptions={watchedClientId ? [
-                    {
-                      text: clientsData?.find(c => c.id === watchedClientId)?.fullName || '',
-                      value: watchedClientId
-                    }
-                  ] : []}
+                  selectedOptions={
+                    watchedClientId
+                      ? [
+                          {
+                            text:
+                              clientsData?.find((c) => c.id === watchedClientId)
+                                ?.fullName || "",
+                            value: watchedClientId,
+                          },
+                        ]
+                      : []
+                  }
                   setSelectedOptions={(options) => {
                     if (options.length > 0 && options[0].value) {
-                      setValue('clientId', options[0].value)
+                      setValue("clientId", options[0].value);
                     } else {
-                      setValue('clientId', '')
+                      setValue("clientId", "");
                     }
                   }}
                   multiple={false}
@@ -183,23 +198,30 @@ export default function CreateContractPage() {
                 <Selectize
                   label="Motocicleta"
                   allOptions={[
-                    { text: 'Selecione uma motocicleta', value: '' },
+                    { text: "Selecione uma motocicleta", value: "" },
                     ...(motorcyclesData?.map((motorcycle) => ({
                       text: `${motorcycle.nome} - ${motorcycle.placa} - R$ ${(motorcycle.valor_venda / 100).toFixed(2)}`,
-                      value: motorcycle.id
-                    })) || [])
+                      value: motorcycle.id,
+                    })) || []),
                   ]}
-                  selectedOptions={watchedMotorcycleId ? [
-                    {
-                      text: motorcyclesData?.find(m => m.id === watchedMotorcycleId)?.nome || '',
-                      value: watchedMotorcycleId
-                    }
-                  ] : []}
+                  selectedOptions={
+                    watchedMotorcycleId
+                      ? [
+                          {
+                            text:
+                              motorcyclesData?.find(
+                                (m) => m.id === watchedMotorcycleId,
+                              )?.nome || "",
+                            value: watchedMotorcycleId,
+                          },
+                        ]
+                      : []
+                  }
                   setSelectedOptions={(options) => {
                     if (options.length > 0 && options[0].value) {
-                      setValue('motorcycleId', options[0].value)
+                      setValue("motorcycleId", options[0].value);
                     } else {
-                      setValue('motorcycleId', '')
+                      setValue("motorcycleId", "");
                     }
                   }}
                   multiple={false}
@@ -219,23 +241,31 @@ export default function CreateContractPage() {
                 <Selectize
                   label="Forma de Pagamento"
                   allOptions={[
-                    { text: 'Selecione...', value: '' },
-                    { text: 'PIX', value: PaymentMethod.PIX },
-                    { text: 'Cartão', value: PaymentMethod.CARTAO },
-                    { text: 'Boleto', value: PaymentMethod.BOLETO }
+                    { text: "Selecione...", value: "" },
+                    { text: "PIX", value: PaymentMethod.PIX },
+                    { text: "Cartão", value: PaymentMethod.CARTAO },
+                    { text: "Boleto", value: PaymentMethod.BOLETO },
                   ]}
-                  selectedOptions={watchedPagamento ? [
-                    {
-                      text: watchedPagamento === PaymentMethod.PIX ? 'PIX' :
-                        watchedPagamento === PaymentMethod.CARTAO ? 'Cartão' : 'Boleto',
-                      value: watchedPagamento
-                    }
-                  ] : []}
+                  selectedOptions={
+                    watchedPagamento
+                      ? [
+                          {
+                            text:
+                              watchedPagamento === PaymentMethod.PIX
+                                ? "PIX"
+                                : watchedPagamento === PaymentMethod.CARTAO
+                                  ? "Cartão"
+                                  : "Boleto",
+                            value: watchedPagamento,
+                          },
+                        ]
+                      : []
+                  }
                   setSelectedOptions={(options) => {
                     if (options.length > 0 && options[0].value) {
-                      setValue('pagamento', options[0].value as PaymentMethod)
+                      setValue("pagamento", options[0].value as PaymentMethod);
                     } else {
-                      setValue('pagamento', '' as any)
+                      setValue("pagamento", "" as any);
                     }
                   }}
                   multiple={false}
@@ -254,13 +284,13 @@ export default function CreateContractPage() {
               <div className="grid grid-cols-1 gap-6">
                 <Textarea
                   textareaFieldProps={{
-                    testID: 'observacao-textarea',
-                    label: 'Observações',
+                    testID: "observacao-textarea",
+                    label: "Observações",
                     textarea: {
-                      ...register('observacao'),
-                      placeholder: 'Observações adicionais sobre o contrato...',
-                      rows: 3
-                    }
+                      ...register("observacao"),
+                      placeholder: "Observações adicionais sobre o contrato...",
+                      rows: 3,
+                    },
                   }}
                   errorMessage={errors.observacao?.message}
                 />
