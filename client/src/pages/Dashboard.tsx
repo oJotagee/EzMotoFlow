@@ -95,29 +95,37 @@ export default function Dashboard() {
     monthlyGoal: 15000000,
   };
 
+  const sortDesc = <T extends { created_at: string }>(arr: T[]) =>
+    [...arr].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
   const recentActivities: RecentActivity[] = [
-    ...(contractsData?.data?.slice(0, 2).map(contract => ({
+    ...sortDesc(contractsData?.data ?? []).slice(0, 2).map(contract => ({
       id: contract.id,
       action: 'Novo contrato criado',
       client: contract.client?.fullName,
       motorcycle: contract.motorcycle?.nome,
       time: new Date(contract.created_at).toLocaleDateString('pt-BR'),
+      _sort: contract.created_at,
       value: formatCurrency(contract.valor)
-    })) || []),
-    ...(clientsData?.data?.slice(0, 1).map(client => ({
+    })),
+    ...sortDesc(clientsData?.data ?? []).slice(0, 1).map(client => ({
       id: client.id,
       action: 'Cliente cadastrado',
       client: client.fullName,
       time: new Date(client.created_at).toLocaleDateString('pt-BR'),
-    })) || []),
-    ...(motorcyclesData?.data?.slice(0, 1).map(motorcycle => ({
+      _sort: client.created_at,
+    })),
+    ...sortDesc(motorcyclesData?.data ?? []).slice(0, 1).map(motorcycle => ({
       id: motorcycle.id,
       action: 'Motocicleta adicionada',
       motorcycle: motorcycle.nome,
       time: new Date(motorcycle.created_at).toLocaleDateString('pt-BR'),
+      _sort: motorcycle.created_at,
       value: formatCurrency(motorcycle.valor_venda)
-    })) || [])
-  ].slice(0, 4);
+    }))
+  ]
+    .sort((a, b) => new Date((b as any)._sort).getTime() - new Date((a as any)._sort).getTime())
+    .slice(0, 4);
 
   const isLoading = usersLoading || clientsLoading || motorcyclesLoading || contractsLoading;
 
