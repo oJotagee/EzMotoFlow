@@ -45,8 +45,7 @@ export default function Dashboard() {
       const { data } = await api.get<PaginatedResponse<User>>('/users?limit=999&offset=0');
       return data;
     },
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
+    staleTime: 0,
   });
 
   const { data: clientsData, isLoading: clientsLoading } = useQuery({
@@ -55,8 +54,7 @@ export default function Dashboard() {
       const { data } = await api.get<PaginatedResponse<Client>>('/clients?limit=9999&offset=0');
       return data;
     },
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
+    staleTime: 0,
   });
 
   const { data: motorcyclesData, isLoading: motorcyclesLoading } = useQuery({
@@ -65,8 +63,7 @@ export default function Dashboard() {
       const { data } = await api.get<PaginatedResponse<Motorcycle>>('/motorcycle?limit=9999&offset=0');
       return data;
     },
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
+    staleTime: 0,
   });
 
   const { data: contractsData, isLoading: contractsLoading } = useQuery({
@@ -75,8 +72,7 @@ export default function Dashboard() {
       const { data } = await api.get<PaginatedResponse<Contract>>('/contract?limit=999&offset=0');
       return data;
     },
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
+    staleTime: 0,
   });
 
   const stats: DashboardStats = {
