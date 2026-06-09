@@ -3,11 +3,9 @@ import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
-  private transporter: nodemailer.Transporter;
-
-  constructor() {
+  private createTransporter() {
     const port = Number(process.env.SMTP_PORT) || 587;
-    this.transporter = nodemailer.createTransport({
+    return nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port,
       secure: port === 465,
@@ -18,6 +16,8 @@ export class EmailService {
       tls: {
         rejectUnauthorized: false,
       },
+      connectionTimeout: 10000,
+      socketTimeout: 10000,
     });
   }
 
@@ -45,6 +45,11 @@ export class EmailService {
       `,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    const transporter = this.createTransporter();
+    try {
+      await transporter.sendMail(mailOptions);
+    } finally {
+      transporter.close();
+    }
   }
 }
