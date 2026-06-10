@@ -21,7 +21,13 @@ import { getErrorMessage } from "@/lib/error-messages";
 const userSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
-  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+  password: z
+    .string()
+    .min(6, "Senha deve ter pelo menos 6 caracteres")
+    .regex(/[a-z]/, "Senha deve conter pelo menos uma letra minúscula")
+    .regex(/[A-Z]/, "Senha deve conter pelo menos uma letra maiúscula")
+    .regex(/[0-9]/, "Senha deve conter pelo menos um número")
+    .regex(/[^a-zA-Z0-9]/, "Senha deve conter pelo menos um símbolo"),
 });
 
 type UserForm = z.infer<typeof userSchema>;
@@ -157,7 +163,7 @@ export default function CreateUserPage() {
                   label: "Senha",
                   input: {
                     ...register("password"),
-                    placeholder: "Mínimo 6 caracteres",
+                    placeholder: "Ex: Senha@123",
                   },
                 }}
                 leftIcon={<Lock className="w-5 h-5 text-muted-foreground" />}
